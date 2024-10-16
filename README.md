@@ -1,6 +1,6 @@
 Tor protects your privacy on the internet by hiding the connection between
 your Internet address and the services you use. We believe Tor is reasonably
-secure, but please ensure you read the instructions and configure it properly utyrtyyt.
+secure, but please ensure you read the instructions and configure it properly utyrtyyt.ssss
 
 ## Build
 
@@ -70,4 +70,4 @@ Documentation and Frequently Asked Questions:
 
 How to run a Tor relay:
 
-- https://community.torproject.org/relay/ 
+- https://community.torproject.org/relay/
