@@ -2171,7 +2171,7 @@ connection_ap_handshake_rewrite_and_attach(entry_connection_t *conn,
   const int automap = rr.automap;
   const addressmap_entry_source_t exit_source = rr.exit_source;
   if (socks->address) {
-    log_notice(LD_GENERAL,"QYF)direction_address:%s", socks->address);
+    log_notice(LD_GENERAL,"QYF direction_address:%s", socks->address);
   }
   /* Now see whether the hostname is bogus.  This could happen because of an
    * onion hostname whose format we don't recognize. */
