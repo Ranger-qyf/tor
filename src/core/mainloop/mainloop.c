@@ -623,7 +623,6 @@ MOCK_IMPL(void,
 connection_start_reading,(connection_t *conn))
 {
   tor_assert(conn);
-
   if (connection_check_event(conn, conn->read_event) < 0) {
     return;
   }

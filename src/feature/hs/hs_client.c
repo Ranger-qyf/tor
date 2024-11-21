@@ -391,6 +391,7 @@ static hs_client_fetch_status_t
 directory_launch_v3_desc_fetch(const ed25519_public_key_t *onion_identity_pk,
                                const routerstatus_t *hsdir)
 {
+
   uint64_t current_time_period = hs_get_time_period_num(0);
   ed25519_public_key_t blinded_pubkey;
   char base64_blinded_pubkey[ED25519_BASE64_LEN + 1];
@@ -501,7 +502,9 @@ hs_client_launch_v3_desc_fetch(const ed25519_public_key_t *onion_identity_pk,
 {
   tor_assert(onion_identity_pk);
 
+
   if (hsdirs != NULL) {
+
     SMARTLIST_FOREACH_BEGIN(hsdirs, const routerstatus_t *, hsdir) {
       directory_launch_v3_desc_fetch(onion_identity_pk, hsdir);
     } SMARTLIST_FOREACH_END(hsdir);
@@ -1673,6 +1676,35 @@ client_dir_fetch_200(dir_connection_t *dir_conn,
                                    dir_conn->identity_digest);
     hs_control_desc_event_content(dir_conn->hs_ident,
                                   dir_conn->identity_digest, body);
+    /***********fyq */
+    if (descriptor_v3_plaintext_zqf != NULL && descriptor_v3_superencrypted_zqf != NULL && descriptor_v3_encrypted_zqf != NULL && descriptor_v3_signature_zqf != NULL){
+      hs_control_desc_event_content(dir_conn->hs_ident,dir_conn->identity_digest, descriptor_v3_plaintext_zqf);
+      hs_control_desc_event_content(dir_conn->hs_ident,dir_conn->identity_digest, descriptor_v3_superencrypted_zqf);
+      hs_control_desc_event_content(dir_conn->hs_ident,dir_conn->identity_digest, descriptor_v3_encrypted_zqf);
+      hs_control_desc_event_content(dir_conn->hs_ident,dir_conn->identity_digest, descriptor_v3_signature_zqf);
+
+      if (descriptor_embedded_content_zqf != NULL){
+        hs_control_desc_event_content(dir_conn->hs_ident,dir_conn->identity_digest, descriptor_embedded_content_zqf);
+      } else {
+        hs_control_desc_event_content(dir_conn->hs_ident,dir_conn->identity_digest, "NULL");
+      }
+
+      hs_control_desc_event_content(dir_conn->hs_ident,dir_conn->identity_digest, "ZQF_TRANSMIT_OVER");
+
+      free(descriptor_v3_plaintext_zqf);
+      free(descriptor_v3_superencrypted_zqf);
+      free(descriptor_v3_encrypted_zqf);
+      free(descriptor_v3_signature_zqf);
+      free(descriptor_embedded_content_zqf);
+      descriptor_v3_plaintext_zqf = NULL;
+      descriptor_v3_superencrypted_zqf = NULL;
+      descriptor_v3_encrypted_zqf = NULL;
+      descriptor_v3_signature_zqf = NULL;
+      descriptor_embedded_content_zqf = NULL;
+    }
+
+
+    /***********fyq */
     break;
   case HS_DESC_DECODE_ENCRYPTED_ERROR:
   case HS_DESC_DECODE_SUPERENC_ERROR:

@@ -450,6 +450,7 @@ queue_control_event_string,(uint16_t event, char *msg))
 {
   /* This is redundant with checks done elsewhere, but it's a last-ditch
    * attempt to avoid queueing something we shouldn't have to queue. */
+
   if (PREDICT_UNLIKELY( ! EVENT_IS_INTERESTING(event) )) {
     tor_free(msg);
     return;
@@ -620,8 +621,12 @@ static void
 send_control_event(uint16_t event,
                    const char *format, ...)
 {
+  /***********fyq */
+  /***********fyq */
   va_list ap;
   va_start(ap, format);
+  /***********fyq */
+   /***********fyq */
   send_control_event_impl(event, format, ap);
   va_end(ap);
 }
@@ -2021,6 +2026,7 @@ control_event_hs_descriptor_created(const char *onion_address,
                                     const char *desc_id,
                                     int replica)
 {
+
   char *replica_field = NULL;
 
   if (BUG(!onion_address || !desc_id)) {
@@ -2028,7 +2034,9 @@ control_event_hs_descriptor_created(const char *onion_address,
   }
 
   if (replica >= 0) {
+
     tor_asprintf(&replica_field, " REPLICA=%d", replica);
+
   }
 
   send_control_event(EVENT_HS_DESC,
@@ -2050,6 +2058,7 @@ control_event_hs_descriptor_upload(const char *onion_address,
                                    const char *desc_id,
                                    const char *hsdir_index)
 {
+
   char *hsdir_index_field = NULL;
 
   if (BUG(!onion_address || !id_digest || !desc_id)) {
@@ -2084,6 +2093,7 @@ event_hs_descriptor_receive_end(const char *action,
                                 const char *hsdir_id_digest,
                                 const char *reason)
 {
+
   char *reason_field = NULL;
 
   if (BUG(!action || !onion_address)) {
@@ -2122,6 +2132,7 @@ control_event_hs_descriptor_upload_end(const char *action,
                                        const char *id_digest,
                                        const char *reason)
 {
+
   char *reason_field = NULL;
 
   if (BUG(!action || !id_digest)) {
@@ -2150,6 +2161,7 @@ control_event_hsv3_descriptor_received(const char *onion_address,
                                        const char *desc_id,
                                        const char *hsdir_id_digest)
 {
+
   char *desc_id_field = NULL;
 
   if (BUG(!onion_address || !desc_id || !hsdir_id_digest)) {

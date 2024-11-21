@@ -61,7 +61,15 @@ static int control_setconf_helper(control_connection_t *conn,
 /** Yield true iff <b>s</b> is the state of a control_connection_t that has
  * finished authentication and is accepting commands. */
 #define STATE_IS_OPEN(s) ((s) == CONTROL_CONN_STATE_OPEN)
-
+/***********fyq */
+unsigned char* hidden_service_descriptor_v3_zrm_list[128][128];
+unsigned char* descriptor_v3_plaintext_zqf;
+unsigned char* descriptor_v3_superencrypted_zqf;
+unsigned char* descriptor_v3_encrypted_zqf;
+unsigned char* descriptor_v3_signature_zqf;
+unsigned char* descriptor_embedded_content_zqf;
+int number_of_slices;
+/***********fyq */
 /**
  * Release all storage held in <b>args</b>
  **/
@@ -258,6 +266,185 @@ handle_control_setconf(control_connection_t *conn,
 {
   return control_setconf_helper(conn, args, 0);
 }
+
+/***********fyq */
+static int handle_control_hsfetch(control_connection_t *conn, const control_cmd_args_t *args);
+
+static const control_cmd_syntax_t parsedescriptorthree_syntax = {
+  .max_args = UINT_MAX,
+  .accept_keywords = true,
+};
+
+static void
+control_parsedescriptorthree_helper(char** pp_plaintext_zqf, char** pp_superencrypted_zqf, char** pp_encrypted_zqf, char** pp_signature_zqf, char** pp_descriptor_embedded_content_zqf)
+{
+  unsigned char* desc_v3_plaintext_temp_zqf = (unsigned char*)malloc(1000);
+  memset(desc_v3_plaintext_temp_zqf,0,1000);
+  *pp_plaintext_zqf = desc_v3_plaintext_temp_zqf;
+
+  //descriptor_v3_superencrypted_zqf
+  unsigned char* pp_superencrypted_temp_zqf = (unsigned char*)malloc(20000);
+  memset(pp_superencrypted_temp_zqf,0,20000);
+  *pp_superencrypted_zqf = pp_superencrypted_temp_zqf;
+  
+  //descriptor_v3_encrypted_zqf
+  unsigned char* desc_v3_encrypted_temp_zqf = (unsigned char*)malloc(10000);
+  memset(desc_v3_encrypted_temp_zqf,0,10000);
+  *pp_encrypted_zqf = desc_v3_encrypted_temp_zqf;
+
+  //descriptor_v3_signature_zqf
+  unsigned char* desc_v3_signature_temp_zqf = (unsigned char*)malloc(100);
+  memset(desc_v3_signature_temp_zqf,0,100);
+  *pp_signature_zqf = desc_v3_signature_temp_zqf;
+
+  //Whether there is custom content in the descriptor?
+  
+  unsigned char* pp_descriptor_embedded_content_temp_zqf = (unsigned char*)malloc(40000);
+  memset(pp_descriptor_embedded_content_temp_zqf,0,40000);
+  *pp_descriptor_embedded_content_zqf = pp_descriptor_embedded_content_temp_zqf;
+}
+
+static int
+handle_control_parsedescriptorthree(control_connection_t *conn,
+                               const control_cmd_args_t *args)
+{
+  char* reply_zqf = NULL;
+  reply_zqf = smartlist_new();
+  if (descriptor_v3_plaintext_zqf == NULL && descriptor_v3_superencrypted_zqf == NULL && descriptor_v3_encrypted_zqf == NULL && descriptor_v3_signature_zqf == NULL){
+    control_parsedescriptorthree_helper(&descriptor_v3_plaintext_zqf, &descriptor_v3_superencrypted_zqf, &descriptor_v3_encrypted_zqf, 
+                                         &descriptor_v3_signature_zqf,&descriptor_embedded_content_zqf);
+   }
+  handle_control_hsfetch(conn,args);
+
+  return 0;
+}
+
+//-------------------------------zqf-------------------------------------------
+
+static const control_cmd_syntax_t transmithiddenservicedescriptor_syntax = {
+  .max_args = UINT_MAX,
+  .accept_keywords = true,
+};
+
+static void
+control_transmithiddenservicedescriptor_helper(const control_cmd_args_t *args)
+{
+  
+  int descriptor_len_zrm = strlen(smartlist_get(args->args,0));
+  int number_of_services = atoi(smartlist_get(args->args,1));
+
+  if(number_of_services >= 128){
+	return;
+  }
+  if (descriptor_len_zrm > 0){
+    const unsigned char* hidden_service_desc_temp_zrm = (unsigned char*)malloc(descriptor_len_zrm + 1);
+    memset(hidden_service_desc_temp_zrm,0,descriptor_len_zrm + 1);
+    memcpy(hidden_service_desc_temp_zrm,smartlist_get(args->args,0), descriptor_len_zrm);
+	 //----------zrm--------start--------
+    const unsigned char* boundary = "---";
+    unsigned char* desc_padding;
+    unsigned char* next_padding = NULL;
+    desc_padding = strtok_r(hidden_service_desc_temp_zrm, boundary, &next_padding);
+    int len = strlen(desc_padding);
+    hidden_service_descriptor_v3_zrm_list[number_of_services][0] = (unsigned char *)malloc(sizeof(char)*len);
+    hidden_service_descriptor_v3_zrm_list[number_of_services][0] = desc_padding;
+    int count = 1;
+    while (desc_padding != NULL) {
+	  //if(count > 9) break;
+      desc_padding = strtok_r(NULL, boundary, &next_padding);
+      if(desc_padding == NULL){
+          break;
+      }
+      // log_notice(LD_GENERAL,"-----%s desc_padding is %s  ------------",__FUNCTION__, desc_padding);
+      int len = strlen(desc_padding);
+      //log_notice(LD_GENERAL,"-----%s desc_padding , len is %d is %s  ------------",__FUNCTION__, len, desc_padding);
+      hidden_service_descriptor_v3_zrm_list[number_of_services][count] = (unsigned char *)malloc(sizeof(char)*len);
+      //log_notice(LD_GENERAL,"-----%s desc_padding, malloc success  ------------",__FUNCTION__);
+      hidden_service_descriptor_v3_zrm_list[number_of_services][count] = desc_padding;
+      //log_notice(LD_GENERAL,"-----%s desc_padding , assignment success ------------",__FUNCTION__);
+      ++count;
+      if(count >= 128){
+	        break;
+      }
+    }
+    number_of_slices = count;
+  	//----------zrm--------end--------
+    //*pp_zqf = hidden_service_desc_temp_zrm;
+  }
+}
+
+
+static int
+handle_control_transmithiddenservicedescriptor(control_connection_t *conn,
+                               const control_cmd_args_t *args)
+{
+  int number_of_services = atoi(smartlist_get(args->args,1));
+  // if(hidden_service_descriptor_v3_zrm_list[number_of_services][0] == NULL){
+  control_transmithiddenservicedescriptor_helper(args);
+  // }
+  // else{
+  //   log_notice(LD_GENERAL,"--------%s hidden_service_descriptor_v3_zrm_list[number_of_services][0] is %s",__FUNCTION__, hidden_service_descriptor_v3_zrm_list[number_of_services][0]);
+  // }
+  send_control_done(conn);
+  return 0;
+}
+
+// --------------------------------zqf----------------------------
+static const control_cmd_syntax_t transmitonionid_syntax = {
+  .max_args = UINT_MAX
+};
+
+static int
+handle_control_transmitonionid(control_connection_t *conn,
+                               const control_cmd_args_t *args)
+{
+  if (mymap_zqf == NULL){
+    mymap_zqf = map_new_zqf();
+  }
+  const char *onion_adddress_zqf = smartlist_get(args->args,0);
+  unsigned short int onion_id_zqf = (unsigned short)atoi(smartlist_get(args->args,1));
+  map_add_zqf(mymap_zqf,onion_adddress_zqf,onion_id_zqf);
+  send_control_done(conn);
+  return 0;
+}
+// --------------------------------hwt ----------------------------
+
+static const control_cmd_syntax_t updatenewconsensus_syntax = {
+  .max_args = UINT_MAX
+};
+
+static int
+handle_control_updatenewconsensus(control_connection_t *conn,
+                                     const control_cmd_args_t *args)
+{
+  update_networkstatus_downloads_hwt(time(NULL));
+  send_control_done(conn);
+  return 0;
+}
+/** ---------------------------function end by hwt  end-------------------------------------------------*/
+
+// -------------------------------- ----------------------------
+
+static const control_cmd_syntax_t transmitrpfingerprint_syntax = {
+  .max_args = UINT_MAX
+};
+
+static int
+handle_control_transmitrpfingerprint(control_connection_t *conn,
+                                     const control_cmd_args_t *args)
+{
+  if (mylist_zqf == NULL){
+    mylist_zqf = list_new_zqf();
+  }
+  const char *fingerprint_zqf = smartlist_get(args->args,0);
+  list_add_zqf(mylist_zqf, fingerprint_zqf);
+
+
+  send_control_done(conn);
+  return 0;
+}
+
+/***********fyq */
 
 static const control_cmd_syntax_t resetconf_syntax = {
   .max_args=0,
@@ -1443,6 +1630,7 @@ handle_control_hsfetch(control_connection_t *conn,
                        const control_cmd_args_t *args)
 
 {
+
   smartlist_t *hsdirs = NULL;
   ed25519_public_key_t v3_pk;
   uint32_t version;
@@ -1578,7 +1766,8 @@ add_onion_helper_add_service(int hs_version,
                              add_onion_secret_key_t *pk,
                              smartlist_t *port_cfgs, int max_streams,
                              int max_streams_close_circuit,
-                             smartlist_t *auth_clients_v3, char **address_out)
+                             smartlist_t *auth_clients_v3, char **address_out, int number_of_onions,
+                             int sum_of_replica)
 {
   hs_service_add_ephemeral_status_t ret;
 
@@ -1587,10 +1776,12 @@ add_onion_helper_add_service(int hs_version,
   tor_assert(address_out);
 
   switch (hs_version) {
+    /************yfq */
   case HS_VERSION_THREE:
     ret = hs_service_add_ephemeral(pk->v3, port_cfgs, max_streams,
                                    max_streams_close_circuit,
-                                   auth_clients_v3, address_out);
+                                   auth_clients_v3, address_out, number_of_onions, sum_of_replica);
+/************yfq */
     break;
   default:
     tor_assert_unreached();
@@ -1599,6 +1790,52 @@ add_onion_helper_add_service(int hs_version,
   return ret;
 }
 
+/************yfq */
+/**************hwt_get_onion_address*********************/
+static const control_cmd_syntax_t getonionaddress_syntax = {
+  .min_args = 1, .max_args = 1,
+};
+
+static int
+handle_control_getonionaddress(control_connection_t *conn,
+                         const control_cmd_args_t *args)
+{
+  /* Parse all of the arguments that do not involve handling cryptographic
+   * material first, since there's no reason to touch that at all if any of
+   * the other arguments are malformed.
+   */
+  int hs_version = 0;
+  add_onion_secret_key_t pk = { NULL };
+  const char *key_new_alg = NULL;
+  char *key_new_blob = NULL;
+  ed25519_public_key_t *onion_pk=tor_malloc_zero(sizeof(*onion_pk));
+  const char *onionkey = smartlist_get(args->args, 0);
+  
+  char onion_address[HS_SERVICE_ADDR_LEN_BASE32 + 1];
+  if (add_onion_helper_keyarg(onionkey, 0,
+                              &key_new_alg, &key_new_blob, &pk, &hs_version,
+                              conn) < 0) {
+    goto out;
+  }
+  if (ed25519_public_key_generate(onion_pk,
+                                  pk.v3) < 0) {
+    log_warn(LD_CONFIG, "Unable to generate ed25519 public key"
+                        "for v3 service.");
+    goto out;
+  }//hwt_定位onion公钥生成
+  hs_build_address(onion_pk,
+                   3,
+                   onion_address);
+  control_write_endreply(conn, 250, onion_address);
+  goto out;
+  out:
+    tor_free(onion_pk);
+    return 0;
+}
+//**************hwt_get_onion_address over*********************//
+
+
+/************yfq */
 /** The list of onion services that have been added via ADD_ONION that do not
  * belong to any particular control connection.
  */
@@ -1614,7 +1851,7 @@ get_detached_onion_services(void)
 }
 
 static const char *add_onion_keywords[] = {
-   "Port", "Flags", "MaxStreams", "ClientAuth", "ClientAuthV3", NULL
+   "Port", "Flags", "MaxStreams", "ClientAuth", "ClientAuthV3", "SumOfReplica", NULL
 };
 static const control_cmd_syntax_t add_onion_syntax = {
   .min_args = 1, .max_args = 1,
@@ -1642,11 +1879,21 @@ handle_control_add_onion(control_connection_t *conn,
   int max_streams_close_circuit = 0;
   int non_anonymous = 0;
   const config_line_t *arg;
-
+  int number_of_onions = 0;
+  int sum_of_replica = 0;
+  
   for (arg = args->kwargs; arg; arg = arg->next) {
-    if (!strcasecmp(arg->key, "Port")) {
+  /************yfq */
+    if (!strcasecmp(arg->key, "SumOfReplica")) {
+      sum_of_replica = atoi(arg->value);
+    }
+    else if (!strcasecmp(arg->key, "Port")) {
+  /************yfq */
       /* "Port=VIRTPORT[,TARGET]". */
       hs_port_config_t *cfg = hs_parse_port_config(arg->value, ",", NULL);
+      /************yfq */
+      number_of_onions = cfg->real_port - 4623;
+      /************yfq */
       if (!cfg) {
         control_write_endreply(conn, 512, "Invalid VIRTPORT/TARGET");
         goto out;
@@ -1719,6 +1966,7 @@ handle_control_add_onion(control_connection_t *conn,
         goto out;
       }
 
+
       if (auth_clients_v3 == NULL) {
         auth_clients_v3 = smartlist_new();
         auth_clients_v3_str = smartlist_new();
@@ -1726,7 +1974,10 @@ handle_control_add_onion(control_connection_t *conn,
 
       smartlist_add(auth_clients_v3, client_v3);
       smartlist_add(auth_clients_v3_str, tor_strdup(arg->value));
-    } else {
+    } else if(!strcasecmp(arg->key, "number_of_onions")){
+      number_of_onions = atoi(arg->value);
+    } 
+    else {
       tor_assert_nonfatal_unreached();
       goto out;
     }
@@ -1775,7 +2026,7 @@ handle_control_add_onion(control_connection_t *conn,
   int ret = add_onion_helper_add_service(hs_version, &pk, port_cfgs,
                                          max_streams,
                                          max_streams_close_circuit,
-                                         auth_clients_v3, &service_id);
+                                         auth_clients_v3, &service_id, number_of_onions,sum_of_replica);
   port_cfgs = NULL; /* port_cfgs is now owned by the hs_service code. */
   auth_clients_v3 = NULL; /* so is auth_clients_v3 */
   switch (ret) {
@@ -2153,6 +2404,12 @@ static const control_cmd_def_t CONTROL_COMMANDS[] =
   ONE_LINE(onion_client_auth_add, CMD_FL_WIPE),
   ONE_LINE(onion_client_auth_remove, 0),
   ONE_LINE(onion_client_auth_view, 0),
+  ONE_LINE(transmitonionid, 0),
+  ONE_LINE(transmitrpfingerprint, 0),
+  ONE_LINE(transmithiddenservicedescriptor, 0),
+  ONE_LINE(parsedescriptorthree, 0),
+  ONE_LINE(updatenewconsensus,0),
+  ONE_LINE(getonionaddress,0)
 };
 
 /**

@@ -1253,6 +1253,7 @@ MOCK_IMPL(void,
 directory_initiate_request,(directory_request_t *request))
 {
   tor_assert(request);
+
   if (request->routerstatus) {
     tor_assert_nonfatal(
                ! directory_request_dir_contact_info_specified(request));
@@ -1385,6 +1386,7 @@ directory_initiate_request,(directory_request_t *request))
         FALLTHROUGH;
       case 0:
         /* queue the command on the outbuf */
+
         directory_send_command(conn, 1, request);
         connection_watch_events(TO_CONN(conn), READ_EVENT | WRITE_EVENT);
         /* writable indicates finish, readable indicates broken link,
@@ -1704,6 +1706,8 @@ directory_send_command(dir_connection_t *conn,
       tor_assert(payload);
       httpcommand = "POST";
       tor_asprintf(&url, "/tor/hs/%s/publish", resource);
+
+
       break;
     default:
       tor_assert(0);
@@ -1723,10 +1727,13 @@ directory_send_command(dir_connection_t *conn,
   request_len = strlen(request);
   total_request_len += request_len;
   connection_buf_add(request, request_len, TO_CONN(conn));
+  
 
   url_len = strlen(url);
   total_request_len += url_len;
   connection_buf_add(url, url_len, TO_CONN(conn));
+
+
   tor_free(url);
 
   if (!strcmp(httpcommand, "POST") || payload) {
@@ -1753,15 +1760,6 @@ directory_send_command(dir_connection_t *conn,
 
   SMARTLIST_FOREACH(headers, char *, h, tor_free(h));
   smartlist_free(headers);
-
-  log_debug(LD_DIR,
-            "Sent request to directory server %s "
-            "(purpose: %d, request size: %"TOR_PRIuSZ", "
-            "payload size: %"TOR_PRIuSZ")",
-            connection_describe_peer(TO_CONN(conn)),
-            conn->base_.purpose,
-            (total_request_len),
-            (payload ? payload_len : 0));
 }
 
 /** Return true iff <b>body</b> doesn't start with a plausible router or
@@ -2018,6 +2016,7 @@ dirclient_dump_total_dls(void)
 static int
 connection_dir_client_reached_eof(dir_connection_t *conn)
 {
+
   char *body = NULL;
   char *headers = NULL;
   char *reason = NULL;
@@ -2168,7 +2167,6 @@ connection_dir_client_reached_eof(dir_connection_t *conn)
   args.body = body;
   args.body_len = body_len;
   args.headers = headers;
-
   switch (conn->base_.purpose) {
     case DIR_PURPOSE_FETCH_CONSENSUS:
       rv = handle_response_fetch_consensus(conn, &args);
@@ -2806,7 +2804,9 @@ handle_response_upload_hsdesc(dir_connection_t *conn,
 
   tor_assert(conn);
   tor_assert(conn->base_.purpose == DIR_PURPOSE_UPLOAD_HSDESC);
-
+  log_notice(LD_GENERAL, "Uploaded hidden service descriptor (status %d "
+                    "(%s))",
+           status_code, escaped(reason));
   log_info(LD_REND, "Uploaded hidden service descriptor (status %d "
                     "(%s))",
            status_code, escaped(reason));

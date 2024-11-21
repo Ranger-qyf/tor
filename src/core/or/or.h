@@ -70,6 +70,33 @@
 // These, more than other includes, are for keeping the other struct
 // definitions working. We should remove them when we minimize our includes.
 #include "core/or/entry_port_cfg_st.h"
+/***********fyq */
+static MyList_zqf* mymap_zqf;   // ----------------------------------------------------------------
+
+static MyList_zqf* mylist_zqf;  // ------------------------------------------------------------------
+
+
+/*
+//smartlist_t * hidden_service_descriptor_v3_zqf;
+// unsigned char* hidden_service_descriptor_v3_zqf;
+*/
+#ifndef OR_H
+#define OR_H
+
+// 声明全局变量
+extern unsigned char* hidden_service_descriptor_v3_zrm_list[128][128];
+extern unsigned char* descriptor_v3_plaintext_zqf;
+extern unsigned char* descriptor_v3_superencrypted_zqf;
+extern unsigned char* descriptor_v3_encrypted_zqf;
+extern unsigned char* descriptor_v3_signature_zqf;
+extern unsigned char* descriptor_embedded_content_zqf;
+extern int number_of_slices;
+#endif // GLOBAL_H
+
+
+// *number_of_slices = 2;
+#define MAX_NUM_OF_DESCRIPTOR_PER_SERVICE_ZRM 128
+/***********fyq */
 
 struct ed25519_public_key_t;
 struct curve25519_public_key_t;

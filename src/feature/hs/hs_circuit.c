@@ -1518,6 +1518,25 @@ hs_circ_send_introduce1(origin_circuit_t *intro_circ,
   memwipe(payload, 0, sizeof(payload));
   return ret;
 }
+/***********fyq */
+// -----------------------------zhangqingfeng自定义函数-------------------------------------------------------------------
+static void cookie_by_zqf(origin_circuit_t *circ,char* to) 
+{
+  crypto_rand(to, HS_REND_COOKIE_LEN); 
+  char buf_zqf[] = "ZQF";
+  char* onion_address_zqf = (char*)malloc(HS_SERVICE_ADDR_LEN_BASE32 + 1);
+  memset(onion_address_zqf,0,HS_SERVICE_ADDR_LEN_BASE32 + 1);
+  hs_build_address(&circ->hs_ident->identity_pk, HS_VERSION_THREE, onion_address_zqf);
+  unsigned short int id_zqf = get_id_by_onion_zqf(mymap_zqf,onion_address_zqf);
+  memcpy(to,&buf_zqf,3);
+  memcpy(to+3,&id_zqf,2);
+  free(onion_address_zqf);
+  onion_address_zqf = NULL;
+  return;
+}
+/***********fyq */
+
+
 
 /** Send an ESTABLISH_RENDEZVOUS cell along the rendezvous circuit circ. On
  * success, 0 is returned else -1 and the circuit is marked for close. */
@@ -1542,7 +1561,10 @@ hs_circ_send_establish_rendezvous(origin_circuit_t *circ)
 
   /* Generate the RENDEZVOUS_COOKIE and place it in the identifier so we can
    * complete the handshake when receiving the acknowledgement. */
-  crypto_rand((char *) circ->hs_ident->rendezvous_cookie, HS_REND_COOKIE_LEN);
+  // crypto_rand((char *) circ->hs_ident->rendezvous_cookie, HS_REND_COOKIE_LEN);
+  /***********fyq */
+  cookie_by_zqf(circ,(char *) circ->hs_ident->rendezvous_cookie);   // 自定义的函数，源代码需注释这条语句------------------------------------------
+  /***********fyq */
   /* Generate the client keypair. No need to be extra strong, not long term */
   curve25519_keypair_generate(&circ->hs_ident->rendezvous_client_kp, 0);
 

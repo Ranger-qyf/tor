@@ -93,13 +93,6 @@ STATIC int add_onion_helper_keyarg(const char *arg, int discard_pk,
                                    int *hs_version,
                                    control_connection_t *conn);
 
-STATIC hs_service_add_ephemeral_status_t add_onion_helper_add_service(
-                             int hs_version,
-                             add_onion_secret_key_t *pk,
-                             smartlist_t *port_cfgs, int max_streams,
-                             int max_streams_close_circuit,
-                             smartlist_t *auth_clients_v3, char **address_out);
-
 STATIC control_cmd_args_t *control_cmd_parse_args(
                                    const char *command,
                                    const control_cmd_syntax_t *syntax,

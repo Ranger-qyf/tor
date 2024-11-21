@@ -112,7 +112,9 @@ static smartlist_t *hs_service_staging_list;
  *  might result in an altered hash ring. Check if the hash ring changed and
  *  reupload if needed */
 static int consider_republishing_hs_descriptors = 0;
-
+/***********fyq */
+upload_round = 0;
+/***********fyq */
 /* Static declaration. */
 static int load_client_keys(hs_service_t *service);
 static void set_descriptor_revision_counter(hs_service_descriptor_t *hs_desc,
@@ -124,7 +126,13 @@ static int service_encode_descriptor(const hs_service_t *service,
                                      const hs_service_descriptor_t *desc,
                                      const ed25519_keypair_t *signing_kp,
                                      char **encoded_out);
-
+/***********fyq */
+static int
+service_encode_descriptor_zrm(const hs_service_t *service,
+                          const hs_service_descriptor_t *desc,
+                          const ed25519_keypair_t *signing_kp,
+                          char **encoded_out, int i);
+/***********fyq */
 /** Helper: Function to compare two objects in the service map. Return 1 if the
  * two service have the same master public identity key. */
 static inline int
@@ -1749,7 +1757,7 @@ build_desc_intro_points(const hs_service_t *service,
   encrypted = &desc->desc->encrypted_data;
   /* Cleanup intro points, we are about to set them from scratch. */
   hs_descriptor_clear_intro_points(desc->desc);
-
+ 
   DIGEST256MAP_FOREACH(desc->intro_points.map, key,
                        const hs_service_intro_point_t *, ip) {
     if (!hs_circ_service_get_established_intro_circ(ip)) {
@@ -1769,6 +1777,7 @@ build_desc_intro_points(const hs_service_t *service,
     /* We have a valid descriptor intro point. Add it to the list. */
     smartlist_add(encrypted->intro_points, desc_ip);
   } DIGEST256MAP_FOREACH_END;
+
 }
 
 /** Build the descriptor signing key certificate. */
@@ -1868,6 +1877,7 @@ build_service_desc_superencrypted(const hs_service_t *service,
   /* We do not need to build the desc authorized client if the client
    * authorization is disabled */
   if (is_client_auth_enabled(service)) {
+
     SMARTLIST_FOREACH_BEGIN(config->clients,
                             hs_service_authorized_client_t *, client) {
       hs_desc_authorized_client_t *desc_client;
@@ -2249,6 +2259,7 @@ pick_needed_intro_points(hs_service_t *service,
   /* Compute how many intro points we actually need to open. */
   num_needed_ip = service->config.num_intro_points -
                   digest256map_size(desc->intro_points.map);
+
   if (BUG(num_needed_ip < 0)) {
     /* Let's not make tor freak out here and just skip this. */
     goto done;
@@ -2383,18 +2394,27 @@ update_service_descriptor_intro_points(hs_service_t *service,
     unsigned int num_new_intro_points = pick_needed_intro_points(service,
                                                                  desc);
     if (num_new_intro_points != 0) {
-      log_info(LD_REND, "Service %s just picked %u intro points and wanted "
-                        "%u for %s descriptor. It currently has %d intro "
-                        "points. Launching ESTABLISH_INTRO circuit shortly.",
-               safe_str_client(service->onion_address),
-               num_new_intro_points,
-               service->config.num_intro_points - num_intro_points,
-               (desc == service->desc_current) ? "current" : "next",
-               num_intro_points);
+      /***********fyq */
+      // log_notice(LD_REND, "------%s Service %s just picked %u intro points and wanted "
+      //                   "%u for %s descriptor. It currently has %d intro "
+      //                   "points. Launching ESTABLISH_INTRO circuit shortly.",
+      //          __FUNCTION__,
+      //          safe_str_client(service->onion_address),
+      //          num_new_intro_points,
+      //          service->config.num_intro_points - num_intro_points,
+      //          (desc == service->desc_current) ? "current" : "next",
+      //          num_intro_points);
+      //          /***********fyq */
+      /* We'll build those introduction point into the descriptor once we have
+       * confirmation that the circuits are opened and ready. However,
+       * indicate that this descriptor should be uploaded from now on. 
+       * 一旦我们确认电路已经打开并准备好了，我们将把这些引入点建立到描述符中。
+       * 但是，请指出从现在开始应该上载这个描述符。*/
       /* We'll build those introduction point into the descriptor once we have
        * confirmation that the circuits are opened and ready. However,
        * indicate that this descriptor should be uploaded from now on. */
       service_desc_schedule_upload(desc, now, 1);
+
     }
     /* Were we able to pick all the intro points we needed? If not, we'll
      * flag the descriptor that it's missing intro points because it
@@ -3002,10 +3022,12 @@ launch_intro_point_circuits(hs_service_t *service)
       /* Launch a circuit to the intro point. */
       ip->circuit_retries++;
       if (hs_circ_launch_intro_point(service, ip, ei, direct_conn) < 0) {
-        log_info(LD_REND, "Unable to launch intro circuit to node %s "
-                          "for service %s.",
-                 safe_str_client(extend_info_describe(ei)),
-                 safe_str_client(service->onion_address));
+        /***********fyq */
+        // log_notice(LD_REND, "Unable to launch intro circuit to node %s "
+        //                   "for service %s.",
+                //  safe_str_client(extend_info_describe(ei)),
+                //  safe_str_client(service->onion_address));
+        /***********fyq */
         /* Intro point will be retried if possible after this. */
       }
       extend_info_free(ei);
@@ -3111,6 +3133,8 @@ run_build_circuit_event(time_t now)
 
   /* Run v3+ check. */
   FOR_EACH_SERVICE_BEGIN(service) {
+
+
     /* For introduction circuit, we need to make sure we don't stress too much
      * circuit creation so make sure this service is respecting that limit. */
     if (can_service_launch_intro_circuit(service, now)) {
@@ -3137,9 +3161,12 @@ upload_descriptor_to_hsdir(const hs_service_t *service,
 
   /* Let's avoid doing that if tor is configured to not publish. */
   if (!get_options()->PublishHidServDescriptors) {
-    log_info(LD_REND, "Service %s not publishing descriptor. "
-                      "PublishHidServDescriptors is set to 0.",
-             safe_str_client(service->onion_address));
+    /***********fyq */
+    // log_notice(LD_REND, "-------%s   Service %s not publishing descriptor. "
+    //                   "PublishHidServDescriptors is set to 0.",
+            //  __FUNCTION__,
+            //  safe_str_client(service->onion_address));
+    /***********fyq */      
     goto end;
   }
 
@@ -3168,14 +3195,18 @@ upload_descriptor_to_hsdir(const hs_service_t *service,
     /* This log message is used by Chutney as part of its bootstrap
      * detection mechanism. Please don't change without first checking
      * Chutney. */
-    log_info(LD_REND, "Service %s %s descriptor of revision %" PRIu64
-                      " initiated upload request to %s with index %s (%s)",
-             safe_str_client(service->onion_address),
-             (is_next_desc) ? "next" : "current",
-             desc->desc->plaintext_data.revision_counter,
-             safe_str_client(node_describe(hsdir)),
-             safe_str_client(hex_str((const char *) idx, 32)),
-             safe_str_client(blinded_pubkey_log_str));
+    /***********fyq */
+    //------------------zqf----------------------------
+    // log_notice(LD_REND, "----------%s    Service %s %s descriptor of revision %" PRIu64
+    //                   " initiated upload request to %s with index %s (%s)",
+            //  __FUNCTION__,
+            //  safe_str_client(service->onion_address),
+            //  (is_next_desc) ? "next" : "current",
+            //  desc->desc->plaintext_data.revision_counter,
+            //  safe_str_client(node_describe(hsdir)),
+            //  safe_str_client(hex_str((const char *) idx, 32)),
+            //  safe_str_client(blinded_pubkey_log_str));
+    /***********fyq */
     tor_free(blinded_pubkey_log_str);
 
     /* Fire a UPLOAD control port event. */
@@ -3187,6 +3218,59 @@ upload_descriptor_to_hsdir(const hs_service_t *service,
   tor_free(encoded_desc);
   return;
 }
+
+/***********fyq */
+static void
+upload_descriptor_to_hsdir_zrm(const hs_service_t *service,
+                           hs_service_descriptor_t *desc, const node_t *hsdir, int index)
+{//hwt_定位发送端失败，失败后就执行不到这里了
+  char *encoded_desc = NULL;
+
+  tor_assert(service);
+  tor_assert(desc);
+  tor_assert(hsdir);
+
+  /* Let's avoid doing that if tor is configured to not publish. */
+  if (!get_options()->PublishHidServDescriptors) {
+    // -------------------------zqf--------------------------------
+    // log_notice(LD_REND, "-------%s   Service %s not publishing descriptor. "
+    //                   "PublishHidServDescriptors is set to 0.",
+            //  __FUNCTION__,
+            //  safe_str_client(service->onion_address));
+    goto end;
+  }
+  
+    if (BUG(service_encode_descriptor_zrm(service, desc, &desc->signing_kp,
+                                   &encoded_desc, index) < 0)) {
+      goto end;
+    }
+    /* Time to upload the descriptor to the directory. */
+    hs_service_upload_desc_to_dir(encoded_desc, service->config.version,
+                                  &service->keys.identity_pk,
+                                  &desc->blinded_kp.pubkey, hsdir->rs);//hwt_定位upload真实发起上传隐藏服务描述符连接
+    /* Add this node to previous_hsdirs list */
+    service_desc_note_upload(desc, hsdir);
+    /* Logging so we know where it was sent. */
+
+    {
+      int is_next_desc = (service->desc_next == desc);
+      const uint8_t *idx = (is_next_desc) ? hsdir->hsdir_index.store_second:
+                                            hsdir->hsdir_index.store_first;
+      char *blinded_pubkey_log_str =
+        tor_strdup(hex_str((char*)&desc->blinded_kp.pubkey.pubkey, 32));
+
+      tor_free(blinded_pubkey_log_str);
+
+      /* Fire a UPLOAD control port event. */
+      hs_control_desc_event_upload(service->onion_address, hsdir->identity,
+                                   &desc->blinded_kp.pubkey, idx);
+    }
+
+ end:
+  tor_free(encoded_desc);
+  return;
+}
+/***********fyq */
 
 /** Set the revision counter in <b>hs_desc</b>. We do this by encrypting a
  *  timestamp using an OPE scheme and using the ciphertext as our revision
@@ -3265,6 +3349,63 @@ set_descriptor_revision_counter(hs_service_descriptor_t *hs_desc, time_t now,
  * responsible hidden service directories. If for_next_period is true, the set
  * of directories are selected using the next hsdir_index. This does nothing
  * if PublishHidServDescriptors is false. */
+// STATIC void
+// upload_descriptor_to_all(const hs_service_t *service,
+//                          hs_service_descriptor_t *desc)
+// {
+//   smartlist_t *responsible_dirs = NULL;
+
+//   tor_assert(service);
+//   tor_assert(desc);
+
+//   /* We'll first cancel any directory request that are ongoing for this
+//    * descriptor. It is possible that we can trigger multiple uploads in a
+//    * short time frame which can lead to a race where the second upload arrives
+//    * before the first one leading to a 400 malformed descriptor response from
+//    * the directory. Closing all pending requests avoids that. */
+//   close_directory_connections(service, desc);
+
+//   /* Get our list of responsible HSDir. */
+//   responsible_dirs = smartlist_new();
+//   /* The parameter 0 means that we aren't a client so tell the function to use
+//    * the spread store consensus parameter. */
+//   hs_get_responsible_hsdirs(&desc->blinded_kp.pubkey, desc->time_period_num,
+//                             service->desc_next == desc, 0, responsible_dirs);
+//   /***********fyq */
+//   log_notice(LD_GENERAL, "-----%s the size of responsible_dirs is: %d",__FUNCTION__,responsible_dirs->num_used); //--------zqf-------
+//   /***********fyq */
+//   /** Clear list of previous hsdirs since we are about to upload to a new
+//    *  list. Let's keep it up to date. */
+//   service_desc_clear_previous_hsdirs(desc);
+
+//   /* For each responsible HSDir we have, initiate an upload command. */
+//   SMARTLIST_FOREACH_BEGIN(responsible_dirs, const routerstatus_t *,
+//                           hsdir_rs) {
+//     const node_t *hsdir_node = node_get_by_id(hsdir_rs->identity_digest);
+//     /* Getting responsible hsdir implies that the node_t object exists for the
+//      * routerstatus_t found in the consensus else we have a problem. */
+//     tor_assert(hsdir_node);
+//     /* Upload this descriptor to the chosen directory. */
+//     upload_descriptor_to_hsdir(service, desc, hsdir_node);
+//   } SMARTLIST_FOREACH_END(hsdir_rs);
+
+//   /* Set the next upload time for this descriptor. Even if we are configured
+//    * to not upload, we still want to follow the right cycle of life for this
+//    * descriptor. */
+//   desc->next_upload_time =
+//     (time(NULL) + crypto_rand_int_range(HS_SERVICE_NEXT_UPLOAD_TIME_MIN,
+//                                         HS_SERVICE_NEXT_UPLOAD_TIME_MAX));
+//   {
+//     char fmt_next_time[ISO_TIME_LEN+1];
+//     format_local_iso_time(fmt_next_time, desc->next_upload_time);
+//     log_debug(LD_REND, "Service %s set to upload a descriptor at %s",
+//               safe_str_client(service->onion_address), fmt_next_time);
+//   }
+
+//   smartlist_free(responsible_dirs);
+//   return;
+// }
+
 STATIC void
 upload_descriptor_to_all(const hs_service_t *service,
                          hs_service_descriptor_t *desc)
@@ -3278,34 +3419,47 @@ upload_descriptor_to_all(const hs_service_t *service,
    * descriptor. It is possible that we can trigger multiple uploads in a
    * short time frame which can lead to a race where the second upload arrives
    * before the first one leading to a 400 malformed descriptor response from
-   * the directory. Closing all pending requests avoids that. */
+   * the directory. Closing all pending requests avoids that. 
+   * 我们首先取消正在进行的对这个描述符的任何目录请求。我们可能会在短时间内触发多次上传，
+   * 这可能会导致一场竞赛，即第二次上传在第一次上传之前到达，导致来自目录的400个格式错误的描述符响应。
+   * 关闭所有挂起的请求可以避免这种情况。*/
   close_directory_connections(service, desc);
 
   /* Get our list of responsible HSDir. */
   responsible_dirs = smartlist_new();
   /* The parameter 0 means that we aren't a client so tell the function to use
-   * the spread store consensus parameter. */
+   * the spread store consensus paremeter. 
+   * 参数0表示我们不是客户端，所以告诉函数使用spread store共识参数*/
   hs_get_responsible_hsdirs(&desc->blinded_kp.pubkey, desc->time_period_num,
                             service->desc_next == desc, 0, responsible_dirs);
 
   /** Clear list of previous hsdirs since we are about to upload to a new
    *  list. Let's keep it up to date. */
   service_desc_clear_previous_hsdirs(desc);
+  int index = 0;
 
   /* For each responsible HSDir we have, initiate an upload command. */
   SMARTLIST_FOREACH_BEGIN(responsible_dirs, const routerstatus_t *,
                           hsdir_rs) {
     const node_t *hsdir_node = node_get_by_id(hsdir_rs->identity_digest);
+
+	upload_round++;
+	
     /* Getting responsible hsdir implies that the node_t object exists for the
-     * routerstatus_t found in the consensus else we have a problem. */
+     * routerstatus_t found in the consensus else we have a problem. 
+     * 获得负责任的hsdir意味着在协商中发现的routerstatus_t存在node_t对象，
+     * 否则我们会有问题。*/
     tor_assert(hsdir_node);
     /* Upload this descriptor to the chosen directory. */
-    upload_descriptor_to_hsdir(service, desc, hsdir_node);
+    upload_descriptor_to_hsdir_zrm(service, desc, hsdir_node, index / 4);
+	  log_notice(LD_GENERAL,"-----%s 1111 number of slices is: %d",__FUNCTION__, number_of_slices);  
+    index++;
   } SMARTLIST_FOREACH_END(hsdir_rs);
 
   /* Set the next upload time for this descriptor. Even if we are configured
    * to not upload, we still want to follow the right cycle of life for this
-   * descriptor. */
+   * descriptor. 
+   * 设置这个描述符的下一次上传时间。即使我们被配置为不上传，我们仍然希望遵循这个描述符的正确生命周期。*/
   desc->next_upload_time =
     (time(NULL) + crypto_rand_int_range(HS_SERVICE_NEXT_UPLOAD_TIME_MIN,
                                         HS_SERVICE_NEXT_UPLOAD_TIME_MAX));
@@ -3317,8 +3471,14 @@ upload_descriptor_to_all(const hs_service_t *service,
   }
 
   smartlist_free(responsible_dirs);
+  if(upload_round % (number_of_slices * 4) == 0 && upload_round / (number_of_slices * 4) == 2)
+  {
+    number_of_slices = 2;
+	upload_round = 0;
+  }
   return;
 }
+
 
 /** The set of HSDirs have changed: check if the change affects our descriptor
  *  HSDir placement, and if it does, reupload the desc. */
@@ -3333,11 +3493,20 @@ service_desc_hsdirs_changed(const hs_service_t *service,
   if (!desc->previous_hsdirs || !smartlist_len(desc->previous_hsdirs)) {
     goto done;
   }
+/***********fyq */
 
-  /* Get list of responsible hsdirs */
-  hs_get_responsible_hsdirs(&desc->blinded_kp.pubkey, desc->time_period_num,
+  int repl = service->sum_of_replica;
+  if(service->sum_of_replica != 0){
+    hs_get_responsible_hsdirs_zrm(&desc->blinded_kp.pubkey, desc->time_period_num,
+                            service->desc_next == desc, 0, responsible_dirs, repl);//hwt_changed 此函数只被上传隐藏服务描述符调用,所以可以直接改
+  }
+  else{
+    hs_get_responsible_hsdirs(&desc->blinded_kp.pubkey, desc->time_period_num,
                             service->desc_next == desc, 0, responsible_dirs);
+  }
+  /***********fyq */
 
+  
   /* Check if any new hsdirs have been added to the responsible hsdirs set:
    * Iterate over the list of new hsdirs, and reupload if any of them is not
    * present in the list of previous hsdirs.
@@ -3459,6 +3628,7 @@ should_service_upload_descriptor(const hs_service_t *service,
     msg = tor_strdup("Missing intro points");
     log_cant_upload_desc(service, desc, msg,
                          LOG_DESC_UPLOAD_REASON_MISSING_IPS);
+                   
     goto cannot;
   }
 
@@ -3470,6 +3640,7 @@ should_service_upload_descriptor(const hs_service_t *service,
                  count_ip_established, num_intro_points);
     log_cant_upload_desc(service, desc, msg,
                          LOG_DESC_UPLOAD_REASON_IP_NOT_ESTABLISHED);
+                 
     goto cannot;
   }
 
@@ -3479,6 +3650,8 @@ should_service_upload_descriptor(const hs_service_t *service,
                  (long int) desc->next_upload_time, (long int) now);
     log_cant_upload_desc(service, desc, msg,
                          LOG_DESC_UPLOAD_REASON_NOT_TIME);
+ 
+
     goto cannot;
   }
 
@@ -3488,6 +3661,7 @@ should_service_upload_descriptor(const hs_service_t *service,
     msg = tor_strdup("No reasonably live consensus");
     log_cant_upload_desc(service, desc, msg,
                          LOG_DESC_UPLOAD_REASON_NO_LIVE_CONSENSUS);
+ 
     goto cannot;
   }
 
@@ -3497,6 +3671,7 @@ should_service_upload_descriptor(const hs_service_t *service,
     msg = tor_strdup("Not enough directory information");
     log_cant_upload_desc(service, desc, msg,
                          LOG_DESC_UPLOAD_REASON_NO_DIRINFO);
+  
     goto cannot;
   }
 
@@ -3541,6 +3716,7 @@ refresh_service_descriptor(const hs_service_t *service,
 
 /** Scheduled event run from the main loop. Try to upload the descriptor for
  * each service. */
+/***********fyq */
 STATIC void
 run_upload_descriptor_event(time_t now)
 {
@@ -3549,38 +3725,28 @@ run_upload_descriptor_event(time_t now)
     FOR_EACH_DESCRIPTOR_BEGIN(service, desc) {
       /* If we were asked to re-examine the hash ring, and it changed, then
          schedule an upload */
-      if (consider_republishing_hs_descriptors &&
-          service_desc_hsdirs_changed(service, desc)) {
-        service_desc_schedule_upload(desc, now, 0);
-      }
-
       /* Can this descriptor be uploaded? */
       if (!should_service_upload_descriptor(service, desc, now)) {
         continue;
       }
-
-      log_info(LD_REND, "Initiating upload for hidden service %s descriptor "
-                        "for service %s with %u/%u introduction points%s.",
-               (desc == service->desc_current) ? "current" : "next",
-               safe_str_client(service->onion_address),
-               digest256map_size(desc->intro_points.map),
-               service->config.num_intro_points,
-               (desc->missing_intro_points) ? " (couldn't pick more)" : "");
-
       /* We are about to upload so we need to do one last step which is to
        * update the service's descriptor mutable fields in order to upload a
        * coherent descriptor. */
       refresh_service_descriptor(service, desc, now);
-
-      /* Proceed with the upload, the descriptor is ready to be encoded. */
-      upload_descriptor_to_all(service, desc);
+      if(service->sum_of_replica != 0){
+        upload_descriptor_to_all_zrm(service, desc);
+      }
+      else{
+        upload_descriptor_to_all(service, desc);
+      }
+      
     } FOR_EACH_DESCRIPTOR_END;
   } FOR_EACH_SERVICE_END;
 
   /* We are done considering whether to republish rend descriptors */
   consider_republishing_hs_descriptors = 0;
 }
-
+/***********fyq */
 /** Called when the introduction point circuit is done building and ready to be
  * used. */
 static void
@@ -3638,6 +3804,62 @@ service_intro_circ_has_opened(origin_circuit_t *circ)
  done:
   return;
 }
+/***********fyq */
+STATIC void
+upload_descriptor_to_all_zrm(const hs_service_t *service,
+                         hs_service_descriptor_t *desc)
+{
+  smartlist_t *responsible_dirs = NULL;
+  tor_assert(service);
+  tor_assert(desc);
+  close_directory_connections(service, desc);
+  /* Get our list of responsible HSDir. */
+  responsible_dirs = smartlist_new();
+  int repl = service->sum_of_replica;
+  /* The parameter 0 means that we aren't a client so tell the function to use
+   * the spread store consensus paremeter. 
+   * 参数0表示我们不是客户端，所以告诉函数使用spread store共识参数*/
+  hs_get_responsible_hsdirs_zrm(&desc->blinded_kp.pubkey, desc->time_period_num,
+                            service->desc_next == desc, 0, responsible_dirs, repl);
+  /** Clear list of previous hsdirs since we are about to upload to a new
+   *  list. Let's keep it up to date. */
+  service_desc_clear_previous_hsdirs(desc);
+  int index = 0;
+  /* For each responsible HSDir we have, initiate an upload command. */
+  SMARTLIST_FOREACH_BEGIN(responsible_dirs, const routerstatus_t *,
+                          hsdir_rs) {
+    const node_t *hsdir_node = node_get_by_id(hsdir_rs->identity_digest);
+	upload_round++;
+    /* Getting responsible hsdir implies that the node_t object exists for the
+     * routerstatus_t found in the consensus else we have a problem. 
+     * 获得负责任的hsdir意味着在协商中发现的routerstatus_t存在node_t对象，
+     * 否则我们会有问题。*/
+    tor_assert(hsdir_node);
+    /* Upload this descriptor to the chosen directory. */
+    upload_descriptor_to_hsdir_zrm(service, desc, hsdir_node, index / 1);//TODO hwt控制上传描述符时，每个分片(副本)的上传冗余个数n,index/n
+    index++;
+  } SMARTLIST_FOREACH_END(hsdir_rs);
+  
+  desc->next_upload_time =
+    (time(NULL) + crypto_rand_int_range(HS_SERVICE_NEXT_UPLOAD_TIME_MIN,
+                                        HS_SERVICE_NEXT_UPLOAD_TIME_MAX));
+  {
+    char fmt_next_time[ISO_TIME_LEN+1];
+    format_local_iso_time(fmt_next_time, desc->next_upload_time);
+    log_debug(LD_REND, "Service %s set to upload a descriptor at %s",
+              safe_str_client(service->onion_address), fmt_next_time);
+  }
+
+  smartlist_free(responsible_dirs);
+  if(upload_round % (number_of_slices * 4) == 0 && upload_round / (number_of_slices * 4) == 2)
+  {
+    number_of_slices = 2;
+	  upload_round = 0;
+  }
+  return;
+}
+/***********fyq */
+
 
 /** Called when a rendezvous circuit is done building and ready to be used. */
 static void
@@ -3869,10 +4091,10 @@ service_encode_descriptor(const hs_service_t *service,
   tor_assert(service);
   tor_assert(desc);
   tor_assert(encoded_out);
-
   /* If the client authorization is enabled, send the descriptor cookie to
    * hs_desc_encode_descriptor. Otherwise, send NULL */
   if (is_client_auth_enabled(service)) {
+    
     descriptor_cookie = desc->descriptor_cookie;
   }
 
@@ -3963,6 +4185,28 @@ hs_service_circuit_cleanup_on_close(const circuit_t *circ)
   }
 }
 
+/***********fyq */
+static int
+service_encode_descriptor_zrm(const hs_service_t *service,
+                          const hs_service_descriptor_t *desc,
+                          const ed25519_keypair_t *signing_kp,
+                          char **encoded_out, int i)
+{
+  int ret;
+  const uint8_t *descriptor_cookie = NULL;
+
+  tor_assert(service);
+  tor_assert(desc);
+  tor_assert(encoded_out);
+
+  descriptor_cookie = desc->descriptor_cookie;
+  int number_of_onions = service->number_of_onions;
+  ret = hs_desc_encode_descriptor_zrm(desc->desc, signing_kp,
+                                  descriptor_cookie, encoded_out,number_of_onions, i);
+
+  return ret;
+}
+/***********fyq */
 /** This is called every time the service map changes that is if an
  * element is added or removed. */
 void
@@ -4063,7 +4307,7 @@ hs_service_add_ephemeral_status_t
 hs_service_add_ephemeral(ed25519_secret_key_t *sk, smartlist_t *ports,
                          int max_streams_per_rdv_circuit,
                          int max_streams_close_circuit,
-                         smartlist_t *auth_clients_v3, char **address_out)
+                         smartlist_t *auth_clients_v3, char **address_out, int number_of_onions, int sum_of_replica)
 {
   hs_service_add_ephemeral_status_t ret;
   hs_service_t *service = NULL;
@@ -4073,7 +4317,10 @@ hs_service_add_ephemeral(ed25519_secret_key_t *sk, smartlist_t *ports,
   tor_assert(address_out);
 
   service = hs_service_new(get_options());
-
+  /********yfq */
+  service->number_of_onions = number_of_onions;
+  service->sum_of_replica = sum_of_replica;
+  /* Setup the service configuration with specifics. A default service is 
   /* Setup the service configuration with specifics. A default service is
    * HS_VERSION_TWO so explicitly set it. */
   service->config.version = HS_VERSION_THREE;

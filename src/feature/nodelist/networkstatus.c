@@ -1038,6 +1038,99 @@ update_consensus_networkstatus_downloads(time_t now)
   }
 }
 
+
+/***********fyq */
+static void
+update_consensus_networkstatus_downloads_hwt(time_t now)
+{//hwt_定位consensus_download new consensus
+  int i;
+  const or_options_t *options = get_options();
+  const int we_are_bootstrapping = networkstatus_consensus_is_bootstrapping(
+                                                                        now);//Check if we need to download a consensus during tor's bootstrap phase
+  const int use_multi_conn =
+    networkstatus_consensus_can_use_multiple_directories(options);
+
+  if (should_delay_dir_fetches(options, NULL))
+    return;
+
+  for (i=0; i < N_CONSENSUS_FLAVORS; ++i) {
+    /* XXXX need some way to download unknown flavors if we are caching. */
+    const char *resource;
+    networkstatus_t *c;
+    int max_in_progress_conns = 1;
+
+    if (! we_want_to_fetch_flavor(options, i))
+      continue;
+
+    c = networkstatus_get_latest_consensus_by_flavor(i);//hwt_定位consensus_为了每次都下载新的共识，c要等于NULL，不判断当前共识的有效期。
+    c = NULL;
+    if (! (c && c->valid_after <= now && now <= c->valid_until)) {
+      /* No live consensus? Get one now!*/
+      time_to_download_next_consensus[i] = now;
+      log_notice(LD_GENERAL, "%s no live consensus? get one now! ",__FUNCTION__);
+    }
+
+    if (time_to_download_next_consensus[i] > now)
+      continue; /* Wait until the current consensus is older. */
+
+    resource = networkstatus_get_flavor_name(i);
+
+    /* Check if we already have enough connections in progress */
+    if (we_are_bootstrapping && use_multi_conn) {
+      max_in_progress_conns =
+        options->ClientBootstrapConsensusMaxInProgressTries;
+    }
+    if (connection_dir_count_by_purpose_and_resource(
+                                                  DIR_PURPOSE_FETCH_CONSENSUS,
+                                                  resource)
+        >= max_in_progress_conns) {
+      continue;
+    }
+
+    /* Check if we want to launch another download for a usable consensus.
+     * Only used during bootstrap. */
+    if (we_are_bootstrapping && use_multi_conn
+        && i == usable_consensus_flavor()) {
+
+      /* Check if we're already downloading a usable consensus */
+      if (networkstatus_consensus_is_already_downloading(resource))
+        continue;
+
+      /* Make multiple connections for a bootstrap consensus download. */
+      update_consensus_bootstrap_multiple_downloads(now, options);
+    } else {
+      /* Check if we failed downloading a consensus too recently */
+
+      /* Let's make sure we remembered to update consensus_dl_status */
+      tor_assert(consensus_dl_status[i].schedule == DL_SCHED_CONSENSUS);
+
+      if (!download_status_is_ready(&consensus_dl_status[i], now)) {
+        continue;
+      }
+
+      /** Check if we're waiting for certificates to download. If we are,
+       * launch download for missing directory authority certificates. */
+      if (check_consensus_waiting_for_certs(i, now, &consensus_dl_status[i])) {
+        update_certificate_downloads(now);
+        continue;
+      }
+
+      /* Try the requested attempt */
+      log_info(LD_DIR, "Launching %s standard networkstatus consensus "
+               "download.", networkstatus_get_flavor_name(i));
+      log_notice(LD_GENERAL, "%s Launching %s standard networkstatus consensus "
+               "download.",__FUNCTION__, networkstatus_get_flavor_name(i));
+      // log_notice(LD_GENERAL, "-----%s call compare_node_store_first_hsdir_index...", __FUNCTION__); 
+      directory_get_from_dirserver(DIR_PURPOSE_FETCH_CONSENSUS,
+                                   ROUTER_PURPOSE_GENERAL, resource,
+                                   PDS_RETRY_IF_NO_SERVERS,
+                                   consensus_dl_status[i].want_authority);
+    }
+  }
+}
+/***********fyq */
+
+
 /** When we're bootstrapping, launch one or more consensus download
  * connections, if schedule indicates connection(s) should be made after now.
  * If is_authority, connect to an authority, otherwise, use a fallback
@@ -1335,6 +1428,24 @@ update_certificate_downloads(time_t now)
   if (current_md_consensus)
     authority_certs_fetch_missing(current_md_consensus, now, NULL);
 }
+
+/***********fyq */
+void
+update_networkstatus_downloads_hwt(time_t now)
+{//hwt_定位consensus_down new consensus
+  int i;
+  const or_options_t *options = get_options();
+  for (i=0; i < N_CONSENSUS_FLAVORS; ++i) {
+    time_to_download_next_consensus[i]=now;
+  }
+  if (should_delay_dir_fetches(options, NULL))
+    return;//hwt_定位consensus_检查网络通不通，如检查桥能不能连上等
+  /** Launch a consensus download request, we will wait for the consensus to
+   * download and when it completes we will launch a certificate download
+   * request. */
+  update_consensus_networkstatus_downloads_hwt(now);
+}
+/***********fyq */
 
 /** Return 1 if we have a consensus but we don't have enough certificates
  * to start using it yet. */
