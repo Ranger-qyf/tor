@@ -30,6 +30,7 @@
         "routerinfo_st.h": "c",
         "networkstatus.h": "c",
         "stdlib.h": "c",
-        "time.h": "c"
+        "time.h": "c",
+        "control_cmd.h": "c"
     }
 }
