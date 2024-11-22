@@ -2541,7 +2541,8 @@ static unsigned char* char_to_string_zqf(const unsigned char* src, int src_len){
   unsigned char* dst = (unsigned char*)malloc(src_len + 1);
   memset(dst, 0, src_len + 1);
   for (int item_zqf = 0; item_zqf < src_len; item_zqf ++){
-    dst[item_zqf] = (unsigned char*)src[item_zqf];
+    dst[item_zqf] = src[item_zqf];
+    // dst[item_zqf] = (unsigned char*)src[item_zqf];
   }
   return dst;
 }

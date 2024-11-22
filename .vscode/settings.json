@@ -28,6 +28,8 @@
         "control_connection_st.h": "c",
         "node_st.h": "c",
         "routerinfo_st.h": "c",
-        "networkstatus.h": "c"
+        "networkstatus.h": "c",
+        "stdlib.h": "c",
+        "time.h": "c"
     }
 }

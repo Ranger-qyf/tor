@@ -113,7 +113,7 @@ static smartlist_t *hs_service_staging_list;
  *  reupload if needed */
 static int consider_republishing_hs_descriptors = 0;
 /***********fyq */
-upload_round = 0;
+int upload_round = 0;
 /***********fyq */
 /* Static declaration. */
 static int load_client_keys(hs_service_t *service);

@@ -13,7 +13,7 @@
 #include "lib/err/torerr.h"
 #include "lib/malloc/malloc.h"
 #include "lib/smartlist_core/smartlist_core.h"
-
+#include <time.h>
 #include <stdlib.h>
 #include <string.h>
 
