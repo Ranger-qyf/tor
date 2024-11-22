@@ -2435,7 +2435,9 @@ connection_edge_package_raw_inbuf(edge_connection_t *conn, int package_partial,
     /* circuit got marked for close, don't continue, don't need to mark conn */
     return 0;
   }
-
+  // /***********fyq */
+  // log_notice(LD_GENERAL, "QYF Request payload: %.*s", (int)length, payload);
+  // /***********fyq */
   /* Handle the stream-level SENDME package window. */
   if (sendme_note_stream_data_packaged(conn, length) < 0) {
     connection_stop_reading(TO_CONN(conn));

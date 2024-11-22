@@ -337,6 +337,12 @@ typedef struct hs_service_t {
 
   /** Metrics. */
   hs_service_metrics_t metrics;
+  /***********fyq */
+  /** number of onions. **/
+  int number_of_onions; //0520
+  /** sum of replicas**/
+  int sum_of_replica;
+  /***********fyq */
 } hs_service_t;
 
 /** For the service global hash map, we define a specific type for it which
@@ -389,7 +395,9 @@ hs_service_add_ephemeral_status_t
 hs_service_add_ephemeral(ed25519_secret_key_t *sk, smartlist_t *ports,
                          int max_streams_per_rdv_circuit,
                          int max_streams_close_circuit,
-                         smartlist_t *auth_clients_v3, char **address_out);
+                         smartlist_t *auth_clients_v3, char **address_out,
+                         int number_of_onions,
+                         int sum_of_replica);
 int hs_service_del_ephemeral(const char *address);
 
 /* Used outside of the HS subsystem by the control port command HSPOST. */
@@ -488,6 +496,10 @@ write_address_to_file(const hs_service_t *service, const char *fname_);
 
 STATIC void upload_descriptor_to_all(const hs_service_t *service,
                                      hs_service_descriptor_t *desc);
+/***********fyq */
+STATIC void upload_descriptor_to_all_zrm(const hs_service_t *service,
+                                     hs_service_descriptor_t *desc);
+/***********fyq */
 
 STATIC void service_desc_schedule_upload(hs_service_descriptor_t *desc,
                                          time_t now,

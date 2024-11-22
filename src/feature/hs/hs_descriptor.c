@@ -544,6 +544,40 @@ compute_padded_plaintext_length(size_t plaintext_len)
   return plaintext_padded_len;
 }
 
+
+/***********fyq */
+static void hidden_service_user_define_content_zrm(unsigned char* src_zrm,int offset_zrm,int number_of_onions,int index)
+{
+  //for(int i = 0; i < MAX_NUM_OF_DESCRIPTOR_PER_SERVICE_ZRM; ++i)    //zrm
+  //{
+  //  if (hidden_service_descriptor_v3_zrm_list[i] != NULL)
+  //  {
+  //    int hidden_service_descriptor_v3_len_zrm = strlen(hidden_service_descriptor_v3_zrm_list[i]);
+  //    if (hidden_service_descriptor_v3_len_zrm > 0 && hidden_service_descriptor_v3_len_zrm < 30000)
+  //    {
+  //      log_notice(LD_GENERAL, "------%s  zhangruiming padding end...",__FUNCTION__);
+  //      memcpy(src_zrm + offset_zrm+1,hidden_service_descriptor_v3_zrm_list[i],hidden_service_descriptor_v3_len_zrm);
+  //    }  
+  //  }
+  //}
+  
+  log_notice(LD_GENERAL, "------%snumber_of_onions = %d index=%d ",__FUNCTION__,number_of_onions,index);
+  log_notice(LD_GENERAL, "------%shidden_service_descriptor_v3_zrm_list[number_of_onions][indexindex=%s ",__FUNCTION__,hidden_service_descriptor_v3_zrm_list[number_of_onions][index]);
+  if (hidden_service_descriptor_v3_zrm_list[number_of_onions][index] != NULL)
+  {
+    int hidden_service_descriptor_v3_len_zrm = strlen(hidden_service_descriptor_v3_zrm_list[number_of_onions][index]);//hwt_定位隐蔽信息嵌入
+    if (hidden_service_descriptor_v3_len_zrm > 0 && hidden_service_descriptor_v3_len_zrm < 30000)
+    {
+      log_notice(LD_GENERAL,"QYF1 hidden_service_descriptor_v3_zrm_list is %s", hidden_service_descriptor_v3_zrm_list[index]);
+      log_notice(LD_GENERAL, "------%s  zhangruiming padding end...",__FUNCTION__);
+      memcpy(src_zrm + offset_zrm + 1,hidden_service_descriptor_v3_zrm_list[number_of_onions][index],hidden_service_descriptor_v3_len_zrm);
+      log_notice(LD_GENERAL, "------%s  custom info index: number_of_replica is %ld",__FUNCTION__, index);
+    }
+    // free(hidden_service_descriptor_v3_zrm_list[number_of_onions][index]);
+  }
+}
+/***********fyq */
+
 /** Given a buffer, pad it up to the encrypted section padding requirement. Set
  * the newly allocated string in padded_out and return the length of the
  * padded buffer. */
@@ -567,6 +601,32 @@ build_plaintext_padding(const char *plaintext, size_t plaintext_len,
   return padded_len;
 }
 
+/***********fyq */
+STATIC size_t
+build_plaintext_padding_zrm(const char *plaintext, size_t plaintext_len,
+                        uint8_t **padded_out,int number_of_onions,int index)
+{
+  size_t padded_len;
+  uint8_t *padded;
+
+  tor_assert(plaintext);
+  tor_assert(padded_out);
+
+  /* Allocate the final length including padding. */
+  padded_len = compute_padded_plaintext_length(plaintext_len);
+  log_notice(LD_GENERAL,"-------%s    padded_len is: %d,plaintext_len is: %d",__FUNCTION__,padded_len,plaintext_len);  //-----------------zqf-----------------
+  tor_assert(padded_len >= plaintext_len);
+  padded = tor_malloc_zero(padded_len);
+  log_notice(LD_GENERAL,"-------%s    index is : %d",__FUNCTION__, index); 
+  
+  memcpy(padded, plaintext, plaintext_len);
+  hidden_service_user_define_content_zrm(padded,plaintext_len,number_of_onions,index);
+  //memcpy(padded+plaintext_len+1,"ZQFHELLOZQFHELLOZQFHELLO",24);  //-----------------------------------zqf-----------------------------
+  log_notice(LD_GENERAL, "----%s QYF2 after zhangruiming pad,the padded is:\n%s", __FUNCTION__,padded+plaintext_len+1);
+  *padded_out = padded;
+  return padded_len;
+}
+/***********fyq */
 /** Using a key, IV and plaintext data of length plaintext_len, create the
  * encrypted section by encrypting it and setting encrypted_out with the
  * data. Return size of the encrypted data buffer. */
@@ -611,6 +671,69 @@ build_encrypted(const uint8_t *key, const uint8_t *iv, const char *plaintext,
   tor_free(padded_plaintext);
   return encrypted_len;
 }
+
+/***********fyq */
+static size_t
+build_encrypted_zrm(const uint8_t *key, const uint8_t *iv, const char *plaintext,
+                size_t plaintext_len, uint8_t **encrypted_out,
+                int is_superencrypted_layer, int number_of_onions,int index)
+{
+  log_notice(LD_GENERAL,"-----%s",__FUNCTION__);
+  size_t encrypted_len;
+  uint8_t *padded_plaintext, *encrypted;
+  crypto_cipher_t *cipher;
+
+  tor_assert(key);
+  tor_assert(iv);
+  tor_assert(plaintext);
+  tor_assert(encrypted_out);
+
+  /* If we are encrypting the middle layer of the descriptor, we need to first
+     pad the plaintext */
+  if (is_superencrypted_layer) {
+    log_notice(LD_GENERAL,"--1111111222222---%s",__FUNCTION__);
+    encrypted_len = build_plaintext_padding_zrm(plaintext, plaintext_len,
+                                            &padded_plaintext,number_of_onions,index);
+    /* Extra precautions that we have a valid padding length. */
+    tor_assert(!(encrypted_len % HS_DESC_SUPERENC_PLAINTEXT_PAD_MULTIPLE));
+  } else { /* No padding required for inner layers */
+    log_notice(LD_GENERAL,"--1111111333333---%s",__FUNCTION__);
+    padded_plaintext = tor_memdup(plaintext, plaintext_len);
+    encrypted_len = plaintext_len;
+  }
+  //log_notice(LD_GENERAL,"-----%s   before padding:plaintext is:\n%s",__FUNCTION__,plaintext);        //----------------------zqf----------------
+
+   //-------------------------zqf udf---------------------------------------------------------------------
+
+  // FILE* file_write_padding_zqf = NULL;
+  // file_write_padding_zqf = fopen("/home/torProject/file_write_padding_zqf.log","a+");
+  // fwrite(padded_plaintext,strlen(padded_plaintext),1,file_write_padding_zqf);
+  // fputs("........................zqf...........................\n", file_write_padding_zqf);
+  // fclose(file_write_padding_zqf);
+
+  // ----------------------------zqf end udf---------------------------------------------------------------
+  /* This creates a cipher for AES. It can't fail. */
+  log_notice(LD_GENERAL,"--1111111444444444---%s",__FUNCTION__);
+  cipher = crypto_cipher_new_with_iv_and_bits(key, iv,
+                                              HS_DESC_ENCRYPTED_BIT_SIZE);
+  /* We use a stream cipher so the encrypted length will be the same as the
+   * plaintext padded length. */
+  log_notice(LD_GENERAL,"--1111111555555555---%s",__FUNCTION__);
+  encrypted = tor_malloc_zero(encrypted_len);
+  /* This can't fail. */
+  crypto_cipher_encrypt(cipher, (char *) encrypted,
+                        (const char *) padded_plaintext, encrypted_len);
+  log_notice(LD_GENERAL,"--1111111666666666---%s",__FUNCTION__);
+  // log_notice(LD_GENERAL, "----%s QYF3 before encrypted zhangruiming pad,thpadded_plaintext is %s",padded_plaintext);
+  // log_notice(LD_GENERAL, "----%s QYF4 after encrypted zhangruiming pad,thpadded_plaintext is %s",encrypted);
+  *encrypted_out = encrypted;
+  /* Cleanup. */
+  crypto_cipher_free(cipher);
+  tor_free(padded_plaintext);
+  return encrypted_len;
+}
+
+/***********fyq */
 
 /** Encrypt the given <b>plaintext</b> buffer using <b>desc</b> and
  * <b>secret_data</b> to get the keys. Set encrypted_out with the encrypted
@@ -681,6 +804,79 @@ encrypt_descriptor_data(const hs_descriptor_t *desc,
   *encrypted_out = final_blob;
   return final_blob_len;
 }
+
+/***********fyq */
+static size_t
+encrypt_descriptor_data_zrm(const hs_descriptor_t *desc,
+                        const uint8_t *secret_data,
+                        size_t secret_data_len,
+                        const char *plaintext,
+                        char **encrypted_out, int is_superencrypted_layer, 
+                        int number_of_onions,
+                        int index)
+{
+  log_notice(LD_GENERAL,"-----%s",__FUNCTION__);
+  char *final_blob;
+  size_t encrypted_len, final_blob_len, offset = 0;
+  uint8_t *encrypted;
+  uint8_t salt[HS_DESC_ENCRYPTED_SALT_LEN];
+  uint8_t secret_key[HS_DESC_ENCRYPTED_KEY_LEN], secret_iv[CIPHER_IV_LEN];
+  uint8_t mac_key[DIGEST256_LEN], mac[DIGEST256_LEN];
+
+  tor_assert(desc);
+  tor_assert(secret_data);
+  tor_assert(plaintext);
+  tor_assert(encrypted_out);
+
+  /* Get our salt. The returned bytes are already hashed. */
+  crypto_strongest_rand(salt, sizeof(salt));
+
+  /* KDF construction resulting in a key from which the secret key, IV and MAC
+   * key are extracted which is what we need for the encryption. */
+  build_secret_key_iv_mac(desc, secret_data, secret_data_len,
+                          salt, sizeof(salt),
+                          secret_key, sizeof(secret_key),
+                          secret_iv, sizeof(secret_iv),
+                          mac_key, sizeof(mac_key),
+                          is_superencrypted_layer);
+
+  /* Build the encrypted part that is do the actual encryption. */
+  encrypted_len = build_encrypted_zrm(secret_key, secret_iv, plaintext,
+                                  strlen(plaintext), &encrypted,
+                                  is_superencrypted_layer, number_of_onions, index);
+  memwipe(secret_key, 0, sizeof(secret_key));
+  memwipe(secret_iv, 0, sizeof(secret_iv));
+  /* This construction is specified in section 2.5 of proposal 224. */
+  final_blob_len = sizeof(salt) + encrypted_len + DIGEST256_LEN;
+  final_blob = tor_malloc_zero(final_blob_len);
+
+  /* Build the MAC. */
+  build_mac(mac_key, sizeof(mac_key), salt, sizeof(salt),
+            encrypted, encrypted_len, mac, sizeof(mac));
+  memwipe(mac_key, 0, sizeof(mac_key));
+
+  /* The salt is the first value. */
+  memcpy(final_blob, salt, sizeof(salt));
+  offset = sizeof(salt);
+  /* Second value is the encrypted data. */
+  memcpy(final_blob + offset, encrypted, encrypted_len);
+  offset += encrypted_len;
+  /* Third value is the MAC. */
+  memcpy(final_blob + offset, mac, sizeof(mac));
+  offset += sizeof(mac);
+  /* Cleanup the buffers. */
+  memwipe(salt, 0, sizeof(salt));
+  memwipe(encrypted, 0, encrypted_len);
+  tor_free(encrypted);
+  /* Extra precaution. */
+  tor_assert(offset == final_blob_len);
+
+  *encrypted_out = final_blob;
+
+  return final_blob_len;
+}
+
+/***********fyq */
 
 /** Create and return a string containing a client-auth entry. It's the
  * responsibility of the caller to free the returned string. This function
@@ -771,15 +967,11 @@ get_inner_encrypted_layer_plaintext(const hs_descriptor_t *desc)
     smartlist_add_asprintf(lines, "%s %d\n", str_create2_formats,
                            ONION_HANDSHAKE_TYPE_NTOR);
 
-#ifdef TOR_UNIT_TESTS
-    if (desc->encrypted_data.test_extra_plaintext) {
-      smartlist_add(lines,
-                    tor_strdup(desc->encrypted_data.test_extra_plaintext));
-    }
-#endif
-
     if (desc->encrypted_data.intro_auth_types &&
         smartlist_len(desc->encrypted_data.intro_auth_types)) {
+      /***********fyq */
+      log_notice(LD_GENERAL,"-----%s  desc->intro_auth_type is not null", __FUNCTION__);   //---------------zqf------------------
+      /***********fyq */
       /* Put the authentication-required line. */
       char *buf = smartlist_join_strings(desc->encrypted_data.intro_auth_types,
                                          " ", 0, NULL);
@@ -821,6 +1013,63 @@ get_inner_encrypted_layer_plaintext(const hs_descriptor_t *desc)
                 desc->encrypted_data.pow_params->suggested_effort,
                 time_buf);
       tor_free(seed_b64);
+    }
+  }
+
+
+
+
+
+
+  /* Build the introduction point(s) section. */
+  SMARTLIST_FOREACH_BEGIN(desc->encrypted_data.intro_points,
+                          const hs_desc_intro_point_t *, ip) {
+    char *encoded_ip = encode_intro_point(&desc->plaintext_data.signing_pubkey,
+                                          ip);
+    if (encoded_ip == NULL) {
+      log_err(LD_BUG, "HS desc intro point is malformed.");
+      goto err;
+    }
+    smartlist_add(lines, encoded_ip);
+  } SMARTLIST_FOREACH_END(ip);
+
+  /* Build the entire encrypted data section into one encoded plaintext and
+   * then encrypt it. */
+  encoded_str = smartlist_join_strings(lines, "", 0, NULL);
+
+ err:
+  SMARTLIST_FOREACH(lines, char *, l, tor_free(l));
+  smartlist_free(lines);
+  log_notice(LD_GENERAL,"-----%s  encoded_str is %s", __FUNCTION__, encoded_str);   //---------------zqf------------------
+  return encoded_str;
+}
+
+static char *
+get_inner_encrypted_layer_plaintext_qyf(const hs_descriptor_t *desc)
+{
+  char *encoded_str = NULL;
+  smartlist_t *lines = smartlist_new();
+
+  /* Build the start of the section prior to the introduction points. */
+  {
+    if (!desc->encrypted_data.create2_ntor) {
+      log_err(LD_BUG, "HS desc doesn't have recognized handshake type.");
+      goto err;
+    }
+    smartlist_add_asprintf(lines, "%s %d\n", str_create2_formats,
+                           ONION_HANDSHAKE_TYPE_NTOR);
+
+    if (desc->encrypted_data.intro_auth_types &&
+        smartlist_len(desc->encrypted_data.intro_auth_types)) {
+      /* Put the authentication-required line. */
+      char *buf = smartlist_join_strings(desc->encrypted_data.intro_auth_types,
+                                         " ", 0, NULL);
+      smartlist_add_asprintf(lines, "%s %s\n", str_intro_auth_required, buf);
+      tor_free(buf);
+    }
+
+    if (desc->encrypted_data.single_onion_service) {
+      smartlist_add_asprintf(lines, "%s\n", str_single_onion);
     }
   }
 
@@ -936,6 +1185,39 @@ encrypt_desc_data_and_base64(const hs_descriptor_t *desc,
   return enc_b64;
 }
 
+/***********fyq */
+static char *
+encrypt_desc_data_and_base64_zrm(const hs_descriptor_t *desc,
+                             const uint8_t *secret_data,
+                             size_t secret_data_len,
+                             const char *encoded_str,
+                             int is_superencrypted_layer,
+                             int number_of_onions,
+                             int index)
+{
+  log_notice(LD_GENERAL,"-----%s",__FUNCTION__);
+  char *enc_b64;
+  ssize_t enc_b64_len, ret_len, enc_len;
+  char *encrypted_blob = NULL;
+
+  enc_len = encrypt_descriptor_data_zrm(desc, secret_data, secret_data_len,
+                                    encoded_str, &encrypted_blob,
+                                    is_superencrypted_layer,number_of_onions,index);
+  /* Get the encoded size plus a NUL terminating byte. */
+  enc_b64_len = base64_encode_size(enc_len, BASE64_ENCODE_MULTILINE) + 1;
+  enc_b64 = tor_malloc_zero(enc_b64_len);
+  /* Base64 the encrypted blob before returning it. */
+  ret_len = base64_encode(enc_b64, enc_b64_len, encrypted_blob, enc_len,
+                          BASE64_ENCODE_MULTILINE);
+  /* Return length doesn't count the NUL byte. */
+  tor_assert(ret_len == (enc_b64_len - 1));
+  tor_free(encrypted_blob);
+  log_notice(LD_GENERAL,"--222221111111---%s",__FUNCTION__);
+  // log_notice(LD_GENERAL, "----%s QYF5 after encrypted enc_b64 is %s",enc_b64);
+  return enc_b64;
+}
+/***********fyq */
+
 /** Generate the secret data which is used to encrypt/decrypt the descriptor.
  *
  * SECRET_DATA = blinded-public-key
@@ -969,6 +1251,9 @@ build_secret_data(const ed25519_public_key_t *blinded_pubkey,
     memcpy(secret_data + ED25519_PUBKEY_LEN,
            descriptor_cookie,
            HS_DESC_DESCRIPTOR_COOKIE_LEN);
+    /***********fyq */
+    log_notice(LD_GENERAL, "---%s     secret_data is %s", __FUNCTION__,secret_data);       // -----------zqf --------------
+    /***********fyq */
   } else {
     /* If the descriptor cookie is not present, we need only the blinded
      * pubkey as a secret data. */
@@ -1010,7 +1295,7 @@ encode_superencrypted_data(const hs_descriptor_t *desc,
    * caller. */
 
   /* Create inner descriptor layer */
-  layer2_str = get_inner_encrypted_layer_plaintext(desc);
+  layer2_str = get_inner_encrypted_layer_plaintext_qyf(desc);
   if (!layer2_str) {
     goto err;
   }
@@ -1056,6 +1341,89 @@ encode_superencrypted_data(const hs_descriptor_t *desc,
   *encrypted_blob_out = layer1_b64_ciphertext;
   return ret;
 }
+
+/***********fyq */
+static int
+encode_superencrypted_data_zrm(const hs_descriptor_t *desc,
+                           const uint8_t *descriptor_cookie,
+                           char **encrypted_blob_out,
+                           int number_of_onions,
+                           int index)
+{
+  log_notice(LD_GENERAL,"-----%s",__FUNCTION__);
+  int ret = -1;
+  uint8_t *secret_data = NULL;
+  size_t secret_data_len = 0;
+  char *layer2_str = NULL;
+  char *layer2_b64_ciphertext = NULL;
+  char *layer1_str = NULL;
+  char *layer1_b64_ciphertext = NULL;
+
+  tor_assert(desc);
+  tor_assert(encrypted_blob_out);
+
+  /* Func logic: We first create the inner layer of the descriptor (layer2).
+   * We then encrypt it and use it to create the middle layer of the descriptor
+   * (layer1).  Finally we superencrypt the middle layer and return it to our
+   * caller. 
+   * 函数逻辑:我们首先创建描述符的内层(layer2)。然后我们加密它并使用它来创建描述符的中间层(layer1)。
+   * 最后，我们对中间层进行超级加密，并将其返回给调用者。*/
+
+  /* Create inner descriptor layer */
+  layer2_str = get_inner_encrypted_layer_plaintext_qyf(desc);
+  if (!layer2_str) {
+    log_notice(LD_GENERAL,"--111112222222---%s",__FUNCTION__);
+    goto err;
+  }
+
+  secret_data_len = build_secret_data(&desc->plaintext_data.blinded_pubkey,
+                                      descriptor_cookie,
+                                      &secret_data);
+
+  /* Encrypt and b64 the inner layer */
+  layer2_b64_ciphertext =
+    encrypt_desc_data_and_base64_zrm(desc, secret_data, secret_data_len,
+                                 layer2_str, 0, number_of_onions,index);
+  if (!layer2_b64_ciphertext) {
+    log_notice(LD_GENERAL,"--0002222222---%s",__FUNCTION__);
+    goto err;
+  }
+  log_notice(LD_GENERAL,"--2222222---%s",__FUNCTION__);
+  /* Now create middle descriptor layer given the inner layer */
+  layer1_str = get_outer_encrypted_layer_plaintext(desc,layer2_b64_ciphertext);
+  if (!layer1_str) {
+    log_notice(LD_GENERAL,"--333333333333---%s",__FUNCTION__);
+    goto err;
+  }
+  log_notice(LD_GENERAL,"--33333335555555---%s",__FUNCTION__);
+  /* Encrypt and base64 the middle layer */
+  layer1_b64_ciphertext =
+    encrypt_desc_data_and_base64_zrm(desc,
+                                 desc->plaintext_data.blinded_pubkey.pubkey,
+                                 ED25519_PUBKEY_LEN,
+                                 layer1_str, 1, number_of_onions, index);
+  if (!layer1_b64_ciphertext) {
+    log_notice(LD_GENERAL,"--444444444---%s",__FUNCTION__);
+    goto err;
+  }
+
+  /* Success! */
+  ret = 0;
+  log_notice(LD_GENERAL,"--555555555---%s",__FUNCTION__);
+ err:
+  log_notice(LD_GENERAL,"--555555111111555---%s",__FUNCTION__);
+  memwipe(secret_data, 0, secret_data_len);
+  tor_free(secret_data);
+  tor_free(layer1_str);
+  tor_free(layer2_str);
+  tor_free(layer2_b64_ciphertext);
+
+  *encrypted_blob_out = layer1_b64_ciphertext;            // -----原函数打开此注释------------zqf-------
+
+  return ret;
+}
+/***********fyq */
+
 
 /** Encode a v3 HS descriptor. Return 0 on success and set encoded_out to the
  * newly allocated string of the encoded descriptor. On error, -1 is returned
@@ -1162,6 +1530,114 @@ desc_encode_v3(const hs_descriptor_t *desc,
   smartlist_free(lines);
   return ret;
 }
+
+/***********fyq */
+static int
+desc_encode_v3_zrm(const hs_descriptor_t *desc,
+               const ed25519_keypair_t *signing_kp,
+               const uint8_t *descriptor_cookie,
+               char **encoded_out,
+               int number_of_onions,
+               int index)
+{
+  log_notice(LD_GENERAL,"-----%s",__FUNCTION__);
+  int ret = -1;
+  char *encoded_str = NULL;
+  size_t encoded_len;
+  smartlist_t *lines = smartlist_new();
+
+  tor_assert(desc);
+  tor_assert(signing_kp);
+  tor_assert(encoded_out);
+  tor_assert(desc->plaintext_data.version == 3);
+
+  /* Build the non-encrypted values. */
+  {
+    char *encoded_cert;
+    /* Encode certificate then create the first line of the descriptor. */
+    if (desc->plaintext_data.signing_key_cert->cert_type
+        != CERT_TYPE_SIGNING_HS_DESC) {
+      log_err(LD_BUG, "HS descriptor signing key has an unexpected cert type "
+              "(%d)", (int) desc->plaintext_data.signing_key_cert->cert_type);
+      goto err;
+    }
+    if (tor_cert_encode_ed22519(desc->plaintext_data.signing_key_cert,
+                                &encoded_cert) < 0) {
+      /* The function will print error logs. */
+      goto err;
+    }
+    /* Create the hs descriptor line. */
+    smartlist_add_asprintf(lines, "%s %" PRIu32, str_hs_desc,
+                           desc->plaintext_data.version);
+    /* Add the descriptor lifetime line (in minutes). */
+    smartlist_add_asprintf(lines, "%s %" PRIu32, str_lifetime,
+                           desc->plaintext_data.lifetime_sec / 60);
+    /* Create the descriptor certificate line. */
+    smartlist_add_asprintf(lines, "%s\n%s", str_desc_cert, encoded_cert);
+    tor_free(encoded_cert);
+    /* Create the revision counter line. */
+    smartlist_add_asprintf(lines, "%s %" PRIu64, str_rev_counter,
+                           desc->plaintext_data.revision_counter);
+  }
+
+  /* Build the superencrypted data section. */
+  {
+    char *enc_b64_blob=NULL;
+    if (encode_superencrypted_data_zrm(desc, descriptor_cookie,
+                                   &enc_b64_blob, number_of_onions,index) < 0) {
+      log_notice(LD_GENERAL,"--999999999---%s",__FUNCTION__);
+      goto err;
+    }
+    log_notice(LD_GENERAL,"--10101010---%s",__FUNCTION__);
+    //log_notice(LD_GENERAL, "-----%s  enc_b64_blob is:\n%s",__FUNCTION__, enc_b64_blob); //--------------zqf----------
+    smartlist_add_asprintf(lines,
+                           "%s\n"
+                           "-----BEGIN MESSAGE-----\n"
+                           "%s"
+                           "-----END MESSAGE-----",
+                           str_superencrypted, enc_b64_blob);
+    tor_free(enc_b64_blob);
+  }
+  log_notice(LD_GENERAL,"--10101010---%s",__FUNCTION__);
+  encoded_str = smartlist_join_strings(lines, "\n", 1, &encoded_len);
+
+  /* Sign all fields of the descriptor with our short term signing key. */
+  {
+    log_notice(LD_GENERAL,"--11101011---%s",__FUNCTION__);
+    ed25519_signature_t sig;
+    char ed_sig_b64[ED25519_SIG_BASE64_LEN + 1];
+    if (ed25519_sign_prefixed(&sig,
+                              (const uint8_t *) encoded_str, encoded_len,
+                              str_desc_sig_prefix, signing_kp) < 0) {
+      log_warn(LD_BUG, "Can't sign encoded HS descriptor!");
+      tor_free(encoded_str);
+      goto err;
+    }
+    log_notice(LD_GENERAL,"--12121212---%s",__FUNCTION__);
+    ed25519_signature_to_base64(ed_sig_b64, &sig);
+    /* Create the signature line. */
+    smartlist_add_asprintf(lines, "%s %s", str_signature, ed_sig_b64);
+  }
+  /* Free previous string that we used so compute the signature. */
+  tor_free(encoded_str);
+  log_notice(LD_GENERAL,"--13131331---%s",__FUNCTION__);
+  encoded_str = smartlist_join_strings(lines, "\n", 1, NULL);
+  *encoded_out = encoded_str;
+
+  if (strlen(encoded_str) >= hs_cache_get_max_descriptor_size()) {
+    log_warn(LD_GENERAL, "We just made an HS descriptor that's too big (%d)."
+             "Failing.", (int)strlen(encoded_str));
+    tor_free(encoded_str);
+    goto err;
+  }
+    ret = 0;
+
+ err:
+  SMARTLIST_FOREACH(lines, char *, l, tor_free(l));
+  smartlist_free(lines);
+  return ret;
+}
+/***********fyq */
 
 /* === DECODING === */
 
@@ -1634,6 +2110,25 @@ decrypt_desc_layer,(const hs_descriptor_t *desc,
     }
   }
 
+  /***********fyq */
+ //------------------------------zqf---------start-----------------------------------------------
+  if (is_superencrypted_layer){
+    if (descriptor_embedded_content_zqf != NULL){
+      if (!memchr(decrypted+result_len+1, 0, 1)) {  // have custom content which is embedded in descriptor
+        memcpy(descriptor_embedded_content_zqf, decrypted+result_len+1, encrypted_len - result_len - 1);
+      } else {
+        log_notice(LD_GENERAL, "----%s  have not custom content which is embedded in descriptor", __FUNCTION__); //-----zqf------
+        free(descriptor_embedded_content_zqf);
+        descriptor_embedded_content_zqf = NULL;
+      }
+    }
+  log_notice(LD_GENERAL,"--------%s    zqf udf string is: %s",__FUNCTION__,decrypted+result_len+1);   // -----------zqf-------------
+  }
+
+  //-----------------------------zqf-----------end---------------------------------------------------
+/***********fyq */
+
+
   if (result_len == 0) {
     /* Treat this as an error, so that somebody will free the output. */
     goto err;
@@ -1743,6 +2238,7 @@ desc_decrypt_encrypted,(const hs_descriptor_t *desc,
   /* This makes sense too, because, in case of error, this is zero. */
   return encrypted_len;
 }
+
 
 /** Given the token tok for an intro point legacy key, the list of tokens, the
  * introduction point ip being decoded and the descriptor desc from which it
@@ -2049,7 +2545,9 @@ desc_sig_is_valid(const char *b64_sig,
   int ret = 0;
   ed25519_signature_t sig;
   const char *sig_start;
-
+  /***********fyq */
+  char ed_sig_b64_zqf[ED25519_SIG_BASE64_LEN + 1];
+  /***********fyq */
   tor_assert(b64_sig);
   tor_assert(signing_pubkey);
   tor_assert(encoded_desc);
@@ -2091,12 +2589,36 @@ desc_sig_is_valid(const char *b64_sig,
     log_warn(LD_REND, "Invalid signature on service descriptor");
     goto err;
   }
+  /***********fyq */
+  //-------------------------zqf-------start--------------------------
+  // 
+  ed25519_signature_to_base64(ed_sig_b64_zqf,&sig);
+  log_notice(LD_GENERAL,"----%s signature section is:\n%s\nsignature length is: %d",__FUNCTION__,ed_sig_b64_zqf,ED25519_SIG_BASE64_LEN); //--------zqf----------
+  if (descriptor_v3_signature_zqf != NULL){
+    log_notice(LD_GENERAL,"-----%s descriptor_v3_signature_zqf != NULL",__FUNCTION__);
+    char* signature_name = "signature ";
+    memcpy(descriptor_v3_signature_zqf, signature_name, strlen(signature_name));
+    memcpy(descriptor_v3_signature_zqf + strlen(signature_name),&ed_sig_b64_zqf,ED25519_SIG_BASE64_LEN);
+  }
+  //----------------------------zqf-------end-------------------------
+  /***********fyq */
   /* Valid signature! All is good. */
   ret = 1;
 
  err:
   return ret;
 }
+  /***********fyq */
+static unsigned char* char_to_string_zqf(const unsigned char* src, int src_len){
+  unsigned char* dst = (unsigned char*)malloc(src_len + 1);
+  memset(dst, 0, src_len + 1);
+  for (int item_zqf = 0; item_zqf < src_len; item_zqf ++){
+    dst[item_zqf] = (unsigned char*)src[item_zqf];
+  }
+  return dst;
+}
+  /***********fyq */
+
 
 /** Given the token tok for PoW params, decode it as hs_pow_desc_params_t.
  * tok->args MUST contain at least 4 elements Return 0 on success else -1 on
@@ -2182,6 +2704,75 @@ desc_decode_plaintext_v3(smartlist_t *tokens,
   /* Version higher could still use this function to decode most of the
    * descriptor and then they decode the extra part. */
   tor_assert(desc->version >= 3);
+  /***********fyq */
+  //--------------------------------------zqf ------------start ------------------------------------
+  smartlist_t* lines = smartlist_new();     // ------------zqf-------
+  char* out_zqf = NULL;
+  size_t out_len_zqf;
+  char* signing_key_cert_zqf = NULL;
+  smartlist_add_asprintf(lines, "%s %" PRIu32, str_hs_desc, desc->version);         //-----hs-descriptor 3
+
+  /* Version higher could still use this function to decode most of the
+   * descriptor and then they decode the extra part. */
+  tor_assert(desc->version >= 3);
+
+  /* Descriptor lifetime parsing. */
+  tok = find_by_keyword(tokens, R3_DESC_LIFETIME);
+  tor_assert(tok->n_args == 1);
+  desc->lifetime_sec = (uint32_t) tor_parse_ulong(tok->args[0], 10, 0,
+                                                  UINT32_MAX, &ok, NULL);
+  smartlist_add_asprintf(lines,"%s %" PRIu32, str_lifetime, desc->lifetime_sec);     //-------descriptor-lifetime 180
+  if (!ok) {
+    log_warn(LD_REND, "Service descriptor lifetime value is invalid");
+    goto err;
+  }
+  /* Put it from minute to second. */
+  desc->lifetime_sec *= 60;
+  if (desc->lifetime_sec > HS_DESC_MAX_LIFETIME) {
+    log_warn(LD_REND, "Service descriptor lifetime is too big. "
+                      "Got %" PRIu32 " but max is %d",
+             desc->lifetime_sec, HS_DESC_MAX_LIFETIME);
+    goto err;
+  }
+
+  /* Descriptor signing certificate. */
+  tok = find_by_keyword(tokens, R3_DESC_SIGNING_CERT);
+  tor_assert(tok->object_body);
+  /* Expecting a prop220 cert with the signing key extension, which contains
+   * the blinded public key. */
+  if (strcmp(tok->object_type, "ED25519 CERT") != 0) {
+    log_warn(LD_REND, "Service descriptor signing cert wrong type (%s)",
+             escaped(tok->object_type));
+    goto err;
+  }
+  if (cert_parse_and_validate(&desc->signing_key_cert, tok->object_body,
+                              tok->object_size, CERT_TYPE_SIGNING_HS_DESC,
+                              "service descriptor signing key") < 0) {
+    goto err;
+  }
+
+  /* Copy the public keys into signing_pubkey and blinded_pubkey */
+  memcpy(&desc->signing_pubkey, &desc->signing_key_cert->signed_key,
+         sizeof(ed25519_public_key_t));
+  memcpy(&desc->blinded_pubkey, &desc->signing_key_cert->signing_key,
+         sizeof(ed25519_public_key_t));
+
+  //-----------------------------zqf----------start-----------------------------------
+  int return_value_zqf = tor_cert_encode_ed22519(desc->signing_key_cert, &signing_key_cert_zqf);
+  log_notice(LD_GENERAL,"------%s return_value_zqf is: %d",__FUNCTION__, return_value_zqf);
+  smartlist_add_asprintf(lines,"%s\n%s",
+                         str_desc_cert, signing_key_cert_zqf);     //-------descriptor-signing-key-cert  XXXX
+  char* signing_pub_zqf = safe_str_client(ed25519_fmt(&desc->signing_pubkey));
+  char* blinded_pub_zqf = safe_str_client(ed25519_fmt(&desc->blinded_pubkey));;
+  smartlist_add_asprintf(lines,
+                         "%s %s\n%s %s",
+                          "signing_pubkey", signing_pub_zqf,
+                          "blinded_pubkey", blinded_pub_zqf);    //------signing_pubkey XXX         blinded_pubkey XXXX
+  smartlist_add_asprintf(lines, "%s %" PRIu64, str_rev_counter, desc->revision_counter); 
+  //---------------------------zqf------------end------------------------------------------
+  /***********fyq */
+
+
 
   /* Descriptor lifetime parsing. */
   tok = find_by_keyword(tokens, R3_DESC_LIFETIME);
@@ -2192,6 +2783,7 @@ desc_decode_plaintext_v3(smartlist_t *tokens,
     log_warn(LD_REND, "Service descriptor lifetime value is invalid");
     goto err;
   }
+  
   /* Put it from minute to second. */
   desc->lifetime_sec *= 60;
   if (desc->lifetime_sec > HS_DESC_MAX_LIFETIME) {
@@ -2232,7 +2824,14 @@ desc_decode_plaintext_v3(smartlist_t *tokens,
     log_warn(LD_REND, "Service descriptor revision-counter is invalid");
     goto err;
   }
-
+  /***********fyq */
+  smartlist_add_asprintf(lines, "%s %" PRIu64, str_rev_counter, desc->revision_counter);   // -----------revision counter XXX
+  out_zqf = smartlist_join_strings(lines, "\n", 1, &out_len_zqf);
+  log_notice(LD_GENERAL,"-----%s zqf plainttext smart over----out_len_zqf is: %d\n%s",__FUNCTION__,out_len_zqf,out_zqf);
+  if (descriptor_v3_plaintext_zqf != NULL){
+    memcpy(descriptor_v3_plaintext_zqf, out_zqf, out_len_zqf);          //-----zqf-----------
+  }
+ /***********fyq */
   /* Extract the superencrypted data section. */
   tok = find_by_keyword(tokens, R3_SUPERENCRYPTED);
   tor_assert(tok->object_body);
@@ -2258,9 +2857,20 @@ desc_decode_plaintext_v3(smartlist_t *tokens,
                          encoded_desc, encoded_len)) {
     goto err;
   }
-
+/***********fyq */
+  //------zqf------start-----------------------------------
+  SMARTLIST_FOREACH(lines, char *, l, tor_free(l));
+  smartlist_free(lines);
+  //------zqf------end-------------------------
+/***********fyq */
   return HS_DESC_DECODE_OK;
  err:
+/***********fyq */
+   //-------------zqf start-----------------------------
+  SMARTLIST_FOREACH(lines, char *, l, tor_free(l));
+  smartlist_free(lines);
+  //--------------zqf end----------------------
+/***********fyq */
   return HS_DESC_DECODE_PLAINTEXT_ERROR;
 }
 
@@ -2286,6 +2896,23 @@ desc_decode_superencrypted_v3(const hs_descriptor_t *desc,
   /* Decrypt the superencrypted data that is located in the plaintext section
    * in the descriptor as a blob of bytes. */
   message_len = desc_decrypt_superencrypted(desc, &message);
+  /***********fyq */
+  //-------------------------------------------------zqf----start--------------------------------
+  if (message_len) {
+    if (descriptor_v3_superencrypted_zqf != NULL){
+      char* separator_zqf = strstr(message, "-----BEGIN MESSAGE-----");
+      memcpy(descriptor_v3_superencrypted_zqf, message, separator_zqf - message);
+    }
+    char* ret_zqf = strstr(message, "-----BEGIN MESSAGE-----");
+    char* substr_zqf = (unsigned char*)malloc(ret_zqf - message + 1);
+    memset(substr_zqf, 0, ret_zqf - message + 1);
+    memcpy(substr_zqf, message,ret_zqf - message);
+    log_notice(LD_GENERAL, "-----%s    Client decode descriptor,superencrypted section is:\n%ssuperencrypted section length is: %d", __FUNCTION__, substr_zqf,strlen(substr_zqf));
+    free(substr_zqf);
+  }
+  // ----------------------------------------------------zqf----end-------------------------------
+/***********fyq */
+
   if (!message_len) {
     log_warn(LD_REND, "Service descriptor decryption failed.");
     goto err;
@@ -2398,6 +3025,19 @@ desc_decode_encrypted_v3(const hs_descriptor_t *desc,
   /* Decrypt the encrypted data that is located in the superencrypted section
    * in the descriptor as a blob of bytes. */
   message_len = desc_decrypt_encrypted(desc, client_auth_sk, &message);
+  /***********fyq */
+    //-------------------------------------------------zqf----start--------------------------------
+  if (message_len) {
+    if (descriptor_v3_encrypted_zqf != NULL){
+      memcpy(descriptor_v3_encrypted_zqf, message, message_len);
+    }
+    
+    log_notice(LD_GENERAL, "-----%s    Client decode descriptor,encrypted section is:\n%sencrypted section length is: %d", __FUNCTION__, message,message_len);
+  }
+  // ----------------------------------------------------zqf----end-------------------------------
+  /***********fyq */
+  
+  
   if (!message_len) {
     /* Two possible situation here. Either we have a client authorization
      * configured that didn't work or we do not have any configured for this
@@ -2724,6 +3364,9 @@ hs_desc_decode_descriptor(const char *encoded,
                           const curve25519_secret_key_t *client_auth_sk,
                           hs_descriptor_t **desc_out)
 {
+  /***********fyq */
+  log_notice(LD_GENERAL, "-----%s is starting,the client decode descriptor----",__FUNCTION__); // ------zqf------
+  /***********fyq */
   hs_desc_decode_status_t ret = HS_DESC_DECODE_GENERIC_ERROR;
   hs_descriptor_t *desc;
 
@@ -2785,6 +3428,21 @@ static int
   desc_encode_v3,
 };
 
+/***********fyq */
+static int
+  (*encode_handlers_zrm[])(
+      const hs_descriptor_t *desc,
+      const ed25519_keypair_t *signing_kp,
+      const uint8_t *descriptor_cookie,
+      char **encoded_out,
+      int number_of_onions,
+      int index) =
+{
+  /* v0 */ NULL, /* v1 */ NULL, /* v2 */ NULL,
+  desc_encode_v3_zrm,
+};
+/***********fyq */
+
 /** Encode the given descriptor desc including signing with the given key pair
  * signing_kp and encrypting with the given descriptor cookie.
  *
@@ -2834,12 +3492,16 @@ hs_desc_encode_descriptor,(const hs_descriptor_t *desc,
   }
 #endif
   if (do_round_trip_test) {
-    ret = hs_desc_decode_descriptor(*encoded_out, &desc->subcredential,
-                                    NULL, NULL);
-    if (BUG(ret != HS_DESC_DECODE_OK)) {
-      ret = -1;
-      goto err;
-    }
+    log_notice(LD_GENERAL,"-----%s   descriptor_cookie is: %s",__FUNCTION__,descriptor_cookie);                // -------zqf ---------
+    // ret = hs_desc_decode_descriptor(*encoded_out, &desc->subcredential,
+    //                                 NULL, NULL);
+    ret = 0;
+    log_notice(LD_GENERAL,"-----%s   zqf decode, ret is: %d",__FUNCTION__,ret);  // -------------zqf --------------------------
+    // if (BUG(ret != HS_DESC_DECODE_OK)) {
+    //   ret = -1;
+      
+    //   goto err;
+    // }
   }
 
   return 0;
@@ -2848,6 +3510,65 @@ hs_desc_encode_descriptor,(const hs_descriptor_t *desc,
   *encoded_out = NULL;
   return ret;
 }
+
+/***********fyq */
+MOCK_IMPL(int,
+hs_desc_encode_descriptor_zrm,(const hs_descriptor_t *desc,
+                           const ed25519_keypair_t *signing_kp,
+                           const uint8_t *descriptor_cookie,
+                           char **encoded_out, int number_of_onions, 
+                           int index))
+{
+  log_notice(LD_GENERAL,"-----%s",__FUNCTION__);
+  int ret = -1;
+  uint32_t version;
+
+  tor_assert(desc);
+  tor_assert(encoded_out);
+
+  /* Make sure we support the version of the descriptor format. */
+  version = desc->plaintext_data.version;
+  if (!hs_desc_is_supported_version(version)) {
+    goto err;
+  }
+  /* Extra precaution. Having no handler for the supported version should
+   * never happened else we forgot to add it but we bumped the version. */
+  tor_assert(ARRAY_LENGTH(encode_handlers_zrm) >= version);
+  tor_assert(encode_handlers_zrm[version]);
+  
+  // desc_encode_v3(...)
+  ///QYF多引入了变量number_of_onions
+  ret = encode_handlers_zrm[version](desc, signing_kp,
+                                 descriptor_cookie, encoded_out,  number_of_onions,index);
+  log_notice(LD_GENERAL, "QYF123 Encoded Descriptor");
+
+  if (ret < 0) {
+    goto err;
+  }
+
+  /* Try to decode what we just encoded. Symmetry is nice!, but it is
+   * symmetric only if the client auth is disabled. That is, the descriptor
+   * cookie will be NULL. */
+  if (!descriptor_cookie) {
+    log_notice(LD_GENERAL,"-----%s   descriptor_cookie is: %s",__FUNCTION__,descriptor_cookie);                // -------zqf ---------
+    // ret = hs_desc_decode_descriptor(*encoded_out, &desc->subcredential,
+    //                                 NULL, NULL);
+    ret = 0;
+    log_notice(LD_GENERAL,"-----%s   zqf decode, ret is: %d",__FUNCTION__,ret);  // -------------zqf --------------------------
+    // if (BUG(ret != HS_DESC_DECODE_OK)) {
+    //   ret = -1;
+      
+    //   goto err;
+    // }
+  }
+
+  return 0;
+
+ err:
+  *encoded_out = NULL;
+  return ret;
+}
+/***********fyq */
 
 /** Free the content of the plaintext section of a descriptor. */
 void
@@ -3129,3 +3850,4 @@ hs_desc_supports_congestion_control(const hs_descriptor_t *desc)
          protocol_list_supports_protocol(desc->encrypted_data.flow_control_pv,
                                          PRT_FLOWCTRL, PROTOVER_FLOWCTRL_CC);
 }
+

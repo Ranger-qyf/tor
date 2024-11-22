@@ -1842,6 +1842,25 @@ pick_rendezvous_node(router_crn_flags_t flags)
   return router_choose_random_node(NULL, options->ExcludeNodes, flags);
 }
 
+/***********fyq */
+// ------------------------zhangqingfeng 自定义的函数，需删除----------------------------------------------------------------------------
+static const node_t *
+pick_rendezvous_node_by_zqf(router_crn_flags_t flags)
+{
+  log_notice(LD_GENERAL,"%s    start get_list_random_element_zqf",__FUNCTION__);
+  const char* target_id_zqf = get_list_random_element_zqf(mylist_zqf);
+  if (target_id_zqf != NULL){
+    log_notice(LD_GENERAL,"%s    ++++fingerprint is %s",__FUNCTION__,target_id_zqf);
+    node_t* node = node_get_by_hex_id(target_id_zqf,flags);
+    /**if (node == NULL){
+      return pick_rendezvous_node(flags);
+    }*/
+    return node;
+  }
+  return pick_rendezvous_node(flags);
+  
+}
+/***********fyq */
 /*
  * Helper function to pick a configured restricted middle node
  * (either HSLayer2Nodes or HSLayer3Nodes).
@@ -1963,6 +1982,7 @@ choose_good_exit_server(origin_circuit_t *circ,
       {
         /* Pick a new RP */
         const node_t *rendezvous_node = pick_rendezvous_node(flags);
+        //const node_t *rendezvous_node = pick_rendezvous_node_by_zqf(flags);     // zqf自定义的函数，源代码需将其注释---------------------------------------------
         log_info(LD_REND, "Picked new RP: %s",
                  safe_str_client(node_describe(rendezvous_node)));
         return rendezvous_node;

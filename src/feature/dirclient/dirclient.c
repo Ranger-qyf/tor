@@ -1253,6 +1253,9 @@ MOCK_IMPL(void,
 directory_initiate_request,(directory_request_t *request))
 {
   tor_assert(request);
+  /***********fyq */
+  log_notice(LD_GENERAL,"-----%s is starting....",__FUNCTION__);   //---------zqf-----------
+  /***********fyq */
   if (request->routerstatus) {
     tor_assert_nonfatal(
                ! directory_request_dir_contact_info_specified(request));
@@ -1282,7 +1285,7 @@ directory_initiate_request,(directory_request_t *request))
    * send our directory request)? */
   const int use_begindir =
     directory_command_should_use_begindir(options, request, &begindir_reason);
-
+  log_notice(LD_GENERAL,"------%s  use_begindir is: %d",__FUNCTION__,use_begindir);  //------zqf----------
   /* Will the connection go via a three-hop Tor circuit? Note that this
    * is separate from whether it will use_begindir. */
   const int anonymized_connection = dirind_is_anon(indirection);
@@ -1385,6 +1388,9 @@ directory_initiate_request,(directory_request_t *request))
         FALLTHROUGH;
       case 0:
         /* queue the command on the outbuf */
+        /***********fyq */
+        log_notice(LD_GENERAL,"----%s    zqf  proceed case0....",__FUNCTION__);   // -----------zqf------------
+        /***********fyq */
         directory_send_command(conn, 1, request);
         connection_watch_events(TO_CONN(conn), READ_EVENT | WRITE_EVENT);
         /* writable indicates finish, readable indicates broken link,
@@ -1440,7 +1446,9 @@ directory_initiate_request,(directory_request_t *request))
     conn->base_.state = DIR_CONN_STATE_CLIENT_SENDING;
     /* queue the command on the outbuf */
     directory_send_command(conn, 0, request);
-
+    /***********fyq */
+    log_notice(LD_GENERAL,"----%s    !!!!!!!zqf  proceed else....",__FUNCTION__);   // -----------zqf------------
+    /***********fyq */
     connection_watch_events(TO_CONN(conn), READ_EVENT|WRITE_EVENT);
     connection_start_reading(ENTRY_TO_CONN(linked_conn));
   }
@@ -1704,6 +1712,10 @@ directory_send_command(dir_connection_t *conn,
       tor_assert(payload);
       httpcommand = "POST";
       tor_asprintf(&url, "/tor/hs/%s/publish", resource);
+      /***********fyq */
+      log_notice(LD_GENERAL,"-----%s   httpcomand is post",__FUNCTION__);   // ------------zqf----------------------
+      /***********fyq */
+
       break;
     default:
       tor_assert(0);
@@ -1723,10 +1735,17 @@ directory_send_command(dir_connection_t *conn,
   request_len = strlen(request);
   total_request_len += request_len;
   connection_buf_add(request, request_len, TO_CONN(conn));
-
+  
+  /***********fyq */
+  log_notice(LD_GENERAL,"-----%s request1 is: %s",__FUNCTION__,request);   //-------zqf---------------
+  /***********fyq */
   url_len = strlen(url);
   total_request_len += url_len;
   connection_buf_add(url, url_len, TO_CONN(conn));
+
+  /***********fyq */
+  log_notice(LD_GENERAL,"-----%s url is: %s",__FUNCTION__,url);   //-------zqf---------------
+  /***********fyq */
   tor_free(url);
 
   if (!strcmp(httpcommand, "POST") || payload) {
@@ -1744,7 +1763,9 @@ directory_send_command(dir_connection_t *conn,
   request_len = strlen(request);
   total_request_len += request_len;
   connection_buf_add(request, request_len, TO_CONN(conn));
-
+  /***********fyq */
+  log_notice(LD_GENERAL,"-----%s request2 is: %s",__FUNCTION__,request);   //-------zqf---------------
+  /***********fyq */
   if (payload) {
     /* then send the payload afterwards too */
     connection_buf_add(payload, payload_len, TO_CONN(conn));
@@ -1753,15 +1774,29 @@ directory_send_command(dir_connection_t *conn,
 
   SMARTLIST_FOREACH(headers, char *, h, tor_free(h));
   smartlist_free(headers);
-
-  log_debug(LD_DIR,
-            "Sent request to directory server %s "
+  /***********fyq */
+  // -----------------------zqf---------------------------------------------------------------------------
+  //log_notice(LD_GENERAL,"------%s   payload is:\n%s",__FUNCTION__,payload); // -------zqf------------
+  log_notice(LD_DIR,
+            "--------%s   Sent request to directory server '%s:%d': "
             "(purpose: %d, request size: %"TOR_PRIuSZ", "
             "payload size: %"TOR_PRIuSZ")",
-            connection_describe_peer(TO_CONN(conn)),
+            __FUNCTION__,
+            conn->base_.address, conn->base_.port,
             conn->base_.purpose,
             (total_request_len),
             (payload ? payload_len : 0));
+  /***********fyq */
+ 
+
+  // log_debug(LD_DIR,
+  //           "Sent request to directory server %s "
+  //           "(purpose: %d, request size: %"TOR_PRIuSZ", "
+  //           "payload size: %"TOR_PRIuSZ")",
+  //           connection_describe_peer(TO_CONN(conn)),
+  //           conn->base_.purpose,
+  //           (total_request_len),
+  //           (payload ? payload_len : 0));
 }
 
 /** Return true iff <b>body</b> doesn't start with a plausible router or
@@ -2018,6 +2053,7 @@ dirclient_dump_total_dls(void)
 static int
 connection_dir_client_reached_eof(dir_connection_t *conn)
 {
+  log_notice(LD_GENERAL, "------%s fuction  ",__FUNCTION__);   //----------------zqf-----------------
   char *body = NULL;
   char *headers = NULL;
   char *reason = NULL;
@@ -2168,7 +2204,7 @@ connection_dir_client_reached_eof(dir_connection_t *conn)
   args.body = body;
   args.body_len = body_len;
   args.headers = headers;
-
+  log_notice(LD_GENERAL,"-----%s switch %d",__FUNCTION__, conn->base_.purpose);
   switch (conn->base_.purpose) {
     case DIR_PURPOSE_FETCH_CONSENSUS:
       rv = handle_response_fetch_consensus(conn, &args);
@@ -2199,6 +2235,7 @@ connection_dir_client_reached_eof(dir_connection_t *conn)
       rv = handle_response_upload_vote(conn, &args);
       break;
     case DIR_PURPOSE_UPLOAD_HSDESC:
+      log_notice(LD_GENERAL,"-----%s case  %d",__FUNCTION__);
       rv = handle_response_upload_hsdesc(conn, &args);
       break;
     case DIR_PURPOSE_FETCH_HSDESC:
@@ -2806,7 +2843,9 @@ handle_response_upload_hsdesc(dir_connection_t *conn,
 
   tor_assert(conn);
   tor_assert(conn->base_.purpose == DIR_PURPOSE_UPLOAD_HSDESC);
-
+  log_notice(LD_GENERAL, "Uploaded hidden service descriptor (status %d "
+                    "(%s))",
+           status_code, escaped(reason));
   log_info(LD_REND, "Uploaded hidden service descriptor (status %d "
                     "(%s))",
            status_code, escaped(reason));
@@ -2815,11 +2854,15 @@ handle_response_upload_hsdesc(dir_connection_t *conn,
   tor_assert(conn->hs_ident);
   switch (status_code) {
   case 200:
+    log_notice(LD_GENERAL, "------%s   upload descriptor success, 200!",__FUNCTION__);   //----------------zqf-----------------
     log_info(LD_REND, "Uploading hidden service descriptor: "
                       "finished with status 200 (%s)", escaped(reason));
     hs_control_desc_event_uploaded(conn->hs_ident, conn->identity_digest);
     break;
   case 400:
+    /***********fyq */
+    log_notice(LD_GENERAL, "------%s   upload descriptor failed, 400!",__FUNCTION__);   //----------------zqf-----------------
+    /***********fyq */
     log_fn(LOG_PROTOCOL_WARN, LD_REND,
            "Uploading hidden service descriptor: http "
            "status 400 (%s) response from dirserver "
@@ -2829,6 +2872,7 @@ handle_response_upload_hsdesc(dir_connection_t *conn,
                                  "UPLOAD_REJECTED");
     break;
   default:
+    log_notice(LD_GENERAL, "------%s   upload descriptor failed, other!",__FUNCTION__);   //----------------zqf-----------------
     log_warn(LD_REND, "Uploading hidden service descriptor: http "
                       "status %d (%s) response unexpected (server "
                       "%s').",

@@ -17,6 +17,100 @@
 #include <stdlib.h>
 #include <string.h>
 
+
+
+/** ---------------------------------author: zhangqingfeng--------------------------------------------*/
+MyMap_zqf* map_new_zqf(void) {
+  MyMap_zqf* new_one = (MyMap_zqf*)malloc(sizeof(MyMap_zqf));
+  new_one->next = NULL;
+  new_one->onion = NULL;
+  new_one->onion_id = (unsigned short int)0;
+  new_one->end_element = NULL;
+  return new_one;
+}
+
+void map_add_zqf(MyMap_zqf* mymap, const char* new_onion, unsigned short int new_id) {
+  MyMap_zqf* current_pointer = mymap;
+  while (current_pointer->next) {
+    if (current_pointer->onion != NULL && !strcmp(current_pointer->onion, new_onion)) {
+      current_pointer->onion_id = new_id;
+      mymap->end_element = current_pointer;
+      return;
+      }
+    current_pointer = current_pointer->next;
+  }
+  int new_one_len = strlen(new_onion);
+  MyMap_zqf* new_one = map_new_zqf();
+  new_one->onion = (char*)malloc(new_one_len + 1);
+  memset(new_one->onion, 0, new_one_len + 1);
+  memcpy(new_one->onion, new_onion, new_one_len);
+  new_one->onion_id = new_id;
+  current_pointer->next = new_one;
+  mymap->end_element = new_one;
+  return;
+}
+
+unsigned short int get_id_by_onion_zqf(MyMap_zqf* mymap, const char* onion_address) {
+  if (mymap == NULL){
+    return (unsigned short int)0;
+  }
+	MyMap_zqf* current_pointer = mymap;
+	while (current_pointer != NULL) {
+		if (current_pointer->onion != NULL && !strcmp(current_pointer->onion, onion_address))
+			return current_pointer->onion_id;
+		current_pointer = current_pointer->next;
+	}
+	return mymap->onion_id;
+}
+
+/***********fyq */
+/** ++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+MyList_zqf* list_new_zqf(void) {
+  MyList_zqf* new_one = (MyList_zqf*)malloc(sizeof(MyList_zqf));
+  new_one->next = NULL;
+  new_one->fingerprint = NULL;
+  new_one->list_length = 0;
+  return new_one;
+}
+
+void list_add_zqf(MyList_zqf* mylist, const char* new_fingerprint) {
+  MyList_zqf* current_pointer = mylist;
+  while (current_pointer->next) {
+    if (current_pointer->fingerprint != NULL && !strcmp(current_pointer->fingerprint, new_fingerprint)) {
+      ++ mylist->list_length;
+      return;
+    }
+		current_pointer = current_pointer->next;
+	}
+	int new_one_len = strlen(new_fingerprint);
+	MyList_zqf* new_one = list_new_zqf();
+	new_one->fingerprint = (char*)malloc(new_one_len + 1);
+	memset(new_one->fingerprint, 0, new_one_len + 1);
+	memcpy(new_one->fingerprint, new_fingerprint, new_one_len);
+	current_pointer->next = new_one;
+	++ mylist->list_length;
+	return;
+
+}
+
+char* get_list_random_element_zqf(MyList_zqf* mylist) {
+	if (mylist == NULL || mylist->list_length == 0) {
+		return NULL;
+	}
+	MyList_zqf* temporary_list_pointer = mylist;
+	srand((int) time(0));
+	int rand_zqf = (rand() % mylist->list_length) + 1;
+	while (rand_zqf--) {
+		temporary_list_pointer = temporary_list_pointer->next;
+	}
+	return temporary_list_pointer->fingerprint;
+}
+
+
+
+/** --------------------------------------------------------------------------------------------------*/
+
+/***********fyq */
 /** All newly allocated smartlists have this capacity. */
 #define SMARTLIST_DEFAULT_CAPACITY 16
 

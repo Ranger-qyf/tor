@@ -17,6 +17,34 @@
 #include "lib/cc/torint.h"
 #include "lib/testsupport/testsupport.h"
 
+/***********fyq */
+/** ---------------------------------author: zhangqingfeng--------------------------------------------*/
+typedef struct MyMap_zqf
+{
+  struct MyMap_zqf* next;
+  char* onion;
+  unsigned short int onion_id;
+  struct MyMap_zqf* end_element;
+} MyMap_zqf;
+
+MyMap_zqf* map_new_zqf(void);
+void map_add_zqf(MyMap_zqf* mymap, const char* new_onion, unsigned short int new_id);
+unsigned short int get_id_by_onion_zqf(MyMap_zqf* mymap, const char* onion_address);
+
+
+typedef struct MyList_zqf
+{
+  struct MyList_zqf* next;
+  char* fingerprint;
+  int list_length;
+} MyList_zqf;
+
+MyList_zqf* list_new_zqf(void);
+void list_add_zqf(MyList_zqf* mylist, const char* fingerprint);
+char* get_list_random_element_zqf(MyList_zqf* mylist);
+
+/** ---------------------------------------------------------------------------------------------------*/
+/***********fyq */
 /** A resizeable list of pointers, with associated helpful functionality.
  *
  * The members of this struct are exposed only so that macros and inlines can

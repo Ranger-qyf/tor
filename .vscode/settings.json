@@ -1,0 +1,29 @@
+{
+    "files.associations": {
+        "confline.h": "c",
+        "nodelist.h": "c",
+        "hs_ob.h": "c",
+        "node_select.h": "c",
+        "hs_circuit.h": "c",
+        "hs_ident.h": "c",
+        "xiosbase": "c",
+        "dirclient.h": "c",
+        "dirserv.h": "c",
+        "hs_cell.h": "c",
+        "circpathbias.h": "c",
+        "directory.h": "c",
+        "system_error": "c",
+        "chrono": "c",
+        "channelpadding.h": "c",
+        "stdio.h": "c",
+        "string.h": "c",
+        "vector": "cpp",
+        "xhash": "cpp",
+        "xstring": "cpp",
+        "*.inc": "cpp",
+        "xlocmon": "c",
+        "or.h": "c",
+        "entry_port_cfg_st.h": "c",
+        "timeval.h": "c"
+    }
+}

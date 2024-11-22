@@ -5335,6 +5335,9 @@ connection_finished_connecting(connection_t *conn)
 static int
 connection_reached_eof(connection_t *conn)
 {
+  /***********fyq */
+  log_notice(LD_GENERAL, "++++++%s is starting ---",__FUNCTION__);//-----zqf---
+  /***********fyq */
   switch (conn->type) {
     case CONN_TYPE_OR:
     case CONN_TYPE_EXT_OR:

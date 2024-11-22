@@ -1051,6 +1051,9 @@ hs_build_hs_index(uint64_t replica, const ed25519_public_key_t *blinded_pk,
   /* Now setup INT_8(replicanum) | INT_8(period_length) | INT_8(period_num) */
   {
     uint64_t period_length = get_time_period_length();
+    /***********fyq */
+    log_notice(LD_GENERAL, "-----%s period_length is: %d",__FUNCTION__,period_length); //--------zqf---------
+    /***********fyq */
     char buf[sizeof(uint64_t)*3];
     size_t offset = 0;
     set_uint64(buf, tor_htonll(replica));
@@ -1278,9 +1281,15 @@ hs_get_responsible_hsdirs(const ed25519_public_key_t *blinded_pk,
     smartlist_sort(sorted_nodes, compare_node_fetch_hsdir_index);
     cmp_fct = compare_digest_to_fetch_hsdir_index;
   } else if (use_second_hsdir_index) {
+    /***********fyq */
+    log_notice(LD_GENERAL, "-----%s call compare_node_store_second_hsdir_index...", __FUNCTION__); //-------zqf------------
+    /***********fyq */
     smartlist_sort(sorted_nodes, compare_node_store_second_hsdir_index);
     cmp_fct = compare_digest_to_store_second_hsdir_index;
   } else {
+    /***********fyq */
+    log_notice(LD_GENERAL, "-----%s call compare_node_store_first_hsdir_index...", __FUNCTION__); //-------zqf------------
+    /***********fyq */
     smartlist_sort(sorted_nodes, compare_node_store_first_hsdir_index);
     cmp_fct = compare_digest_to_store_first_hsdir_index;
   }
@@ -1288,19 +1297,33 @@ hs_get_responsible_hsdirs(const ed25519_public_key_t *blinded_pk,
   /* For all replicas, we'll select a set of HSDirs using the consensus
    * parameters and the sorted list. The replica starting at value 1 is
    * defined by the specification. */
-  for (int replica = 1; replica <= hs_get_hsdir_n_replicas(); replica++) {
+  int replica_num_zqf = hs_get_hsdir_n_replicas();
+  log_notice(LD_GENERAL,"-----%s  replica_num_zqf is: %d",__FUNCTION__,replica_num_zqf);   
+  //------zqf_end----------
+  int temp;
+  if(number_of_slices < 2 || number_of_slices > 128){
+    number_of_slices = 2;
+  }
+  temp = number_of_slices;
+  log_notice(LD_GENERAL,"-----%s  number of slices is: %d",__FUNCTION__, number_of_slices);   
+
+  
+
+  for (int replica = 1; replica <= number_of_slices; replica++) {
     int idx, start, found, n_added = 0;
     uint8_t hs_index[DIGEST256_LEN] = {0};
     /* Number of node to add to the responsible dirs list depends on if we are
-     * trying to fetch or store. A client always fetches. */
-    int n_to_add = (for_fetching) ? hs_get_hsdir_spread_fetch() :
-                                    hs_get_hsdir_spread_store();
-
+     * trying to fetch or store. A client always fetches. 
+     * 添加到责任目录列表的节点数量取决于我们是试图获取还是存储。客户端总是取回。*/
+    //int n_to_add = (for_fetching) ? hs_get_hsdir_spread_fetch() :
+    //                                hs_get_hsdir_spread_store();
+    int n_to_add = 1;
     /* Get the index that we should use to select the node. */
     hs_build_hs_index(replica, blinded_pk, time_period_num, hs_index);
     /* The compare function pointer has been set correctly earlier. */
     start = idx = smartlist_bsearch_idx(sorted_nodes, hs_index, cmp_fct,
                                         &found);
+    log_notice(LD_GENERAL,"-----%s  start is: %d, found is: %d", __FUNCTION__, start, found); //-------zqf----------
     /* Getting the length of the list if no member is greater than the key we
      * are looking for so start at the first element. */
     if (idx == smartlist_len(sorted_nodes)) {
@@ -1312,6 +1335,7 @@ hs_get_responsible_hsdirs(const ed25519_public_key_t *blinded_pk,
        * replicas, the specification says to skip over. */
       if (!smartlist_contains(responsible_dirs, node->rs)) {
         smartlist_add(responsible_dirs, node->rs);
+	log_notice(LD_GENERAL,"-----%s  hsdir is %s", __FUNCTION__, hex_str(node->identity, DIGEST_LEN));
         ++n_added;
       }
       if (++idx == smartlist_len(sorted_nodes)) {
@@ -1328,6 +1352,137 @@ hs_get_responsible_hsdirs(const ed25519_public_key_t *blinded_pk,
  done:
   smartlist_free(sorted_nodes);
 }
+
+/***********fyq */
+void
+hs_get_responsible_hsdirs_zrm(const ed25519_public_key_t *blinded_pk,
+                          uint64_t time_period_num, int use_second_hsdir_index,
+                          int for_fetching, smartlist_t *responsible_dirs, int repl)
+{
+  smartlist_t *sorted_nodes;
+  /* The compare function used for the smartlist bsearch. We have two
+   * different depending on is_next_period. */
+  int (*cmp_fct)(const void *, const void **);
+
+  tor_assert(blinded_pk);
+  tor_assert(responsible_dirs);
+
+  sorted_nodes = smartlist_new();
+
+  /* Make sure we actually have a live consensus */
+  networkstatus_t *c = networkstatus_get_live_consensus(approx_time());//hwt_定位consensus
+  if (!c || smartlist_len(c->routerstatus_list) == 0) {
+      log_warn(LD_REND, "No live consensus so we can't get the responsible "
+               "hidden service directories.");
+      goto done;
+  }
+
+  /* Ensure the nodelist is fresh, since it contains the HSDir indices. */
+  nodelist_ensure_freshness(c);
+
+  /* Add every node_t that support HSDir v3 for which we do have a valid
+   * hsdir_index already computed for them for this consensus. 
+   * 添加每个支持HSDir v3的node_t，并且我们已经为它们计算了有效的hsdir_index。*/
+  {
+    SMARTLIST_FOREACH_BEGIN(c->routerstatus_list, const routerstatus_t *, rs) {
+      /* Even though this node_t object won't be modified and should be const,
+       * we can't add const object in a smartlist_t. */
+      node_t *n = node_get_mutable_by_id(rs->identity_digest);
+      tor_assert(n);
+      if (node_supports_v3_hsdir(n) && rs->is_hs_dir) {
+        if (!node_has_hsdir_index(n)) {
+          log_notice(LD_GENERAL, "-----%s Node %s was found without hsdir index.",__FUNCTION__,
+                   node_describe(n));    //-----zqf---------------
+          continue;
+        }
+        smartlist_add(sorted_nodes, n);
+      }
+    } SMARTLIST_FOREACH_END(rs);
+  }
+  if (smartlist_len(sorted_nodes) == 0) {
+    log_warn(LD_REND, "No nodes found to be HSDir or supporting v3.");
+    goto done;
+  }
+
+  /* First thing we have to do is sort all node_t by hsdir_index. The
+   * is_next_period tells us if we want the current or the next one. Set the
+   * bsearch compare function also while we are at it. */
+  if (for_fetching) {
+    smartlist_sort(sorted_nodes, compare_node_fetch_hsdir_index);
+    cmp_fct = compare_digest_to_fetch_hsdir_index;
+  } else if (use_second_hsdir_index) {
+    log_notice(LD_GENERAL, "-----%s call compare_node_store_second_hsdir_index...", __FUNCTION__); //-------zqf------------
+    smartlist_sort(sorted_nodes, compare_node_store_second_hsdir_index);
+    cmp_fct = compare_digest_to_store_second_hsdir_index;
+  } else {
+    log_notice(LD_GENERAL, "-----%s call compare_node_store_first_hsdir_index...", __FUNCTION__); //-------zqf------------
+    smartlist_sort(sorted_nodes, compare_node_store_first_hsdir_index);
+    cmp_fct = compare_digest_to_store_first_hsdir_index;
+  }
+
+  /* For all replicas, we'll select a set of HSDirs using the consensus
+   * parameters and the sorted list. The replica starting at value 1 is
+   * defined by the specification. 
+   * 对于所有副本，我们将使用共识参数和排序列表选择一组hsdir。该规范定义了从值1开始的副本。*/
+
+  //----------zqf_start------
+  int replica_num_zqf = hs_get_hsdir_n_replicas();
+  log_notice(LD_GENERAL,"-----%s  replica_num_zqf is: %d",__FUNCTION__,replica_num_zqf);   
+  //------zqf_end----------
+  int temp;
+  if(number_of_slices < 2 || number_of_slices > 128){
+    number_of_slices = 2;
+  }
+  temp = number_of_slices;
+  log_notice(LD_GENERAL,"-----%s  number of slices is: %d",__FUNCTION__, number_of_slices);
+  int temp_len = ((repl + 1) % 4 == 0 ? (repl + 1) / 4 : (repl + 1) / 4 + 1);
+  // int len = for_fetching ? temp_len: number_of_slices;
+  int len = repl;
+  log_notice(LD_GENERAL,"-----%s  len is: %d",__FUNCTION__, len);
+  for (int replica = 1; replica <= len; replica++) {
+    int idx, start, found, n_added = 0;
+    uint8_t hs_index[DIGEST256_LEN] = {0};
+    /* Number of node to add to the responsible dirs list depends on if we are
+     * trying to fetch or store. A client always fetches. 
+     * 添加到责任目录列表的节点数量取决于我们是试图获取还是存储。客户端总是取回。*/
+    //int n_to_add = (for_fetching) ? hs_get_hsdir_spread_fetch() :
+    //                                hs_get_hsdir_spread_store();
+    int n_to_add = 1; //TODO hwt_控制上传描述符时，每个分片(副本)的上传冗余个数
+    /* Get the index that we should use to select the node. */
+    hs_build_hs_index(replica, blinded_pk, time_period_num, hs_index);
+    /* The compare function pointer has been set correctly earlier. */
+    start = idx = smartlist_bsearch_idx(sorted_nodes, hs_index, cmp_fct,
+                                        &found);
+    log_notice(LD_GENERAL,"-----%s  start is: %d, found is: %d", __FUNCTION__, start, found); //-------zqf----------
+    /* Getting the length of the list if no member is greater than the key we
+     * are looking for so start at the first element. */
+    if (idx == smartlist_len(sorted_nodes)) {
+      start = idx = 0;
+    }
+    while (n_added < n_to_add) {
+      const node_t *node = smartlist_get(sorted_nodes, idx);
+      /* If the node has already been selected which is possible between
+       * replicas, the specification says to skip over. */
+      if (!smartlist_contains(responsible_dirs, node->rs)) {
+        smartlist_add(responsible_dirs, node->rs);
+		log_notice(LD_GENERAL,"-----%s  hsdir is %s", __FUNCTION__, hex_str(node->identity, DIGEST_LEN)); 
+        ++n_added;
+      }
+      if (++idx == smartlist_len(sorted_nodes)) {
+        /* Wrap if we've reached the end of the list. */
+        idx = 0;
+      }
+      if (idx == start) {
+        /* We've gone over the whole list, stop and avoid infinite loop. */
+        break;
+      }
+    }
+  }
+
+ done:
+  smartlist_free(sorted_nodes);
+}
+/***********fyq */
 
 /*********************** HSDir request tracking ***************************/
 

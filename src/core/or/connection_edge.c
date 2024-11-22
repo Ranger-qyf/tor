@@ -120,6 +120,15 @@
 #include "core/or/socks_request_st.h"
 #include "lib/evloop/compat_libevent.h"
 
+
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <ifaddrs.h>
+
 #ifdef HAVE_LINUX_TYPES_H
 #include <linux/types.h>
 #endif
@@ -163,6 +172,9 @@
 
 #define SOCKS4_GRANTED          90
 #define SOCKS4_REJECT           91
+
+
+
 
 static int connection_ap_handshake_process_socks(entry_connection_t *conn);
 static int connection_ap_process_natd(entry_connection_t *conn);
@@ -2124,6 +2136,38 @@ connection_ap_handle_onion(entry_connection_t *conn,
   return 0;
 }
 
+
+void print_local_ip() {
+    struct ifaddrs *ifaddr, *ifa;
+    int family;
+    char host[256];
+
+    // 获取本地接口地址信息
+    if (getifaddrs(&ifaddr) == -1) {
+        log_notice(LD_GENERAL, "getifaddrs");
+        return;
+    }
+
+    // 遍历接口列表，查找非回环地址
+    for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
+        if (ifa->ifa_addr == NULL) continue;
+
+        family = ifa->ifa_addr->sa_family;
+
+        // 只处理IPv4地址，并排除回环地址
+        if (family == AF_INET && !(ifa->ifa_flags & IFF_LOOPBACK)) {
+            // 转换并打印IP地址
+            if (getnameinfo(ifa->ifa_addr, sizeof(struct sockaddr_in), 
+                            host, 256, NULL, 0, 0x02) == 0) {
+                log_notice(LD_GENERAL, "QYF-Local-IP-Address: %s", host);
+            }
+        }
+    }
+
+    freeifaddrs(ifaddr);
+}
+
+
 /** Connection <b>conn</b> just finished its socks handshake, or the
  * controller asked us to take care of it. If <b>circ</b> is defined,
  * then that's where we'll want to attach it. Otherwise we have to
@@ -2171,7 +2215,8 @@ connection_ap_handshake_rewrite_and_attach(entry_connection_t *conn,
   const int automap = rr.automap;
   const addressmap_entry_source_t exit_source = rr.exit_source;
   if (socks->address) {
-    log_notice(LD_GENERAL,"QYF direction_address:%s", socks->address);
+    print_local_ip();
+    log_notice(LD_GENERAL,"QYF-Target-IP-Address:%s", socks->address);
   }
   /* Now see whether the hostname is bogus.  This could happen because of an
    * onion hostname whose format we don't recognize. */
@@ -2825,7 +2870,10 @@ connection_ap_handshake_process_socks(entry_connection_t *conn)
   int sockshere;
   const or_options_t *options = get_options();
   int had_reply = 0;
-  connection_t *base_conn = ENTRY_TO_CONN(conn);
+  connection_t *base_conn = ENTRY_TO_CONN(conn);\
+
+
+  
 
   tor_assert(conn);
   tor_assert(base_conn->type == CONN_TYPE_AP);
@@ -2837,7 +2885,20 @@ connection_ap_handshake_process_socks(entry_connection_t *conn)
 
   sockshere = fetch_from_buf_socks(base_conn->inbuf, socks,
                                    options->TestSocks, options->SafeSocks);
-
+  /*********fyq */
+  size_t data_len = buf_datalen(base_conn->inbuf);
+  if (data_len > 0) {
+    char *data = tor_malloc(data_len + 1);  // Allocate memory to store the data
+    connection_buf_get_bytes(data, data_len, base_conn);  // Get bytes from buffer
+    data[data_len] = '\0';  // Null terminate the string
+    log_info(LD_GENERAL, "QYF SOCKS request: %s", data);  // Log the raw data
+    tor_free(data);  // Free the allocated memory
+  }
+  // if (buf_datalen(base_conn->inbuf) > 0) {
+  //   char *raw_data = (char *)buf_get(base_conn->inbuf, buf_datalen(base_conn->inbuf));
+  //   log_info(LD_GENERAL, "QYF raw SOCKS request: %s", raw_data);
+  // }
+  /*********fyq */
   if (socks->replylen) {
     had_reply = 1;
     connection_buf_add((const char*)socks->reply, socks->replylen,

@@ -121,7 +121,10 @@ hs_control_desc_event_created(const char *onion_address,
 
   /* Version 3 doesn't use the replica number in its descriptor ID computation
    * so we pass negative value so the control port subsystem can ignore it. */
-  control_event_hs_descriptor_created(onion_address, base64_blinded_pk, -1);
+  /***********fyq */
+  control_event_hs_descriptor_created(onion_address, base64_blinded_pk, 5); //-----zrm  
+  /***********fyq */
+  // control_event_hs_descriptor_created(onion_address, base64_blinded_pk, -1);
 }
 
 /** Send on the control port the "HS_DESC UPLOAD [...]" event.

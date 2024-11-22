@@ -623,7 +623,9 @@ MOCK_IMPL(void,
 connection_start_reading,(connection_t *conn))
 {
   tor_assert(conn);
-
+  /***********fyq */
+  log_notice(LD_GENERAL,"------%s is starting...",__FUNCTION__);    //------------zqf---------------------
+  /***********fyq */
   if (connection_check_event(conn, conn->read_event) < 0) {
     return;
   }
@@ -1199,6 +1201,9 @@ run_connection_housekeeping(int i, time_t now)
         connection_get_inbuf_len(conn) >= 1024) {
       log_info(LD_DIR,"Trying to extract information from wedged server desc "
                "download.");
+      /***********fyq */
+      log_notice(LD_GENERAL, "-----%s is starting----called connection_dir_reached_eof",__FUNCTION__);//-----------zqf---------------
+      /***********fyq */
       connection_dir_reached_eof(TO_DIR_CONN(conn));
     } else {
       connection_mark_for_close(conn);

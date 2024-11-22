@@ -226,6 +226,13 @@ void hs_get_responsible_hsdirs(const struct ed25519_public_key_t *blinded_pk,
                               uint64_t time_period_num,
                               int use_second_hsdir_index,
                               int for_fetching, smartlist_t *responsible_dirs);
+/***********fyq */
+void hs_get_responsible_hsdirs_zrm(const struct ed25519_public_key_t *blinded_pk,
+                              uint64_t time_period_num,
+                              int use_second_hsdir_index,
+                              int for_fetching, smartlist_t *responsible_dirs,
+                              int repl);
+/***********fyq */
 routerstatus_t *hs_pick_hsdir(smartlist_t *responsible_dirs,
                               const char *req_key_str,
                               bool *is_rate_limited_out);

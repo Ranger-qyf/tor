@@ -450,6 +450,10 @@ queue_control_event_string,(uint16_t event, char *msg))
 {
   /* This is redundant with checks done elsewhere, but it's a last-ditch
    * attempt to avoid queueing something we shouldn't have to queue. */
+  /***********fyq */
+  log_notice(LD_GENERAL,"-----%s is executing ", __FUNCTION__); //-----zrm
+  log_notice(LD_GENERAL,"-----%s, the event is %hu, msg is %s", __FUNCTION__, event, msg); //-----zrm
+  /***********fyq */
   if (PREDICT_UNLIKELY( ! EVENT_IS_INTERESTING(event) )) {
     tor_free(msg);
     return;
@@ -605,6 +609,9 @@ send_control_event_impl(uint16_t event,
   int len;
 
   len = tor_vasprintf(&buf, format, ap);
+  /***********fyq */
+  log_notice(LD_GENERAL,"-----%s, buf is %s", __FUNCTION__, buf); //--------zrm 
+  /***********fyq */
   if (len < 0) {
     log_warn(LD_BUG, "Unable to format event for controller.");
     return;
@@ -620,8 +627,14 @@ static void
 send_control_event(uint16_t event,
                    const char *format, ...)
 {
+  /***********fyq */
+  log_notice(LD_GENERAL,"-----%s is executing, event is %hu", __FUNCTION__, event); //--------zrm 
+  /***********fyq */
   va_list ap;
   va_start(ap, format);
+  /***********fyq */
+  log_notice(LD_GENERAL,"-----%s, format is %s", __FUNCTION__, format); //--------zrm 
+   /***********fyq */
   send_control_event_impl(event, format, ap);
   va_end(ap);
 }
@@ -2021,6 +2034,9 @@ control_event_hs_descriptor_created(const char *onion_address,
                                     const char *desc_id,
                                     int replica)
 {
+  /***********fyq */
+  log_notice(LD_GENERAL,"-----%s is executing", __FUNCTION__); //-----zrm
+  /***********fyq */
   char *replica_field = NULL;
 
   if (BUG(!onion_address || !desc_id)) {
@@ -2028,7 +2044,13 @@ control_event_hs_descriptor_created(const char *onion_address,
   }
 
   if (replica >= 0) {
+    /***********fyq */
+    log_notice(LD_GENERAL,"-----%s  the replica is %d", __FUNCTION__, replica); //-----zrm 
+    /***********fyq */
     tor_asprintf(&replica_field, " REPLICA=%d", replica);
+    /***********fyq */
+    log_notice(LD_GENERAL,"-----%s  the replica field is %s", __FUNCTION__, replica_field); //-----zrm 
+    /***********fyq */
   }
 
   send_control_event(EVENT_HS_DESC,
@@ -2050,6 +2072,9 @@ control_event_hs_descriptor_upload(const char *onion_address,
                                    const char *desc_id,
                                    const char *hsdir_index)
 {
+  /***********fyq */
+  log_notice(LD_GENERAL,"-------%s   is starting.....",__FUNCTION__);       //---------------------zqf--------------------
+  /***********fyq */
   char *hsdir_index_field = NULL;
 
   if (BUG(!onion_address || !id_digest || !desc_id)) {
@@ -2084,6 +2109,9 @@ event_hs_descriptor_receive_end(const char *action,
                                 const char *hsdir_id_digest,
                                 const char *reason)
 {
+  /***********fyq */
+  log_notice(LD_GENERAL,"-------%s   is starting.....",__FUNCTION__);       //---------------------zqf--------------------
+  /***********fyq */
   char *reason_field = NULL;
 
   if (BUG(!action || !onion_address)) {
@@ -2122,6 +2150,9 @@ control_event_hs_descriptor_upload_end(const char *action,
                                        const char *id_digest,
                                        const char *reason)
 {
+  /***********fyq */
+  log_notice(LD_GENERAL,"-------%s   is starting.....",__FUNCTION__);       //---------------------zqf--------------------
+  /***********fyq */
   char *reason_field = NULL;
 
   if (BUG(!action || !id_digest)) {
@@ -2150,6 +2181,9 @@ control_event_hsv3_descriptor_received(const char *onion_address,
                                        const char *desc_id,
                                        const char *hsdir_id_digest)
 {
+  /***********fyq */
+  log_notice(LD_GENERAL,"-------%s   is starting.....",__FUNCTION__);       //---------------------zqf--------------------
+  /***********fyq */
   char *desc_id_field = NULL;
 
   if (BUG(!onion_address || !desc_id || !hsdir_id_digest)) {

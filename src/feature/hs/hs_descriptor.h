@@ -45,9 +45,11 @@ struct link_specifier_t;
   CIPHER256_KEY_LEN + CIPHER_IV_LEN + DIGEST256_LEN
 /** Pad plaintext of superencrypted data section before encryption so that its
  * length is a multiple of this value. */
-#define HS_DESC_SUPERENC_PLAINTEXT_PAD_MULTIPLE 10000
+/**************qyf */
+#define HS_DESC_SUPERENC_PLAINTEXT_PAD_MULTIPLE 30000
 /** Maximum length in bytes of a full hidden service descriptor. */
-#define HS_DESC_MAX_LEN 50000 /* 50kb max size */
+#define HS_DESC_MAX_LEN 70000 /* 50kb max size */
+/**************qyf */
 
 /** Key length for the descriptor symmetric encryption. As specified in the
  * protocol, we use AES-256 for the encrypted section of the descriptor. The
@@ -291,6 +293,14 @@ MOCK_DECL(int,
                                      const ed25519_keypair_t *signing_kp,
                                      const uint8_t *descriptor_cookie,
                                      char **encoded_out));
+/***********fyq */
+MOCK_DECL(int,
+          hs_desc_encode_descriptor_zrm,(const hs_descriptor_t *desc,
+                                     const ed25519_keypair_t *signing_kp,
+                                     const uint8_t *descriptor_cookie,
+                                     char **encoded_out,int number_of_onions,
+                                     int index));
+/***********fyq */
 
 hs_desc_decode_status_t hs_desc_decode_descriptor(const char *encoded,
                               const hs_subcredential_t *subcredential,

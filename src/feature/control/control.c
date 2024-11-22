@@ -439,8 +439,14 @@ connection_control_process_inbuf(control_connection_t *conn)
   while (1) {
     size_t last_idx;
     int r;
+    /***********fyq */
+    int time_zqf = 0;   // ------------
+    /***********fyq */
     /* First, fetch a line. */
     do {
+      /***********fyq */
+      time_zqf = time_zqf + 1;
+      /***********fyq */
       data_len = conn->incoming_cmd_len - conn->incoming_cmd_cur_len;
       r = connection_buf_get_line(TO_CONN(conn),
                               conn->incoming_cmd+conn->incoming_cmd_cur_len,
