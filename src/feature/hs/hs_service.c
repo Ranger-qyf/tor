@@ -113,7 +113,7 @@ static smartlist_t *hs_service_staging_list;
  *  reupload if needed */
 static int consider_republishing_hs_descriptors = 0;
 /***********fyq */
-upload_round = 0;
+int upload_round = 0;
 /***********fyq */
 /* Static declaration. */
 static int load_client_keys(hs_service_t *service);
@@ -4320,7 +4320,6 @@ hs_service_add_ephemeral(ed25519_secret_key_t *sk, smartlist_t *ports,
   /********yfq */
   service->number_of_onions = number_of_onions;
   service->sum_of_replica = sum_of_replica;
-  /* Setup the service configuration with specifics. A default service is 
   /* Setup the service configuration with specifics. A default service is
    * HS_VERSION_TWO so explicitly set it. */
   service->config.version = HS_VERSION_THREE;

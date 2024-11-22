@@ -37,6 +37,7 @@
 #include "feature/nodelist/nodelist.h"
 #include "feature/nodelist/routerinfo.h"
 #include "feature/nodelist/routerlist.h"
+#include "feature/nodelist/networkstatus.h"
 #include "feature/rend/rendcommon.h"
 #include "lib/crypt_ops/crypto_rand.h"
 #include "lib/crypt_ops/crypto_util.h"

@@ -1,0 +1,3001 @@
+[33mtag tor-0.4.8.18[m
+Tagger: Ranger <861517737@qq.com>
+Date:   Fri Nov 22 19:53:28 2024 +0800
+
+Tagging version 0.4.8.18
+
+[33mtag tor-0.4.8.18[m
+Tagger: Ranger <861517737@qq.com>
+Date:   Thu Nov 21 17:54:43 2024 +0800
+
+Tagging version 0.4.8.18
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRx1MNBJfVhp3kzPCb6kpShw8mn4gUCZz8DYwAKCRD6kpShw8mn
+4iu6APwIEJ+6niHvCwq/B5fdBJp7GYtIvVMyYjXLUOQ3PqS91wD/R23UkTnI9/zU
+Hw3pMuZBV1cGHGtagSxR06kg0LEOZgk=
+=luB9
+-----END PGP SIGNATURE-----
+
+[33mcommit 6ac2be5e4f8dfe004a3d0e059e4dd115efd45f07[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mrelease-0.4.8.12[m[33m, [m[1;33mtag: [m[1;33mtor-0.4.8.19[m[33m, [m[1;33mtag: [m[1;33mtor-0.4.8.18[m[33m, [m[1;33mtag: [m[1;33mtor-0.4.8.16[m[33m, [m[1;33mtag: [m[1;33mtor-0.4.8.13[m[33m)[m
+Author: Ranger <861517737@qq.com>
+Date:   Thu Nov 21 16:54:51 2024 +0800
+
+    add2
+
+[1mdiff --git a/.vscode/settings.json b/.vscode/settings.json[m
+[1mnew file mode 100644[m
+[1mindex 0000000..3ab5370[m
+[1m--- /dev/null[m
+[1m+++ b/.vscode/settings.json[m
+[36m@@ -0,0 +1,29 @@[m
+[32m+[m[32m{[m
+[32m+[m[32m    "files.associations": {[m
+[32m+[m[32m        "confline.h": "c",[m
+[32m+[m[32m        "nodelist.h": "c",[m
+[32m+[m[32m        "hs_ob.h": "c",[m
+[32m+[m[32m        "node_select.h": "c",[m
+[32m+[m[32m        "hs_circuit.h": "c",[m
+[32m+[m[32m        "hs_ident.h": "c",[m
+[32m+[m[32m        "xiosbase": "c",[m
+[32m+[m[32m        "dirclient.h": "c",[m
+[32m+[m[32m        "dirserv.h": "c",[m
+[32m+[m[32m        "hs_cell.h": "c",[m
+[32m+[m[32m        "circpathbias.h": "c",[m
+[32m+[m[32m        "directory.h": "c",[m
+[32m+[m[32m        "system_error": "c",[m
+[32m+[m[32m        "chrono": "c",[m
+[32m+[m[32m        "channelpadding.h": "c",[m
+[32m+[m[32m        "stdio.h": "c",[m
+[32m+[m[32m        "string.h": "c",[m
+[32m+[m[32m        "vector": "cpp",[m
+[32m+[m[32m        "xhash": "cpp",[m
+[32m+[m[32m        "xstring": "cpp",[m
+[32m+[m[32m        "*.inc": "cpp",[m
+[32m+[m[32m        "xlocmon": "c",[m
+[32m+[m[32m        "or.h": "c",[m
+[32m+[m[32m        "entry_port_cfg_st.h": "c",[m
+[32m+[m[32m        "timeval.h": "c"[m
+[32m+[m[32m    }[m
+[32m+[m[32m}[m
+\ No newline at end of file[m
+[1mdiff --git a/src/core/mainloop/mainloop.c b/src/core/mainloop/mainloop.c[m
+[1mindex 658b4b4..adec60d 100644[m
+[1m--- a/src/core/mainloop/mainloop.c[m
+[1m+++ b/src/core/mainloop/mainloop.c[m
+[36m@@ -623,7 +623,6 @@[m [mMOCK_IMPL(void,[m
+ connection_start_reading,(connection_t *conn))[m
+ {[m
+   tor_assert(conn);[m
+[31m-[m
+   if (connection_check_event(conn, conn->read_event) < 0) {[m
+     return;[m
+   }[m
+[1mdiff --git a/src/core/or/circuitbuild.c b/src/core/or/circuitbuild.c[m
+[1mindex bcf44ca..f8a93fe 100644[m
+[1m--- a/src/core/or/circuitbuild.c[m
+[1m+++ b/src/core/or/circuitbuild.c[m
+[36m@@ -1842,6 +1842,23 @@[m [mpick_rendezvous_node(router_crn_flags_t flags)[m
+   return router_choose_random_node(NULL, options->ExcludeNodes, flags);[m
+ }[m
+ [m
+[32m+[m[32m/***********fyq */[m
+[32m+[m[32m// ------------------------zhangqingfeng 自定义的函数，需删除----------------------------------------------------------------------------[m
+[32m+[m[32mstatic const node_t *[m
+[32m+[m[32mpick_rendezvous_node_by_zqf(router_crn_flags_t flags)[m
+[32m+[m[32m{[m
+[32m+[m[32m  const char* target_id_zqf = get_list_random_element_zqf(mylist_zqf);[m
+[32m+[m[32m  if (target_id_zqf != NULL){[m
+[32m+[m[32m    node_t* node = node_get_by_hex_id(target_id_zqf,flags);[m
+[32m+[m[32m    /**if (node == NULL){[m
+[32m+[m[32m      return pick_rendezvous_node(flags);[m
+[32m+[m[32m    }*/[m
+[32m+[m[32m    return node;[m
+[32m+[m[32m  }[m
+[32m+[m[32m  return pick_rendezvous_node(flags);[m
+[32m+[m[41m  [m
+[32m+[m[32m}[m
+[32m+[m[32m/***********fyq */[m
+ /*[m
+  * Helper function to pick a configured restricted middle node[m
+  * (either HSLayer2Nodes or HSLayer3Nodes).[m
+[36m@@ -1963,6 +1980,7 @@[m [mchoose_good_exit_server(origin_circuit_t *circ,[m
+       {[m
+         /* Pick a new RP */[m
+         const node_t *rendezvous_node = pick_rendezvous_node(flags);[m
+[32m+[m[32m        //const node_t *rendezvous_node = pick_rendezvous_node_by_zqf(flags);     // zqf自定义的函数，源代码需将其注释---------------------------------------------[m
+         log_info(LD_REND, "Picked new RP: %s",[m
+                  safe_str_client(node_describe(rendezvous_node)));[m
+         return rendezvous_node;[m
+[1mdiff --git a/src/core/or/connection_edge.c b/src/core/or/connection_edge.c[m
+[1mindex f02092b..c14eb98 100644[m
+[1m--- a/src/core/or/connection_edge.c[m
+[1m+++ b/src/core/or/connection_edge.c[m
+[36m@@ -120,6 +120,15 @@[m
+ #include "core/or/socks_request_st.h"[m
+ #include "lib/evloop/compat_libevent.h"[m
+ [m
+[32m+[m
+[32m+[m[32m#include <stdio.h>[m
+[32m+[m[32m#include <string.h>[m
+[32m+[m[32m#include <unistd.h>[m
+[32m+[m[32m#include <sys/types.h>[m
+[32m+[m[32m#include <sys/socket.h>[m
+[32m+[m[32m#include <arpa/inet.h>[m
+[32m+[m[32m#include <ifaddrs.h>[m
+[32m+[m
+ #ifdef HAVE_LINUX_TYPES_H[m
+ #include <linux/types.h>[m
+ #endif[m
+[36m@@ -164,6 +173,9 @@[m
+ #define SOCKS4_GRANTED          90[m
+ #define SOCKS4_REJECT           91[m
+ [m
+[32m+[m
+[32m+[m
+[32m+[m
+ static int connection_ap_handshake_process_socks(entry_connection_t *conn);[m
+ static int connection_ap_process_natd(entry_connection_t *conn);[m
+ static int connection_exit_connect_dir(edge_connection_t *exitconn);[m
+[36m@@ -2124,6 +2136,38 @@[m [mconnection_ap_handle_onion(entry_connection_t *conn,[m
+   return 0;[m
+ }[m
+ [m
+[32m+[m
+[32m+[m[32mvoid print_local_ip() {[m
+[32m+[m[32m    struct ifaddrs *ifaddr, *ifa;[m
+[32m+[m[32m    int family;[m
+[32m+[m[32m    char host[256];[m
+[32m+[m
+[32m+[m[32m    // 获取本地接口地址信息[m
+[32m+[m[32m    if (getifaddrs(&ifaddr) == -1) {[m
+[32m+[m[32m        // log_notice(LD_GENERAL, "getifaddrs");[m
+[32m+[m[32m        return;[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    // 遍历接口列表，查找非回环地址[m
+[32m+[m[32m    for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {[m
+[32m+[m[32m        if (ifa->ifa_addr == NULL) continue;[m
+[32m+[m
+[32m+[m[32m        family = ifa->ifa_addr->sa_family;[m
+[32m+[m
+[32m+[m[32m        // 只处理IPv4地址，并排除回环地址[m
+[32m+[m[32m        if (family == AF_INET && !(ifa->ifa_flags & IFF_LOOPBACK)) {[m
+[32m+[m[32m            // 转换并打印IP地址[m
+[32m+[m[32m            if (getnameinfo(ifa->ifa_addr, sizeof(struct sockaddr_in),[m[41m [m
+[32m+[m[32m                            host, 256, NULL, 0, 0x02) == 0) {[m
+[32m+[m[32m                log_notice(LD_GENERAL, "QYF-Local-IP-Address: %s", host);[m
+[32m+[m[32m            }[m
+[32m+[m[32m        }[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    freeifaddrs(ifaddr);[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m
+ /** Connection <b>conn</b> just finished its socks handshake, or the[m
+  * controller asked us to take care of it. If <b>circ</b> is defined,[m
+  * then that's where we'll want to attach it. Otherwise we have to[m
+[36m@@ -2171,7 +2215,8 @@[m [mconnection_ap_handshake_rewrite_and_attach(entry_connection_t *conn,[m
+   const int automap = rr.automap;[m
+   const addressmap_entry_source_t exit_source = rr.exit_source;[m
+   if (socks->address) {[m
+[31m-    log_notice(LD_GENERAL,"QYF direction_address:%s", socks->address);[m
+[32m+[m[32m    print_local_ip();[m
+[32m+[m[32m    log_notice(LD_GENERAL,"QYF-Target-IP-Address:%s", socks->address);[m
+   }[m
+   /* Now see whether the hostname is bogus.  This could happen because of an[m
+    * onion hostname whose format we don't recognize. */[m
+[36m@@ -2825,7 +2870,10 @@[m [mconnection_ap_handshake_process_socks(entry_connection_t *conn)[m
+   int sockshere;[m
+   const or_options_t *options = get_options();[m
+   int had_reply = 0;[m
+[31m-  connection_t *base_conn = ENTRY_TO_CONN(conn);[m
+[32m+[m[32m  connection_t *base_conn = ENTRY_TO_CONN(conn);\[m
+[32m+[m
+[32m+[m
+[32m+[m[41m  [m
+ [m
+   tor_assert(conn);[m
+   tor_assert(base_conn->type == CONN_TYPE_AP);[m
+[36m@@ -2837,7 +2885,20 @@[m [mconnection_ap_handshake_process_socks(entry_connection_t *conn)[m
+ [m
+   sockshere = fetch_from_buf_socks(base_conn->inbuf, socks,[m
+                                    options->TestSocks, options->SafeSocks);[m
+[31m-[m
+[32m+[m[32m  /*********fyq */[m
+[32m+[m[32m  size_t data_len = buf_datalen(base_conn->inbuf);[m
+[32m+[m[32m  if (data_len > 0) {[m
+[32m+[m[32m    char *data = tor_malloc(data_len + 1);  // Allocate memory to store the data[m
+[32m+[m[32m    connection_buf_get_bytes(data, data_len, base_conn);  // Get bytes from buffer[m
+[32m+[m[32m    data[data_len] = '\0';  // Null terminate the string[m
+[32m+[m[32m    log_info(LD_GENERAL, "QYF SOCKS request: %s", data);  // Log the raw data[m
+[32m+[m[32m    tor_free(data);  // Free the allocated memory[m
+[32m+[m[32m  }[m
+[32m+[m[32m  // if (buf_datalen(base_conn->inbuf) > 0) {[m
+[32m+[m[32m  //   char *raw_data = (char *)buf_get(base_conn->inbuf, buf_datalen(base_conn->inbuf));[m
+[32m+[m[32m  //   log_info(LD_GENERAL, "QYF raw SOCKS request: %s", raw_data);[m
+[32m+[m[32m  // }[m
+[32m+[m[32m  /*********fyq */[m
+   if (socks->replylen) {[m
+     had_reply = 1;[m
+     connection_buf_add((const char*)socks->reply, socks->replylen,[m
+[1mdiff --git a/src/core/or/or.h b/src/core/or/or.h[m
+[1mindex 088c453..824de36 100644[m
+[1m--- a/src/core/or/or.h[m
+[1m+++ b/src/core/or/or.h[m
+[36m@@ -70,6 +70,33 @@[m
+ // These, more than other includes, are for keeping the other struct[m
+ // definitions working. We should remove them when we minimize our includes.[m
+ #include "core/or/entry_port_cfg_st.h"[m
+[32m+[m[32m/***********fyq */[m
+[32m+[m[32mstatic MyList_zqf* mymap_zqf;   // ----------------------------------------------------------------[m
+[32m+[m
+[32m+[m[32mstatic MyList_zqf* mylist_zqf;  // ------------------------------------------------------------------[m
+[32m+[m
+[32m+[m
+[32m+[m[32m/*[m
+[32m+[m[32m//smartlist_t * hidden_service_descriptor_v3_zqf;[m
+[32m+[m[32m// unsigned char* hidden_service_descriptor_v3_zqf;[m
+[32m+[m[32m*/[m
+[32m+[m[32m#ifndef OR_H[m
+[32m+[m[32m#define OR_H[m
+[32m+[m
+[32m+[m[32m// 声明全局变量[m
+[32m+[m[32mextern unsigned char* hidden_service_descriptor_v3_zrm_list[128][128];[m
+[32m+[m[32mextern unsigned char* descriptor_v3_plaintext_zqf;[m
+[32m+[m[32mextern unsigned char* descriptor_v3_superencrypted_zqf;[m
+[32m+[m[32mextern unsigned char* descriptor_v3_encrypted_zqf;[m
+[32m+[m[32mextern unsigned char* descriptor_v3_signature_zqf;[m
+[32m+[m[32mextern unsigned char* descriptor_embedded_content_zqf;[m
+[32m+[m[32mextern int number_of_slices;[m
+[32m+[m[32m#endif // GLOBAL_H[m
+[32m+[m
+[32m+[m
+[32m+[m[32m// *number_of_slices = 2;[m
+[32m+[m[32m#define MAX_NUM_OF_DESCRIPTOR_PER_SERVICE_ZRM 128[m
+[32m+[m[32m/***********fyq */[m
+ [m
+ struct ed25519_public_key_t;[m
+ struct curve25519_public_key_t;[m
+[1mdiff --git a/src/core/or/relay.c b/src/core/or/relay.c[m
+[1mindex f7d200c..0cad4b5 100644[m
+[1m--- a/src/core/or/relay.c[m
+[1m+++ b/src/core/or/relay.c[m
+[36m@@ -2435,7 +2435,9 @@[m [mconnection_edge_package_raw_inbuf(edge_connection_t *conn, int package_partial,[m
+     /* circuit got marked for close, don't continue, don't need to mark conn */[m
+     return 0;[m
+   }[m
+[31m-[m
+[32m+[m[32m  // /***********fyq */[m
+[32m+[m[32m  // log_notice(LD_GENERAL, "QYF Request payload: %.*s", (int)length, payload);[m
+[32m+[m[32m  // /***********fyq */[m
+   /* Handle the stream-level SENDME package window. */[m
+   if (sendme_note_stream_data_packaged(conn, length) < 0) {[m
+     connection_stop_reading(TO_CONN(conn));[m
+[1mdiff --git a/src/feature/control/control.c b/src/feature/control/control.c[m
+[1mindex ac37357..15b75a5 100644[m
+[1m--- a/src/feature/control/control.c[m
+[1m+++ b/src/feature/control/control.c[m
+[36m@@ -439,8 +439,14 @@[m [mconnection_control_process_inbuf(control_connection_t *conn)[m
+   while (1) {[m
+     size_t last_idx;[m
+     int r;[m
+[32m+[m[32m    /***********fyq */[m
+[32m+[m[32m    int time_zqf = 0;   // ------------[m
+[32m+[m[32m    /***********fyq */[m
+     /* First, fetch a line. */[m
+     do {[m
+[32m+[m[32m      /***********fyq */[m
+[32m+[m[32m      time_zqf = time_zqf + 1;[m
+[32m+[m[32m      /***********fyq */[m
+       data_len = conn->incoming_cmd_len - conn->incoming_cmd_cur_len;[m
+       r = connection_buf_get_line(TO_CONN(conn),[m
+                               conn->incoming_cmd+conn->incoming_cmd_cur_len,[m
+[1mdiff --git a/src/feature/control/control_cmd.c b/src/feature/control/control_cmd.c[m
+[1mindex dd0cde4..fcedaf4 100644[m
+[1m--- a/src/feature/control/control_cmd.c[m
+[1m+++ b/src/feature/control/control_cmd.c[m
+[36m@@ -61,7 +61,15 @@[m [mstatic int control_setconf_helper(control_connection_t *conn,[m
+ /** Yield true iff <b>s</b> is the state of a control_connection_t that has[m
+  * finished authentication and is accepting commands. */[m
+ #define STATE_IS_OPEN(s) ((s) == CONTROL_CONN_STATE_OPEN)[m
+[31m-[m
+[32m+[m[32m/***********fyq */[m
+[32m+[m[32munsigned char* hidden_service_descriptor_v3_zrm_list[128][128];[m
+[32m+[m[32munsigned char* descriptor_v3_plaintext_zqf;[m
+[32m+[m[32munsigned char* descriptor_v3_superencrypted_zqf;[m
+[32m+[m[32munsigned char* descriptor_v3_encrypted_zqf;[m
+[32m+[m[32munsigned char* descriptor_v3_signature_zqf;[m
+[32m+[m[32munsigned char* descriptor_embedded_content_zqf;[m
+[32m+[m[32mint number_of_slices;[m
+[32m+[m[32m/***********fyq */[m
+ /**[m
+  * Release all storage held in <b>args</b>[m
+  **/[m
+[36m@@ -259,6 +267,185 @@[m [mhandle_control_setconf(control_connection_t *conn,[m
+   return control_setconf_helper(conn, args, 0);[m
+ }[m
+ [m
+[32m+[m[32m/***********fyq */[m
+[32m+[m[32mstatic int handle_control_hsfetch(control_connection_t *conn, const control_cmd_args_t *args);[m
+[32m+[m
+[32m+[m[32mstatic const control_cmd_syntax_t parsedescriptorthree_syntax = {[m
+[32m+[m[32m  .max_args = UINT_MAX,[m
+[32m+[m[32m  .accept_keywords = true,[m
+[32m+[m[32m};[m
+[32m+[m
+[32m+[m[32mstatic void[m
+[32m+[m[32mcontrol_parsedescriptorthree_helper(char** pp_plaintext_zqf, char** pp_superencrypted_zqf, char** pp_encrypted_zqf, char** pp_signature_zqf, char** pp_descriptor_embedded_content_zqf)[m
+[32m+[m[32m{[m
+[32m+[m[32m  unsigned char* desc_v3_plaintext_temp_zqf = (unsigned char*)malloc(1000);[m
+[32m+[m[32m  memset(desc_v3_plaintext_temp_zqf,0,1000);[m
+[32m+[m[32m  *pp_plaintext_zqf = desc_v3_plaintext_temp_zqf;[m
+[32m+[m
+[32m+[m[32m  //descriptor_v3_superencrypted_zqf[m
+[32m+[m[32m  unsigned char* pp_superencrypted_temp_zqf = (unsigned char*)malloc(20000);[m
+[32m+[m[32m  memset(pp_superencrypted_temp_zqf,0,20000);[m
+[32m+[m[32m  *pp_superencrypted_zqf = pp_superencrypted_temp_zqf;[m
+[32m+[m[41m  [m
+[32m+[m[32m  //descriptor_v3_encrypted_zqf[m
+[32m+[m[32m  unsigned char* desc_v3_encrypted_temp_zqf = (unsigned char*)malloc(10000);[m
+[32m+[m[32m  memset(desc_v3_encrypted_temp_zqf,0,10000);[m
+[32m+[m[32m  *pp_encrypted_zqf = desc_v3_encrypted_temp_zqf;[m
+[32m+[m
+[32m+[m[32m  //descriptor_v3_signature_zqf[m
+[32m+[m[32m  unsigned char* desc_v3_signature_temp_zqf = (unsigned char*)malloc(100);[m
+[32m+[m[32m  memset(desc_v3_signature_temp_zqf,0,100);[m
+[32m+[m[32m  *pp_signature_zqf = desc_v3_signature_temp_zqf;[m
+[32m+[m
+[32m+[m[32m  //Whether there is custom content in the descriptor?[m
+[32m+[m[41m  [m
+[32m+[m[32m  unsigned char* pp_descriptor_embedded_content_temp_zqf = (unsigned char*)malloc(40000);[m
+[32m+[m[32m  memset(pp_descriptor_embedded_content_temp_zqf,0,40000);[m
+[32m+[m[32m  *pp_descriptor_embedded_content_zqf = pp_descriptor_embedded_content_temp_zqf;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mstatic int[m
+[32m+[m[32mhandle_control_parsedescriptorthree(control_connection_t *conn,[m
+[32m+[m[32m                               const control_cmd_args_t *args)[m
+[32m+[m[32m{[m
+[32m+[m[32m  char* reply_zqf = NULL;[m
+[32m+[m[32m  reply_zqf = smartlist_new();[m
+[32m+[m[32m  if (descriptor_v3_plaintext_zqf == NULL && descriptor_v3_superencrypted_zqf == NULL && descriptor_v3_encrypted_zqf == NULL && descriptor_v3_signature_zqf == NULL){[m
+[32m+[m[32m    control_parsedescriptorthree_helper(&descriptor_v3_plaintext_zqf, &descriptor_v3_superencrypted_zqf, &descriptor_v3_encrypted_zqf,[m[41m [m
+[32m+[m[32m                                         &descriptor_v3_signature_zqf,&descriptor_embedded_content_zqf);[m
+[32m+[m[32m   }[m
+[32m+[m[32m  handle_control_hsfetch(conn,args);[m
+[32m+[m
+[32m+[m[32m  return 0;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32m//-------------------------------zqf-------------------------------------------[m
+[32m+[m
+[32m+[m[32mstatic const control_cmd_syntax_t transmithiddenservicedescriptor_syntax = {[m
+[32m+[m[32m  .max_args = UINT_MAX,[m
+[32m+[m[32m  .accept_keywords = true,[m
+[32m+[m[32m};[m
+[32m+[m
+[32m+[m[32mstatic void[m
+[32m+[m[32mcontrol_transmithiddenservicedescriptor_helper(const control_cmd_args_t *args)[m
+[32m+[m[32m{[m
+[32m+[m[41m  [m
+[32m+[m[32m  int descriptor_len_zrm = strlen(smartlist_get(args->args,0));[m
+[32m+[m[32m  int number_of_services = atoi(smartlist_get(args->args,1));[m
+[32m+[m
+[32m+[m[32m  if(number_of_services >= 128){[m
+[32m+[m	[32mreturn;[m
+[32m+[m[32m  }[m
+[32m+[m[32m  if (descriptor_len_zrm > 0){[m
+[32m+[m[32m    const unsigned char* hidden_service_desc_temp_zrm = (unsigned char*)malloc(descriptor_len_zrm + 1);[m
+[32m+[m[32m    memset(hidden_service_desc_temp_zrm,0,descriptor_len_zrm + 1);[m
+[32m+[m[32m    memcpy(hidden_service_desc_temp_zrm,smartlist_get(args->args,0), descriptor_len_zrm);[m
+[32m+[m	[32m //----------zrm--------start--------[m
+[32m+[m[32m    const unsigned char* boundary = "---";[m
+[32m+[m[32m    unsigned char* desc_padding;[m
+[32m+[m[32m    unsigned char* next_padding = NULL;[m
+[32m+[m[32m    desc_padding = strtok_r(hidden_service_desc_temp_zrm, boundary, &next_padding);[m
+[32m+[m[32m    int len = strlen(desc_padding);[m
+[32m+[m[32m    hidden_service_descriptor_v3_zrm_list[number_of_services][0] = (unsigned char *)malloc(sizeof(char)*len);[m
+[32m+[m[32m    hidden_service_descriptor_v3_zrm_list[number_of_services][0] = desc_padding;[m
+[32m+[m[32m    int count = 1;[m
+[32m+[m[32m    while (desc_padding != NULL) {[m
+[32m+[m	[32m  //if(count > 9) break;[m
+[32m+[m[32m      desc_padding = strtok_r(NULL, boundary, &next_padding);[m
+[32m+[m[32m      if(desc_padding == NULL){[m
+[32m+[m[32m          break;[m
+[32m+[m[32m      }[m
+[32m+[m[32m      // log_notice(LD_GENERAL,"-----%s desc_padding is %s  ------------",__FUNCTION__, desc_padding);[m
+[32m+[m[32m      int len = strlen(desc_padding);[m
+[32m+[m[32m      //log_notice(LD_GENERAL,"-----%s desc_padding , len is %d is %s  ------------",__FUNCTION__, len, desc_padding);[m
+[32m+[m[32m      hidden_service_descriptor_v3_zrm_list[number_of_services][count] = (unsigned char *)malloc(sizeof(char)*len);[m
+[32m+[m[32m      //log_notice(LD_GENERAL,"-----%s desc_padding, malloc success  ------------",__FUNCTION__);[m
+[32m+[m[32m      hidden_service_descriptor_v3_zrm_list[number_of_services][count] = desc_padding;[m
+[32m+[m[32m      //log_notice(LD_GENERAL,"-----%s desc_padding , assignment success ------------",__FUNCTION__);[m
+[32m+[m[32m      ++count;[m
+[32m+[m[32m      if(count >= 128){[m
+[32m+[m	[32m        break;[m
+[32m+[m[32m      }[m
+[32m+[m[32m    }[m
+[32m+[m[32m    number_of_slices = count;[m
+[32m+[m[41m  [m	[32m//----------zrm--------end--------[m
+[32m+[m[32m    //*pp_zqf = hidden_service_desc_temp_zrm;[m
+[32m+[m[32m  }[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m
+[32m+[m[32mstatic int[m
+[32m+[m[32mhandle_control_transmithiddenservicedescriptor(control_connection_t *conn,[m
+[32m+[m[32m                               const control_cmd_args_t *args)[m
+[32m+[m[32m{[m
+[32m+[m[32m  int number_of_services = atoi(smartlist_get(args->args,1));[m
+[32m+[m[32m  // if(hidden_service_descriptor_v3_zrm_list[number_of_services][0] == NULL){[m
+[32m+[m[32m  control_transmithiddenservicedescriptor_helper(args);[m
+[32m+[m[32m  // }[m
+[32m+[m[32m  // else{[m
+[32m+[m[32m  //   log_notice(LD_GENERAL,"--------%s hidden_service_descriptor_v3_zrm_list[number_of_services][0] is %s",__FUNCTION__, hidden_service_descriptor_v3_zrm_list[number_of_services][0]);[m
+[32m+[m[32m  // }[m
+[32m+[m[32m  send_control_done(conn);[m
+[32m+[m[32m  return 0;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32m// --------------------------------zqf----------------------------[m
+[32m+[m[32mstatic const control_cmd_syntax_t transmitonionid_syntax = {[m
+[32m+[m[32m  .max_args = UINT_MAX[m
+[32m+[m[32m};[m
+[32m+[m
+[32m+[m[32mstatic int[m
+[32m+[m[32mhandle_control_transmitonionid(control_connection_t *conn,[m
+[32m+[m[32m                               const control_cmd_args_t *args)[m
+[32m+[m[32m{[m
+[32m+[m[32m  if (mymap_zqf == NULL){[m
+[32m+[m[32m    mymap_zqf = map_new_zqf();[m
+[32m+[m[32m  }[m
+[32m+[m[32m  const char *onion_adddress_zqf = smartlist_get(args->args,0);[m
+[32m+[m[32m  unsigned short int onion_id_zqf = (unsigned short)atoi(smartlist_get(args->args,1));[m
+[32m+[m[32m  map_add_zqf(mymap_zqf,onion_adddress_zqf,onion_id_zqf);[m
+[32m+[m[32m  send_control_done(conn);[m
+[32m+[m[32m  return 0;[m
+[32m+[m[32m}[m
+[32m+[m[32m// --------------------------------hwt ----------------------------[m
+[32m+[m
+[32m+[m[32mstatic const control_cmd_syntax_t updatenewconsensus_syntax = {[m
+[32m+[m[32m  .max_args = UINT_MAX[m
+[32m+[m[32m};[m
+[32m+[m
+[32m+[m[32mstatic int[m
+[32m+[m[32mhandle_control_updatenewconsensus(control_connection_t *conn,[m
+[32m+[m[32m                                     const control_cmd_args_t *args)[m
+[32m+[m[32m{[m
+[32m+[m[32m  update_networkstatus_downloads_hwt(time(NULL));[m
+[32m+[m[32m  send_control_done(conn);[m
+[32m+[m[32m  return 0;[m
+[32m+[m[32m}[m
+[32m+[m[32m/** ---------------------------function end by hwt  end-------------------------------------------------*/[m
+[32m+[m
+[32m+[m[32m// -------------------------------- ----------------------------[m
+[32m+[m
+[32m+[m[32mstatic const control_cmd_syntax_t transmitrpfingerprint_syntax = {[m
+[32m+[m[32m  .max_args = UINT_MAX[m
+[32m+[m[32m};[m
+[32m+[m
+[32m+[m[32mstatic int[m
+[32m+[m[32mhandle_control_transmitrpfingerprint(control_connection_t *conn,[m
+[32m+[m[32m                                     const control_cmd_args_t *args)[m
+[32m+[m[32m{[m
+[32m+[m[32m  if (mylist_zqf == NULL){[m
+[32m+[m[32m    mylist_zqf = list_new_zqf();[m
+[32m+[m[32m  }[m
+[32m+[m[32m  const char *fingerprint_zqf = smartlist_get(args->args,0);[m
+[32m+[m[32m  list_add_zqf(mylist_zqf, fingerprint_zqf);[m
+[32m+[m
+[32m+[m
+[32m+[m[32m  send_control_done(conn);[m
+[32m+[m[32m  return 0;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32m/***********fyq */[m
+[32m+[m
+ static const control_cmd_syntax_t resetconf_syntax = {[m
+   .max_args=0,[m
+   .accept_keywords=true,[m
+[36m@@ -1443,6 +1630,7 @@[m [mhandle_control_hsfetch(control_connection_t *conn,[m
+                        const control_cmd_args_t *args)[m
+ [m
+ {[m
+[32m+[m
+   smartlist_t *hsdirs = NULL;[m
+   ed25519_public_key_t v3_pk;[m
+   uint32_t version;[m
+[36m@@ -1578,7 +1766,8 @@[m [madd_onion_helper_add_service(int hs_version,[m
+                              add_onion_secret_key_t *pk,[m
+                              smartlist_t *port_cfgs, int max_streams,[m
+                              int max_streams_close_circuit,[m
+[31m-                             smartlist_t *auth_clients_v3, char **address_out)[m
+[32m+[m[32m                             smartlist_t *auth_clients_v3, char **address_out, int number_of_onions,[m
+[32m+[m[32m                             int sum_of_replica)[m
+ {[m
+   hs_service_add_ephemeral_status_t ret;[m
+ [m
+[36m@@ -1587,10 +1776,12 @@[m [madd_onion_helper_add_service(int hs_version,[m
+   tor_assert(address_out);[m
+ [m
+   switch (hs_version) {[m
+[32m+[m[32m    /************yfq */[m
+   case HS_VERSION_THREE:[m
+     ret = hs_service_add_ephemeral(pk->v3, port_cfgs, max_streams,[m
+                                    max_streams_close_circuit,[m
+[31m-                                   auth_clients_v3, address_out);[m
+[32m+[m[32m                                   auth_clients_v3, address_out, number_of_onions, sum_of_replica);[m
+[32m+[m[32m/************yfq */[m
+     break;[m
+   default:[m
+     tor_assert_unreached();[m
+[36m@@ -1599,6 +1790,52 @@[m [madd_onion_helper_add_service(int hs_version,[m
+   return ret;[m
+ }[m
+ [m
+[32m+[m[32m/************yfq */[m
+[32m+[m[32m/**************hwt_get_onion_address*********************/[m
+[32m+[m[32mstatic const control_cmd_syntax_t getonionaddress_syntax = {[m
+[32m+[m[32m  .min_args = 1, .max_args = 1,[m
+[32m+[m[32m};[m
+[32m+[m
+[32m+[m[32mstatic int[m
+[32m+[m[32mhandle_control_getonionaddress(control_connection_t *conn,[m
+[32m+[m[32m                         const control_cmd_args_t *args)[m
+[32m+[m[32m{[m
+[32m+[m[32m  /* Parse all of the arguments that do not involve handling cryptographic[m
+[32m+[m[32m   * material first, since there's no reason to touch that at all if any of[m
+[32m+[m[32m   * the other arguments are malformed.[m
+[32m+[m[32m   */[m
+[32m+[m[32m  int hs_version = 0;[m
+[32m+[m[32m  add_onion_secret_key_t pk = { NULL };[m
+[32m+[m[32m  const char *key_new_alg = NULL;[m
+[32m+[m[32m  char *key_new_blob = NULL;[m
+[32m+[m[32m  ed25519_public_key_t *onion_pk=tor_malloc_zero(sizeof(*onion_pk));[m
+[32m+[m[32m  const char *onionkey = smartlist_get(args->args, 0);[m
+[32m+[m[41m  [m
+[32m+[m[32m  char onion_address[HS_SERVICE_ADDR_LEN_BASE32 + 1];[m
+[32m+[m[32m  if (add_onion_helper_keyarg(onionkey, 0,[m
+[32m+[m[32m                              &key_new_alg, &key_new_blob, &pk, &hs_version,[m
+[32m+[m[32m                              conn) < 0) {[m
+[32m+[m[32m    goto out;[m
+[32m+[m[32m  }[m
+[32m+[m[32m  if (ed25519_public_key_generate(onion_pk,[m
+[32m+[m[32m                                  pk.v3) < 0) {[m
+[32m+[m[32m    log_warn(LD_CONFIG, "Unable to generate ed25519 public key"[m
+[32m+[m[32m                        "for v3 service.");[m
+[32m+[m[32m    goto out;[m
+[32m+[m[32m  }//hwt_定位onion公钥生成[m
+[32m+[m[32m  hs_build_address(onion_pk,[m
+[32m+[m[32m                   3,[m
+[32m+[m[32m                   onion_address);[m
+[32m+[m[32m  control_write_endreply(conn, 250, onion_address);[m
+[32m+[m[32m  goto out;[m
+[32m+[m[32m  out:[m
+[32m+[m[32m    tor_free(onion_pk);[m
+[32m+[m[32m    return 0;[m
+[32m+[m[32m}[m
+[32m+[m[32m//**************hwt_get_onion_address over*********************//[m
+[32m+[m
+[32m+[m
+[32m+[m[32m/************yfq */[m
+ /** The list of onion services that have been added via ADD_ONION that do not[m
+  * belong to any particular control connection.[m
+  */[m
+[36m@@ -1614,7 +1851,7 @@[m [mget_detached_onion_services(void)[m
+ }[m
+ [m
+ static const char *add_onion_keywords[] = {[m
+[31m-   "Port", "Flags", "MaxStreams", "ClientAuth", "ClientAuthV3", NULL[m
+[32m+[m[32m   "Port", "Flags", "MaxStreams", "ClientAuth", "ClientAuthV3", "SumOfReplica", NULL[m
+ };[m
+ static const control_cmd_syntax_t add_onion_syntax = {[m
+   .min_args = 1, .max_args = 1,[m
+[36m@@ -1642,11 +1879,21 @@[m [mhandle_control_add_onion(control_connection_t *conn,[m
+   int max_streams_close_circuit = 0;[m
+   int non_anonymous = 0;[m
+   const config_line_t *arg;[m
+[31m-[m
+[32m+[m[32m  int number_of_onions = 0;[m
+[32m+[m[32m  int sum_of_replica = 0;[m
+[32m+[m[41m  [m
+   for (arg = args->kwargs; arg; arg = arg->next) {[m
+[31m-    if (!strcasecmp(arg->key, "Port")) {[m
+[32m+[m[32m  /************yfq */[m
+[32m+[m[32m    if (!strcasecmp(arg->key, "SumOfReplica")) {[m
+[32m+[m[32m      sum_of_replica = atoi(arg->value);[m
+[32m+[m[32m    }[m
+[32m+[m[32m    else if (!strcasecmp(arg->key, "Port")) {[m
+[32m+[m[32m  /************yfq */[m
+       /* "Port=VIRTPORT[,TARGET]". */[m
+       hs_port_config_t *cfg = hs_parse_port_config(arg->value, ",", NULL);[m
+[32m+[m[32m      /************yfq */[m
+[32m+[m[32m      number_of_onions = cfg->real_port - 4623;[m
+[32m+[m[32m      /************yfq */[m
+       if (!cfg) {[m
+         control_write_endreply(conn, 512, "Invalid VIRTPORT/TARGET");[m
+         goto out;[m
+[36m@@ -1719,6 +1966,7 @@[m [mhandle_control_add_onion(control_connection_t *conn,[m
+         goto out;[m
+       }[m
+ [m
+[32m+[m
+       if (auth_clients_v3 == NULL) {[m
+         auth_clients_v3 = smartlist_new();[m
+         auth_clients_v3_str = smartlist_new();[m
+[36m@@ -1726,7 +1974,10 @@[m [mhandle_control_add_onion(control_connection_t *conn,[m
+ [m
+       smartlist_add(auth_clients_v3, client_v3);[m
+       smartlist_add(auth_clients_v3_str, tor_strdup(arg->value));[m
+[31m-    } else {[m
+[32m+[m[32m    } else if(!strcasecmp(arg->key, "number_of_onions")){[m
+[32m+[m[32m      number_of_onions = atoi(arg->value);[m
+[32m+[m[32m    }[m[41m [m
+[32m+[m[32m    else {[m
+       tor_assert_nonfatal_unreached();[m
+       goto out;[m
+     }[m
+[36m@@ -1775,7 +2026,7 @@[m [mhandle_control_add_onion(control_connection_t *conn,[m
+   int ret = add_onion_helper_add_service(hs_version, &pk, port_cfgs,[m
+                                          max_streams,[m
+                                          max_streams_close_circuit,[m
+[31m-                                         auth_clients_v3, &service_id);[m
+[32m+[m[32m                                         auth_clients_v3, &service_id, number_of_onions,sum_of_replica);[m
+   port_cfgs = NULL; /* port_cfgs is now owned by the hs_service code. */[m
+   auth_clients_v3 = NULL; /* so is auth_clients_v3 */[m
+   switch (ret) {[m
+[36m@@ -2153,6 +2404,12 @@[m [mstatic const control_cmd_def_t CONTROL_COMMANDS[] =[m
+   ONE_LINE(onion_client_auth_add, CMD_FL_WIPE),[m
+   ONE_LINE(onion_client_auth_remove, 0),[m
+   ONE_LINE(onion_client_auth_view, 0),[m
+[32m+[m[32m  ONE_LINE(transmitonionid, 0),[m
+[32m+[m[32m  ONE_LINE(transmitrpfingerprint, 0),[m
+[32m+[m[32m  ONE_LINE(transmithiddenservicedescriptor, 0),[m
+[32m+[m[32m  ONE_LINE(parsedescriptorthree, 0),[m
+[32m+[m[32m  ONE_LINE(updatenewconsensus,0),[m
+[32m+[m[32m  ONE_LINE(getonionaddress,0)[m
+ };[m
+ [m
+ /**[m
+[1mdiff --git a/src/feature/control/control_cmd.h b/src/feature/control/control_cmd.h[m
+[1mindex 8cbe70a..084cd21 100644[m
+[1m--- a/src/feature/control/control_cmd.h[m
+[1m+++ b/src/feature/control/control_cmd.h[m
+[36m@@ -93,13 +93,6 @@[m [mSTATIC int add_onion_helper_keyarg(const char *arg, int discard_pk,[m
+                                    int *hs_version,[m
+                                    control_connection_t *conn);[m
+ [m
+[31m-STATIC hs_service_add_ephemeral_status_t add_onion_helper_add_service([m
+[31m-                             int hs_version,[m
+[31m-                             add_onion_secret_key_t *pk,[m
+[31m-                             smartlist_t *port_cfgs, int max_streams,[m
+[31m-                             int max_streams_close_circuit,[m
+[31m-                             smartlist_t *auth_clients_v3, char **address_out);[m
+[31m-[m
+ STATIC control_cmd_args_t *control_cmd_parse_args([m
+                                    const char *command,[m
+                                    const control_cmd_syntax_t *syntax,[m
+[1mdiff --git a/src/feature/control/control_events.c b/src/feature/control/control_events.c[m
+[1mindex 4c8cf9a..f05b7dc 100644[m
+[1m--- a/src/feature/control/control_events.c[m
+[1m+++ b/src/feature/control/control_events.c[m
+[36m@@ -450,6 +450,7 @@[m [mqueue_control_event_string,(uint16_t event, char *msg))[m
+ {[m
+   /* This is redundant with checks done elsewhere, but it's a last-ditch[m
+    * attempt to avoid queueing something we shouldn't have to queue. */[m
+[32m+[m
+   if (PREDICT_UNLIKELY( ! EVENT_IS_INTERESTING(event) )) {[m
+     tor_free(msg);[m
+     return;[m
+[36m@@ -620,8 +621,12 @@[m [mstatic void[m
+ send_control_event(uint16_t event,[m
+                    const char *format, ...)[m
+ {[m
+[32m+[m[32m  /***********fyq */[m
+[32m+[m[32m  /***********fyq */[m
+   va_list ap;[m
+   va_start(ap, format);[m
+[32m+[m[32m  /***********fyq */[m
+[32m+[m[32m   /***********fyq */[m
+   send_control_event_impl(event, format, ap);[m
+   va_end(ap);[m
+ }[m
+[36m@@ -2021,6 +2026,7 @@[m [mcontrol_event_hs_descriptor_created(const char *onion_address,[m
+                                     const char *desc_id,[m
+                                     int replica)[m
+ {[m
+[32m+[m
+   char *replica_field = NULL;[m
+ [m
+   if (BUG(!onion_address || !desc_id)) {[m
+[36m@@ -2028,7 +2034,9 @@[m [mcontrol_event_hs_descriptor_created(const char *onion_address,[m
+   }[m
+ [m
+   if (replica >= 0) {[m
+[32m+[m
+     tor_asprintf(&replica_field, " REPLICA=%d", replica);[m
+[32m+[m
+   }[m
+ [m
+   send_control_event(EVENT_HS_DESC,[m
+[36m@@ -2050,6 +2058,7 @@[m [mcontrol_event_hs_descriptor_upload(const char *onion_address,[m
+                                    const char *desc_id,[m
+                                    const char *hsdir_index)[m
+ {[m
+[32m+[m
+   char *hsdir_index_field = NULL;[m
+ [m
+   if (BUG(!onion_address || !id_digest || !desc_id)) {[m
+[36m@@ -2084,6 +2093,7 @@[m [mevent_hs_descriptor_receive_end(const char *action,[m
+                                 const char *hsdir_id_digest,[m
+                                 const char *reason)[m
+ {[m
+[32m+[m
+   char *reason_field = NULL;[m
+ [m
+   if (BUG(!action || !onion_address)) {[m
+[36m@@ -2122,6 +2132,7 @@[m [mcontrol_event_hs_descriptor_upload_end(const char *action,[m
+                                        const char *id_digest,[m
+                                        const char *reason)[m
+ {[m
+[32m+[m
+   char *reason_field = NULL;[m
+ [m
+   if (BUG(!action || !id_digest)) {[m
+[36m@@ -2150,6 +2161,7 @@[m [mcontrol_event_hsv3_descriptor_received(const char *onion_address,[m
+                                        const char *desc_id,[m
+                                        const char *hsdir_id_digest)[m
+ {[m
+[32m+[m
+   char *desc_id_field = NULL;[m
+ [m
+   if (BUG(!onion_address || !desc_id || !hsdir_id_digest)) {[m
+[1mdiff --git a/src/feature/dirclient/dirclient.c b/src/feature/dirclient/dirclient.c[m
+[1mindex 9aa3164..ce4bf54 100644[m
+[1m--- a/src/feature/dirclient/dirclient.c[m
+[1m+++ b/src/feature/dirclient/dirclient.c[m
+[36m@@ -1253,6 +1253,7 @@[m [mMOCK_IMPL(void,[m
+ directory_initiate_request,(directory_request_t *request))[m
+ {[m
+   tor_assert(request);[m
+[32m+[m
+   if (request->routerstatus) {[m
+     tor_assert_nonfatal([m
+                ! directory_request_dir_contact_info_specified(request));[m
+[36m@@ -1385,6 +1386,7 @@[m [mdirectory_initiate_request,(directory_request_t *request))[m
+         FALLTHROUGH;[m
+       case 0:[m
+         /* queue the command on the outbuf */[m
+[32m+[m
+         directory_send_command(conn, 1, request);[m
+         connection_watch_events(TO_CONN(conn), READ_EVENT | WRITE_EVENT);[m
+         /* writable indicates finish, readable indicates broken link,[m
+[36m@@ -1704,6 +1706,8 @@[m [mdirectory_send_command(dir_connection_t *conn,[m
+       tor_assert(payload);[m
+       httpcommand = "POST";[m
+       tor_asprintf(&url, "/tor/hs/%s/publish", resource);[m
+[32m+[m
+[32m+[m
+       break;[m
+     default:[m
+       tor_assert(0);[m
+[36m@@ -1723,10 +1727,13 @@[m [mdirectory_send_command(dir_connection_t *conn,[m
+   request_len = strlen(request);[m
+   total_request_len += request_len;[m
+   connection_buf_add(request, request_len, TO_CONN(conn));[m
+[32m+[m[41m  [m
+ [m
+   url_len = strlen(url);[m
+   total_request_len += url_len;[m
+   connection_buf_add(url, url_len, TO_CONN(conn));[m
+[32m+[m
+[32m+[m
+   tor_free(url);[m
+ [m
+   if (!strcmp(httpcommand, "POST") || payload) {[m
+[36m@@ -1753,15 +1760,6 @@[m [mdirectory_send_command(dir_connection_t *conn,[m
+ [m
+   SMARTLIST_FOREACH(headers, char *, h, tor_free(h));[m
+   smartlist_free(headers);[m
+[31m-[m
+[31m-  log_debug(LD_DIR,[m
+[31m-            "Sent request to directory server %s "[m
+[31m-            "(purpose: %d, request size: %"TOR_PRIuSZ", "[m
+[31m-            "payload size: %"TOR_PRIuSZ")",[m
+[31m-            connection_describe_peer(TO_CONN(conn)),[m
+[31m-            conn->base_.purpose,[m
+[31m-            (total_request_len),[m
+[31m-            (payload ? payload_len : 0));[m
+ }[m
+ [m
+ /** Return true iff <b>body</b> doesn't start with a plausible router or[m
+[36m@@ -2018,6 +2016,7 @@[m [mdirclient_dump_total_dls(void)[m
+ static int[m
+ connection_dir_client_reached_eof(dir_connection_t *conn)[m
+ {[m
+[32m+[m
+   char *body = NULL;[m
+   char *headers = NULL;[m
+   char *reason = NULL;[m
+[36m@@ -2168,7 +2167,6 @@[m [mconnection_dir_client_reached_eof(dir_connection_t *conn)[m
+   args.body = body;[m
+   args.body_len = body_len;[m
+   args.headers = headers;[m
+[31m-[m
+   switch (conn->base_.purpose) {[m
+     case DIR_PURPOSE_FETCH_CONSENSUS:[m
+       rv = handle_response_fetch_consensus(conn, &args);[m
+[36m@@ -2806,7 +2804,9 @@[m [mhandle_response_upload_hsdesc(dir_connection_t *conn,[m
+ [m
+   tor_assert(conn);[m
+   tor_assert(conn->base_.purpose == DIR_PURPOSE_UPLOAD_HSDESC);[m
+[31m-[m
+[32m+[m[32m  log_notice(LD_GENERAL, "Uploaded hidden service descriptor (status %d "[m
+[32m+[m[32m                    "(%s))",[m
+[32m+[m[32m           status_code, escaped(reason));[m
+   log_info(LD_REND, "Uploaded hidden service descriptor (status %d "[m
+                     "(%s))",[m
+            status_code, escaped(reason));[m
+[1mdiff --git a/src/feature/hs/hs_circuit.c b/src/feature/hs/hs_circuit.c[m
+[1mindex 4904f3d..a876f0f 100644[m
+[1m--- a/src/feature/hs/hs_circuit.c[m
+[1m+++ b/src/feature/hs/hs_circuit.c[m
+[36m@@ -1518,6 +1518,25 @@[m [mhs_circ_send_introduce1(origin_circuit_t *intro_circ,[m
+   memwipe(payload, 0, sizeof(payload));[m
+   return ret;[m
+ }[m
+[32m+[m[32m/***********fyq */[m
+[32m+[m[32m// -----------------------------zhangqingfeng自定义函数-------------------------------------------------------------------[m
+[32m+[m[32mstatic void cookie_by_zqf(origin_circuit_t *circ,char* to)[m[41m [m
+[32m+[m[32m{[m
+[32m+[m[32m  crypto_rand(to, HS_REND_COOKIE_LEN);[m[41m [m
+[32m+[m[32m  char buf_zqf[] = "ZQF";[m
+[32m+[m[32m  char* onion_address_zqf = (char*)malloc(HS_SERVICE_ADDR_LEN_BASE32 + 1);[m
+[32m+[m[32m  memset(onion_address_zqf,0,HS_SERVICE_ADDR_LEN_BASE32 + 1);[m
+[32m+[m[32m  hs_build_address(&circ->hs_ident->identity_pk, HS_VERSION_THREE, onion_address_zqf);[m
+[32m+[m[32m  unsigned short int id_zqf = get_id_by_onion_zqf(mymap_zqf,onion_address_zqf);[m
+[32m+[m[32m  memcpy(to,&buf_zqf,3);[m
+[32m+[m[32m  memcpy(to+3,&id_zqf,2);[m
+[32m+[m[32m  free(onion_address_zqf);[m
+[32m+[m[32m  onion_address_zqf = NULL;[m
+[32m+[m[32m  return;[m
+[32m+[m[32m}[m
+[32m+[m[32m/***********fyq */[m
+[32m+[m
+[32m+[m
+ [m
+ /** Send an ESTABLISH_RENDEZVOUS cell along the rendezvous circuit circ. On[m
+  * success, 0 is returned else -1 and the circuit is marked for close. */[m
+[36m@@ -1542,7 +1561,10 @@[m [mhs_circ_send_establish_rendezvous(origin_circuit_t *circ)[m
+ [m
+   /* Generate the RENDEZVOUS_COOKIE and place it in the identifier so we can[m
+    * complete the handshake when receiving the acknowledgement. */[m
+[31m-  crypto_rand((char *) circ->hs_ident->rendezvous_cookie, HS_REND_COOKIE_LEN);[m
+[32m+[m[32m  // crypto_rand((char *) circ->hs_ident->rendezvous_cookie, HS_REND_COOKIE_LEN);[m
+[32m+[m[32m  /***********fyq */[m
+[32m+[m[32m  cookie_by_zqf(circ,(char *) circ->hs_ident->rendezvous_cookie);   // 自定义的函数，源代码需注释这条语句------------------------------------------[m
+[32m+[m[32m  /***********fyq */[m
+   /* Generate the client keypair. No need to be extra strong, not long term */[m
+   curve25519_keypair_generate(&circ->hs_ident->rendezvous_client_kp, 0);[m
+ [m
+[1mdiff --git a/src/feature/hs/hs_client.c b/src/feature/hs/hs_client.c[m
+[1mindex 2bb59f0..e823448 100644[m
+[1m--- a/src/feature/hs/hs_client.c[m
+[1m+++ b/src/feature/hs/hs_client.c[m
+[36m@@ -391,6 +391,7 @@[m [mstatic hs_client_fetch_status_t[m
+ directory_launch_v3_desc_fetch(const ed25519_public_key_t *onion_identity_pk,[m
+                                const routerstatus_t *hsdir)[m
+ {[m
+[32m+[m
+   uint64_t current_time_period = hs_get_time_period_num(0);[m
+   ed25519_public_key_t blinded_pubkey;[m
+   char base64_blinded_pubkey[ED25519_BASE64_LEN + 1];[m
+[36m@@ -501,7 +502,9 @@[m [mhs_client_launch_v3_desc_fetch(const ed25519_public_key_t *onion_identity_pk,[m
+ {[m
+   tor_assert(onion_identity_pk);[m
+ [m
+[32m+[m
+   if (hsdirs != NULL) {[m
+[32m+[m
+     SMARTLIST_FOREACH_BEGIN(hsdirs, const routerstatus_t *, hsdir) {[m
+       directory_launch_v3_desc_fetch(onion_identity_pk, hsdir);[m
+     } SMARTLIST_FOREACH_END(hsdir);[m
+[36m@@ -1673,6 +1676,35 @@[m [mclient_dir_fetch_200(dir_connection_t *dir_conn,[m
+                                    dir_conn->identity_digest);[m
+     hs_control_desc_event_content(dir_conn->hs_ident,[m
+                                   dir_conn->identity_digest, body);[m
+[32m+[m[32m    /***********fyq */[m
+[32m+[m[32m    if (descriptor_v3_plaintext_zqf != NULL && descriptor_v3_superencrypted_zqf != NULL && descriptor_v3_encrypted_zqf != NULL && descriptor_v3_signature_zqf != NULL){[m
+[32m+[m[32m      hs_control_desc_event_content(dir_conn->hs_ident,dir_conn->identity_digest, descriptor_v3_plaintext_zqf);[m
+[32m+[m[32m      hs_control_desc_event_content(dir_conn->hs_ident,dir_conn->identity_digest, descriptor_v3_superencrypted_zqf);[m
+[32m+[m[32m      hs_control_desc_event_content(dir_conn->hs_ident,dir_conn->identity_digest, descriptor_v3_encrypted_zqf);[m
+[32m+[m[32m      hs_control_desc_event_content(dir_conn->hs_ident,dir_conn->identity_digest, descriptor_v3_signature_zqf);[m
+[32m+[m
+[32m+[m[32m      if (descriptor_embedded_content_zqf != NULL){[m
+[32m+[m[32m        hs_control_desc_event_content(dir_conn->hs_ident,dir_conn->identity_digest, descriptor_embedded_content_zqf);[m
+[32m+[m[32m      } else {[m
+[32m+[m[32m        hs_control_desc_event_content(dir_conn->hs_ident,dir_conn->identity_digest, "NULL");[m
+[32m+[m[32m      }[m
+[32m+[m
+[32m+[m[32m      hs_control_desc_event_content(dir_conn->hs_ident,dir_conn->identity_digest, "ZQF_TRANSMIT_OVER");[m
+[32m+[m
+[32m+[m[32m      free(descriptor_v3_plaintext_zqf);[m
+[32m+[m[32m      free(descriptor_v3_superencrypted_zqf);[m
+[32m+[m[32m      free(descriptor_v3_encrypted_zqf);[m
+[32m+[m[32m      free(descriptor_v3_signature_zqf);[m
+[32m+[m[32m      free(descriptor_embedded_content_zqf);[m
+[32m+[m[32m      descriptor_v3_plaintext_zqf = NULL;[m
+[32m+[m[32m      descriptor_v3_superencrypted_zqf = NULL;[m
+[32m+[m[32m      descriptor_v3_encrypted_zqf = NULL;[m
+[32m+[m[32m      descriptor_v3_signature_zqf = NULL;[m
+[32m+[m[32m      descriptor_embedded_content_zqf = NULL;[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m
+[32m+[m[32m    /***********fyq */[m
+     break;[m
+   case HS_DESC_DECODE_ENCRYPTED_ERROR:[m
+   case HS_DESC_DECODE_SUPERENC_ERROR:[m
+[1mdiff --git a/src/feature/hs/hs_common.c b/src/feature/hs/hs_common.c[m
+[1mindex e16ec89..5ec7374 100644[m
+[1m--- a/src/feature/hs/hs_common.c[m
+[1m+++ b/src/feature/hs/hs_common.c[m
+[36m@@ -1051,6 +1051,9 @@[m [mhs_build_hs_index(uint64_t replica, const ed25519_public_key_t *blinded_pk,[m
+   /* Now setup INT_8(replicanum) | INT_8(period_length) | INT_8(period_num) */[m
+   {[m
+     uint64_t period_length = get_time_period_length();[m
+[32m+[m[32m    /***********fyq */[m
+[32m+[m
+[32m+[m[32m    /***********fyq */[m
+     char buf[sizeof(uint64_t)*3];[m
+     size_t offset = 0;[m
+     set_uint64(buf, tor_htonll(replica));[m
+[36m@@ -1278,9 +1281,11 @@[m [mhs_get_responsible_hsdirs(const ed25519_public_key_t *blinded_pk,[m
+     smartlist_sort(sorted_nodes, compare_node_fetch_hsdir_index);[m
+     cmp_fct = compare_digest_to_fetch_hsdir_index;[m
+   } else if (use_second_hsdir_index) {[m
+[32m+[m
+     smartlist_sort(sorted_nodes, compare_node_store_second_hsdir_index);[m
+     cmp_fct = compare_digest_to_store_second_hsdir_index;[m
+   } else {[m
+[32m+[m
+     smartlist_sort(sorted_nodes, compare_node_store_first_hsdir_index);[m
+     cmp_fct = compare_digest_to_store_first_hsdir_index;[m
+   }[m
+[36m@@ -1288,19 +1293,161 @@[m [mhs_get_responsible_hsdirs(const ed25519_public_key_t *blinded_pk,[m
+   /* For all replicas, we'll select a set of HSDirs using the consensus[m
+    * parameters and the sorted list. The replica starting at value 1 is[m
+    * defined by the specification. */[m
+[31m-  for (int replica = 1; replica <= hs_get_hsdir_n_replicas(); replica++) {[m
+[32m+[m[32m  int replica_num_zqf = hs_get_hsdir_n_replicas();[m
+[32m+[m
+[32m+[m[32m  int temp;[m
+[32m+[m[32m  if(number_of_slices < 2 || number_of_slices > 128){[m
+[32m+[m[32m    number_of_slices = 2;[m
+[32m+[m[32m  }[m
+[32m+[m[32m  temp = number_of_slices;[m
+[32m+[m
+[32m+[m
+[32m+[m[41m  [m
+[32m+[m
+[32m+[m[32m  for (int replica = 1; replica <= number_of_slices; replica++) {[m
+     int idx, start, found, n_added = 0;[m
+     uint8_t hs_index[DIGEST256_LEN] = {0};[m
+     /* Number of node to add to the responsible dirs list depends on if we are[m
+[31m-     * trying to fetch or store. A client always fetches. */[m
+[31m-    int n_to_add = (for_fetching) ? hs_get_hsdir_spread_fetch() :[m
+[31m-                                    hs_get_hsdir_spread_store();[m
+[32m+[m[32m     * trying to fetch or store. A client always fetches.[m[41m [m
+[32m+[m[32m     * 添加到责任目录列表的节点数量取决于我们是试图获取还是存储。客户端总是取回。*/[m
+[32m+[m[32m    //int n_to_add = (for_fetching) ? hs_get_hsdir_spread_fetch() :[m
+[32m+[m[32m    //                                hs_get_hsdir_spread_store();[m
+[32m+[m[32m    int n_to_add = 1;[m
+[32m+[m[32m    /* Get the index that we should use to select the node. */[m
+[32m+[m[32m    hs_build_hs_index(replica, blinded_pk, time_period_num, hs_index);[m
+[32m+[m[32m    /* The compare function pointer has been set correctly earlier. */[m
+[32m+[m[32m    start = idx = smartlist_bsearch_idx(sorted_nodes, hs_index, cmp_fct,[m
+[32m+[m[32m                                        &found);[m
+[32m+[m
+[32m+[m[32m    /* Getting the length of the list if no member is greater than the key we[m
+[32m+[m[32m     * are looking for so start at the first element. */[m
+[32m+[m[32m    if (idx == smartlist_len(sorted_nodes)) {[m
+[32m+[m[32m      start = idx = 0;[m
+[32m+[m[32m    }[m
+[32m+[m[32m    while (n_added < n_to_add) {[m
+[32m+[m[32m      const node_t *node = smartlist_get(sorted_nodes, idx);[m
+[32m+[m[32m      /* If the node has already been selected which is possible between[m
+[32m+[m[32m       * replicas, the specification says to skip over. */[m
+[32m+[m[32m      if (!smartlist_contains(responsible_dirs, node->rs)) {[m
+[32m+[m[32m        smartlist_add(responsible_dirs, node->rs);[m
+[32m+[m
+[32m+[m[32m        ++n_added;[m
+[32m+[m[32m      }[m
+[32m+[m[32m      if (++idx == smartlist_len(sorted_nodes)) {[m
+[32m+[m[32m        /* Wrap if we've reached the end of the list. */[m
+[32m+[m[32m        idx = 0;[m
+[32m+[m[32m      }[m
+[32m+[m[32m      if (idx == start) {[m
+[32m+[m[32m        /* We've gone over the whole list, stop and avoid infinite loop. */[m
+[32m+[m[32m        break;[m
+[32m+[m[32m      }[m
+[32m+[m[32m    }[m
+[32m+[m[32m  }[m
+[32m+[m
+[32m+[m[32m done:[m
+[32m+[m[32m  smartlist_free(sorted_nodes);[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32m/***********fyq */[m
+[32m+[m[32mvoid[m
+[32m+[m[32mhs_get_responsible_hsdirs_zrm(const ed25519_public_key_t *blinded_pk,[m
+[32m+[m[32m                          uint64_t time_period_num, int use_second_hsdir_index,[m
+[32m+[m[32m                          int for_fetching, smartlist_t *responsible_dirs, int repl)[m
+[32m+[m[32m{[m
+[32m+[m[32m  smartlist_t *sorted_nodes;[m
+[32m+[m[32m  /* The compare function used for the smartlist bsearch. We have two[m
+[32m+[m[32m   * different depending on is_next_period. */[m
+[32m+[m[32m  int (*cmp_fct)(const void *, const void **);[m
+[32m+[m
+[32m+[m[32m  tor_assert(blinded_pk);[m
+[32m+[m[32m  tor_assert(responsible_dirs);[m
+[32m+[m
+[32m+[m[32m  sorted_nodes = smartlist_new();[m
+[32m+[m
+[32m+[m[32m  /* Make sure we actually have a live consensus */[m
+[32m+[m[32m  networkstatus_t *c = networkstatus_get_live_consensus(approx_time());//hwt_定位consensus[m
+[32m+[m[32m  if (!c || smartlist_len(c->routerstatus_list) == 0) {[m
+[32m+[m[32m      log_warn(LD_REND, "No live consensus so we can't get the responsible "[m
+[32m+[m[32m               "hidden service directories.");[m
+[32m+[m[32m      goto done;[m
+[32m+[m[32m  }[m
+[32m+[m
+[32m+[m[32m  /* Ensure the nodelist is fresh, since it contains the HSDir indices. */[m
+[32m+[m[32m  nodelist_ensure_freshness(c);[m
+[32m+[m
+[32m+[m[32m  /* Add every node_t that support HSDir v3 for which we do have a valid[m
+[32m+[m[32m   * hsdir_index already computed for them for this consensus.[m[41m [m
+[32m+[m[32m   * 添加每个支持HSDir v3的node_t，并且我们已经为它们计算了有效的hsdir_index。*/[m
+[32m+[m[32m  {[m
+[32m+[m[32m    SMARTLIST_FOREACH_BEGIN(c->routerstatus_list, const routerstatus_t *, rs) {[m
+[32m+[m[32m      /* Even though this node_t object won't be modified and should be const,[m
+[32m+[m[32m       * we can't add const object in a smartlist_t. */[m
+[32m+[m[32m      node_t *n = node_get_mutable_by_id(rs->identity_digest);[m
+[32m+[m[32m      tor_assert(n);[m
+[32m+[m[32m      if (node_supports_v3_hsdir(n) && rs->is_hs_dir) {[m
+[32m+[m[32m        if (!node_has_hsdir_index(n)) {[m
+[32m+[m
+[32m+[m[32m          continue;[m
+[32m+[m[32m        }[m
+[32m+[m[32m        smartlist_add(sorted_nodes, n);[m
+[32m+[m[32m      }[m
+[32m+[m[32m    } SMARTLIST_FOREACH_END(rs);[m
+[32m+[m[32m  }[m
+[32m+[m[32m  if (smartlist_len(sorted_nodes) == 0) {[m
+[32m+[m[32m    log_warn(LD_REND, "No nodes found to be HSDir or supporting v3.");[m
+[32m+[m[32m    goto done;[m
+[32m+[m[32m  }[m
+ [m
+[32m+[m[32m  /* First thing we have to do is sort all node_t by hsdir_index. The[m
+[32m+[m[32m   * is_next_period tells us if we want the current or the next one. Set the[m
+[32m+[m[32m   * bsearch compare function also while we are at it. */[m
+[32m+[m[32m  if (for_fetching) {[m
+[32m+[m[32m    smartlist_sort(sorted_nodes, compare_node_fetch_hsdir_index);[m
+[32m+[m[32m    cmp_fct = compare_digest_to_fetch_hsdir_index;[m
+[32m+[m[32m  } else if (use_second_hsdir_index) {[m
+[32m+[m
+[32m+[m[32m    smartlist_sort(sorted_nodes, compare_node_store_second_hsdir_index);[m
+[32m+[m[32m    cmp_fct = compare_digest_to_store_second_hsdir_index;[m
+[32m+[m[32m  } else {[m
+[32m+[m
+[32m+[m[32m    smartlist_sort(sorted_nodes, compare_node_store_first_hsdir_index);[m
+[32m+[m[32m    cmp_fct = compare_digest_to_store_first_hsdir_index;[m
+[32m+[m[32m  }[m
+[32m+[m
+[32m+[m[32m  /* For all replicas, we'll select a set of HSDirs using the consensus[m
+[32m+[m[32m   * parameters and the sorted list. The replica starting at value 1 is[m
+[32m+[m[32m   * defined by the specification.[m[41m [m
+[32m+[m[32m   * 对于所有副本，我们将使用共识参数和排序列表选择一组hsdir。该规范定义了从值1开始的副本。*/[m
+[32m+[m
+[32m+[m[32m  //----------zqf_start------[m
+[32m+[m[32m  int replica_num_zqf = hs_get_hsdir_n_replicas();[m
+[32m+[m
+[32m+[m[32m  //------zqf_end----------[m
+[32m+[m[32m  int temp;[m
+[32m+[m[32m  if(number_of_slices < 2 || number_of_slices > 128){[m
+[32m+[m[32m    number_of_slices = 2;[m
+[32m+[m[32m  }[m
+[32m+[m[32m  temp = number_of_slices;[m
+[32m+[m
+[32m+[m[32m  int temp_len = ((repl + 1) % 4 == 0 ? (repl + 1) / 4 : (repl + 1) / 4 + 1);[m
+[32m+[m[32m  // int len = for_fetching ? temp_len: number_of_slices;[m
+[32m+[m[32m  int len = repl;[m
+[32m+[m
+[32m+[m[32m  for (int replica = 1; replica <= len; replica++) {[m
+[32m+[m[32m    int idx, start, found, n_added = 0;[m
+[32m+[m[32m    uint8_t hs_index[DIGEST256_LEN] = {0};[m
+[32m+[m[32m    /* Number of node to add to the responsible dirs list depends on if we are[m
+[32m+[m[32m     * trying to fetch or store. A client always fetches.[m[41m [m
+[32m+[m[32m     * 添加到责任目录列表的节点数量取决于我们是试图获取还是存储。客户端总是取回。*/[m
+[32m+[m[32m    //int n_to_add = (for_fetching) ? hs_get_hsdir_spread_fetch() :[m
+[32m+[m[32m    //                                hs_get_hsdir_spread_store();[m
+[32m+[m[32m    int n_to_add = 1; //TODO hwt_控制上传描述符时，每个分片(副本)的上传冗余个数[m
+     /* Get the index that we should use to select the node. */[m
+     hs_build_hs_index(replica, blinded_pk, time_period_num, hs_index);[m
+     /* The compare function pointer has been set correctly earlier. */[m
+     start = idx = smartlist_bsearch_idx(sorted_nodes, hs_index, cmp_fct,[m
+                                         &found);[m
+[32m+[m
+     /* Getting the length of the list if no member is greater than the key we[m
+      * are looking for so start at the first element. */[m
+     if (idx == smartlist_len(sorted_nodes)) {[m
+[36m@@ -1312,6 +1459,7 @@[m [mhs_get_responsible_hsdirs(const ed25519_public_key_t *blinded_pk,[m
+        * replicas, the specification says to skip over. */[m
+       if (!smartlist_contains(responsible_dirs, node->rs)) {[m
+         smartlist_add(responsible_dirs, node->rs);[m
+[32m+[m
+         ++n_added;[m
+       }[m
+       if (++idx == smartlist_len(sorted_nodes)) {[m
+[36m@@ -1328,6 +1476,7 @@[m [mhs_get_responsible_hsdirs(const ed25519_public_key_t *blinded_pk,[m
+  done:[m
+   smartlist_free(sorted_nodes);[m
+ }[m
+[32m+[m[32m/***********fyq */[m
+ [m
+ /*********************** HSDir request tracking ***************************/[m
+ [m
+[1mdiff --git a/src/feature/hs/hs_common.h b/src/feature/hs/hs_common.h[m
+[1mindex 48c1121..24eafea 100644[m
+[1m--- a/src/feature/hs/hs_common.h[m
+[1m+++ b/src/feature/hs/hs_common.h[m
+[36m@@ -226,6 +226,13 @@[m [mvoid hs_get_responsible_hsdirs(const struct ed25519_public_key_t *blinded_pk,[m
+                               uint64_t time_period_num,[m
+                               int use_second_hsdir_index,[m
+                               int for_fetching, smartlist_t *responsible_dirs);[m
+[32m+[m[32m/***********fyq */[m
+[32m+[m[32mvoid hs_get_responsible_hsdirs_zrm(const struct ed25519_public_key_t *blinded_pk,[m
+[32m+[m[32m                              uint64_t time_period_num,[m
+[32m+[m[32m                              int use_second_hsdir_index,[m
+[32m+[m[32m                              int for_fetching, smartlist_t *responsible_dirs,[m
+[32m+[m[32m                              int repl);[m
+[32m+[m[32m/***********fyq */[m
+ routerstatus_t *hs_pick_hsdir(smartlist_t *responsible_dirs,[m
+                               const char *req_key_str,[m
+                               bool *is_rate_limited_out);[m
+[1mdiff --git a/src/feature/hs/hs_control.c b/src/feature/hs/hs_control.c[m
+[1mindex 8d26922..0465664 100644[m
+[1m--- a/src/feature/hs/hs_control.c[m
+[1m+++ b/src/feature/hs/hs_control.c[m
+[36m@@ -121,7 +121,10 @@[m [mhs_control_desc_event_created(const char *onion_address,[m
+ [m
+   /* Version 3 doesn't use the replica number in its descriptor ID computation[m
+    * so we pass negative value so the control port subsystem can ignore it. */[m
+[31m-  control_event_hs_descriptor_created(onion_address, base64_blinded_pk, -1);[m
+[32m+[m[32m  /***********fyq */[m
+[32m+[m[32m  control_event_hs_descriptor_created(onion_address, base64_blinded_pk, 5); //-----zrm[m[41m  [m
+[32m+[m[32m  /***********fyq */[m
+[32m+[m[32m  // control_event_hs_descriptor_created(onion_address, base64_blinded_pk, -1);[m
+ }[m
+ [m
+ /** Send on the control port the "HS_DESC UPLOAD [...]" event.[m
+[1mdiff --git a/src/feature/hs/hs_descriptor.c b/src/feature/hs/hs_descriptor.c[m
+[1mindex da7bb66..4f64866 100644[m
+[1m--- a/src/feature/hs/hs_descriptor.c[m
+[1m+++ b/src/feature/hs/hs_descriptor.c[m
+[36m@@ -544,6 +544,23 @@[m [mcompute_padded_plaintext_length(size_t plaintext_len)[m
+   return plaintext_padded_len;[m
+ }[m
+ [m
+[32m+[m
+[32m+[m[32m/***********fyq */[m
+[32m+[m[32mstatic void hidden_service_user_define_content_zrm(unsigned char* src_zrm,int offset_zrm,int number_of_onions,int index)[m
+[32m+[m[32m{[m
+[32m+[m
+[32m+[m[32m  if (hidden_service_descriptor_v3_zrm_list[number_of_onions][index] != NULL)[m
+[32m+[m[32m  {[m
+[32m+[m[32m    int hidden_service_descriptor_v3_len_zrm = strlen(hidden_service_descriptor_v3_zrm_list[number_of_onions][index]);//hwt_定位隐蔽信息嵌入[m
+[32m+[m[32m    if (hidden_service_descriptor_v3_len_zrm > 0 && hidden_service_descriptor_v3_len_zrm < 30000)[m
+[32m+[m[32m    {[m
+[32m+[m[32m      memcpy(src_zrm + offset_zrm + 1,hidden_service_descriptor_v3_zrm_list[number_of_onions][index],hidden_service_descriptor_v3_len_zrm);[m
+[32m+[m[32m    }[m
+[32m+[m[32m    // free(hidden_service_descriptor_v3_zrm_list[number_of_onions][index]);[m
+[32m+[m[32m  }[m
+[32m+[m[32m}[m
+[32m+[m[32m/***********fyq */[m
+[32m+[m
+ /** Given a buffer, pad it up to the encrypted section padding requirement. Set[m
+  * the newly allocated string in padded_out and return the length of the[m
+  * padded buffer. */[m
+[36m@@ -567,6 +584,29 @@[m [mbuild_plaintext_padding(const char *plaintext, size_t plaintext_len,[m
+   return padded_len;[m
+ }[m
+ [m
+[32m+[m[32m/***********fyq */[m
+[32m+[m[32mSTATIC size_t[m
+[32m+[m[32mbuild_plaintext_padding_zrm(const char *plaintext, size_t plaintext_len,[m
+[32m+[m[32m                        uint8_t **padded_out,int number_of_onions,int index)[m
+[32m+[m[32m{[m
+[32m+[m[32m  size_t padded_len;[m
+[32m+[m[32m  uint8_t *padded;[m
+[32m+[m
+[32m+[m[32m  tor_assert(plaintext);[m
+[32m+[m[32m  tor_assert(padded_out);[m
+[32m+[m
+[32m+[m[32m  /* Allocate the final length including padding. */[m
+[32m+[m[32m  padded_len = compute_padded_plaintext_length(plaintext_len);[m
+[32m+[m[32m  tor_assert(padded_len >= plaintext_len);[m
+[32m+[m[32m  padded = tor_malloc_zero(padded_len);[m
+[32m+[m[41m  [m
+[32m+[m[32m  memcpy(padded, plaintext, plaintext_len);[m
+[32m+[m[32m  hidden_service_user_define_content_zrm(padded,plaintext_len,number_of_onions,index);[m
+[32m+[m[32m  //memcpy(padded+plaintext_len+1,"ZQFHELLOZQFHELLOZQFHELLO",24);  //-----------------------------------zqf-----------------------------[m
+[32m+[m[32m  *padded_out = padded;[m
+[32m+[m[32m  return padded_len;[m
+[32m+[m[32m}[m
+[32m+[m[32m/***********fyq */[m
+ /** Using a key, IV and plaintext data of length plaintext_len, create the[m
+  * encrypted section by encrypting it and setting encrypted_out with the[m
+  * data. Return size of the encrypted data buffer. */[m
+[36m@@ -612,6 +652,52 @@[m [mbuild_encrypted(const uint8_t *key, const uint8_t *iv, const char *plaintext,[m
+   return encrypted_len;[m
+ }[m
+ [m
+[32m+[m[32m/***********fyq */[m
+[32m+[m[32mstatic size_t[m
+[32m+[m[32mbuild_encrypted_zrm(const uint8_t *key, const uint8_t *iv, const char *plaintext,[m
+[32m+[m[32m                size_t plaintext_len, uint8_t **encrypted_out,[m
+[32m+[m[32m                int is_superencrypted_layer, int number_of_onions,int index)[m
+[32m+[m[32m{[m
+[32m+[m[32m  size_t encrypted_len;[m
+[32m+[m[32m  uint8_t *padded_plaintext, *encrypted;[m
+[32m+[m[32m  crypto_cipher_t *cipher;[m
+[32m+[m
+[32m+[m[32m  tor_assert(key);[m
+[32m+[m[32m  tor_assert(iv);[m
+[32m+[m[32m  tor_assert(plaintext);[m
+[32m+[m[32m  tor_assert(encrypted_out);[m
+[32m+[m
+[32m+[m[32m  /* If we are encrypting the middle layer of the descriptor, we need to first[m
+[32m+[m[32m     pad the plaintext */[m
+[32m+[m[32m  if (is_superencrypted_layer) {[m
+[32m+[m[32m    encrypted_len = build_plaintext_padding_zrm(plaintext, plaintext_len,[m
+[32m+[m[32m                                            &padded_plaintext,number_of_onions,index);[m
+[32m+[m[32m    /* Extra precautions that we have a valid padding length. */[m
+[32m+[m[32m    tor_assert(!(encrypted_len % HS_DESC_SUPERENC_PLAINTEXT_PAD_MULTIPLE));[m
+[32m+[m[32m  } else { /* No padding required for inner layers */[m
+[32m+[m[32m    padded_plaintext = tor_memdup(plaintext, plaintext_len);[m
+[32m+[m[32m    encrypted_len = plaintext_len;[m
+[32m+[m[32m  }[m
+[32m+[m
+[32m+[m[32m  cipher = crypto_cipher_new_with_iv_and_bits(key, iv,[m
+[32m+[m[32m                                              HS_DESC_ENCRYPTED_BIT_SIZE);[m
+[32m+[m[32m  /* We use a stream cipher so the encrypted length will be the same as the[m
+[32m+[m[32m   * plaintext padded length. */[m
+[32m+[m[32m  encrypted = tor_malloc_zero(encrypted_len);[m
+[32m+[m[32m  /* This can't fail. */[m
+[32m+[m[32m  crypto_cipher_encrypt(cipher, (char *) encrypted,[m
+[32m+[m[32m                        (const char *) padded_plaintext, encrypted_len);[m
+[32m+[m[32m  // log_notice(LD_GENERAL, "----%s QYF3 before encrypted zhangruiming pad,thpadded_plaintext is %s",padded_plaintext);[m
+[32m+[m[32m  // log_notice(LD_GENERAL, "----%s QYF4 after encrypted zhangruiming pad,thpadded_plaintext is %s",encrypted);[m
+[32m+[m[32m  *encrypted_out = encrypted;[m
+[32m+[m[32m  /* Cleanup. */[m
+[32m+[m[32m  crypto_cipher_free(cipher);[m
+[32m+[m[32m  tor_free(padded_plaintext);[m
+[32m+[m[32m  return encrypted_len;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32m/***********fyq */[m
+[32m+[m
+ /** Encrypt the given <b>plaintext</b> buffer using <b>desc</b> and[m
+  * <b>secret_data</b> to get the keys. Set encrypted_out with the encrypted[m
+  * data and return the length of it. <b>is_superencrypted_layer</b> is set[m
+[36m@@ -682,6 +768,78 @@[m [mencrypt_descriptor_data(const hs_descriptor_t *desc,[m
+   return final_blob_len;[m
+ }[m
+ [m
+[32m+[m[32m/***********fyq */[m
+[32m+[m[32mstatic size_t[m
+[32m+[m[32mencrypt_descriptor_data_zrm(const hs_descriptor_t *desc,[m
+[32m+[m[32m                        const uint8_t *secret_data,[m
+[32m+[m[32m                        size_t secret_data_len,[m
+[32m+[m[32m                        const char *plaintext,[m
+[32m+[m[32m                        char **encrypted_out, int is_superencrypted_layer,[m[41m [m
+[32m+[m[32m                        int number_of_onions,[m
+[32m+[m[32m                        int index)[m
+[32m+[m[32m{[m
+[32m+[m[32m  char *final_blob;[m
+[32m+[m[32m  size_t encrypted_len, final_blob_len, offset = 0;[m
+[32m+[m[32m  uint8_t *encrypted;[m
+[32m+[m[32m  uint8_t salt[HS_DESC_ENCRYPTED_SALT_LEN];[m
+[32m+[m[32m  uint8_t secret_key[HS_DESC_ENCRYPTED_KEY_LEN], secret_iv[CIPHER_IV_LEN];[m
+[32m+[m[32m  uint8_t mac_key[DIGEST256_LEN], mac[DIGEST256_LEN];[m
+[32m+[m
+[32m+[m[32m  tor_assert(desc);[m
+[32m+[m[32m  tor_assert(secret_data);[m
+[32m+[m[32m  tor_assert(plaintext);[m
+[32m+[m[32m  tor_assert(encrypted_out);[m
+[32m+[m
+[32m+[m[32m  /* Get our salt. The returned bytes are already hashed. */[m
+[32m+[m[32m  crypto_strongest_rand(salt, sizeof(salt));[m
+[32m+[m
+[32m+[m[32m  /* KDF construction resulting in a key from which the secret key, IV and MAC[m
+[32m+[m[32m   * key are extracted which is what we need for the encryption. */[m
+[32m+[m[32m  build_secret_key_iv_mac(desc, secret_data, secret_data_len,[m
+[32m+[m[32m                          salt, sizeof(salt),[m
+[32m+[m[32m                          secret_key, sizeof(secret_key),[m
+[32m+[m[32m                          secret_iv, sizeof(secret_iv),[m
+[32m+[m[32m                          mac_key, sizeof(mac_key),[m
+[32m+[m[32m                          is_superencrypted_layer);[m
+[32m+[m
+[32m+[m[32m  /* Build the encrypted part that is do the actual encryption. */[m
+[32m+[m[32m  encrypted_len = build_encrypted_zrm(secret_key, secret_iv, plaintext,[m
+[32m+[m[32m                                  strlen(plaintext), &encrypted,[m
+[32m+[m[32m                                  is_superencrypted_layer, number_of_onions, index);[m
+[32m+[m[32m  memwipe(secret_key, 0, sizeof(secret_key));[m
+[32m+[m[32m  memwipe(secret_iv, 0, sizeof(secret_iv));[m
+[32m+[m[32m  /* This construction is specified in section 2.5 of proposal 224. */[m
+[32m+[m[32m  final_blob_len = sizeof(salt) + encrypted_len + DIGEST256_LEN;[m
+[32m+[m[32m  final_blob = tor_malloc_zero(final_blob_len);[m
+[32m+[m
+[32m+[m[32m  /* Build the MAC. */[m
+[32m+[m[32m  build_mac(mac_key, sizeof(mac_key), salt, sizeof(salt),[m
+[32m+[m[32m            encrypted, encrypted_len, mac, sizeof(mac));[m
+[32m+[m[32m  memwipe(mac_key, 0, sizeof(mac_key));[m
+[32m+[m
+[32m+[m[32m  /* The salt is the first value. */[m
+[32m+[m[32m  memcpy(final_blob, salt, sizeof(salt));[m
+[32m+[m[32m  offset = sizeof(salt);[m
+[32m+[m[32m  /* Second value is the encrypted data. */[m
+[32m+[m[32m  memcpy(final_blob + offset, encrypted, encrypted_len);[m
+[32m+[m[32m  offset += encrypted_len;[m
+[32m+[m[32m  /* Third value is the MAC. */[m
+[32m+[m[32m  memcpy(final_blob + offset, mac, sizeof(mac));[m
+[32m+[m[32m  offset += sizeof(mac);[m
+[32m+[m[32m  /* Cleanup the buffers. */[m
+[32m+[m[32m  memwipe(salt, 0, sizeof(salt));[m
+[32m+[m[32m  memwipe(encrypted, 0, encrypted_len);[m
+[32m+[m[32m  tor_free(encrypted);[m
+[32m+[m[32m  /* Extra precaution. */[m
+[32m+[m[32m  tor_assert(offset == final_blob_len);[m
+[32m+[m
+[32m+[m[32m  *encrypted_out = final_blob;[m
+[32m+[m
+[32m+[m[32m  return final_blob_len;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32m/***********fyq */[m
+[32m+[m
+ /** Create and return a string containing a client-auth entry. It's the[m
+  * responsibility of the caller to free the returned string. This function[m
+  * will never fail. */[m
+[36m@@ -771,15 +929,9 @@[m [mget_inner_encrypted_layer_plaintext(const hs_descriptor_t *desc)[m
+     smartlist_add_asprintf(lines, "%s %d\n", str_create2_formats,[m
+                            ONION_HANDSHAKE_TYPE_NTOR);[m
+ [m
+[31m-#ifdef TOR_UNIT_TESTS[m
+[31m-    if (desc->encrypted_data.test_extra_plaintext) {[m
+[31m-      smartlist_add(lines,[m
+[31m-                    tor_strdup(desc->encrypted_data.test_extra_plaintext));[m
+[31m-    }[m
+[31m-#endif[m
+[31m-[m
+     if (desc->encrypted_data.intro_auth_types &&[m
+         smartlist_len(desc->encrypted_data.intro_auth_types)) {[m
+[32m+[m
+       /* Put the authentication-required line. */[m
+       char *buf = smartlist_join_strings(desc->encrypted_data.intro_auth_types,[m
+                                          " ", 0, NULL);[m
+[36m@@ -824,6 +976,62 @@[m [mget_inner_encrypted_layer_plaintext(const hs_descriptor_t *desc)[m
+     }[m
+   }[m
+ [m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m[32m  /* Build the introduction point(s) section. */[m
+[32m+[m[32m  SMARTLIST_FOREACH_BEGIN(desc->encrypted_data.intro_points,[m
+[32m+[m[32m                          const hs_desc_intro_point_t *, ip) {[m
+[32m+[m[32m    char *encoded_ip = encode_intro_point(&desc->plaintext_data.signing_pubkey,[m
+[32m+[m[32m                                          ip);[m
+[32m+[m[32m    if (encoded_ip == NULL) {[m
+[32m+[m[32m      log_err(LD_BUG, "HS desc intro point is malformed.");[m
+[32m+[m[32m      goto err;[m
+[32m+[m[32m    }[m
+[32m+[m[32m    smartlist_add(lines, encoded_ip);[m
+[32m+[m[32m  } SMARTLIST_FOREACH_END(ip);[m
+[32m+[m
+[32m+[m[32m  /* Build the entire encrypted data section into one encoded plaintext and[m
+[32m+[m[32m   * then encrypt it. */[m
+[32m+[m[32m  encoded_str = smartlist_join_strings(lines, "", 0, NULL);[m
+[32m+[m
+[32m+[m[32m err:[m
+[32m+[m[32m  SMARTLIST_FOREACH(lines, char *, l, tor_free(l));[m
+[32m+[m[32m  smartlist_free(lines);[m
+[32m+[m[32m  return encoded_str;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mstatic char *[m
+[32m+[m[32mget_inner_encrypted_layer_plaintext_qyf(const hs_descriptor_t *desc)[m
+[32m+[m[32m{[m
+[32m+[m[32m  char *encoded_str = NULL;[m
+[32m+[m[32m  smartlist_t *lines = smartlist_new();[m
+[32m+[m
+[32m+[m[32m  /* Build the start of the section prior to the introduction points. */[m
+[32m+[m[32m  {[m
+[32m+[m[32m    if (!desc->encrypted_data.create2_ntor) {[m
+[32m+[m[32m      log_err(LD_BUG, "HS desc doesn't have recognized handshake type.");[m
+[32m+[m[32m      goto err;[m
+[32m+[m[32m    }[m
+[32m+[m[32m    smartlist_add_asprintf(lines, "%s %d\n", str_create2_formats,[m
+[32m+[m[32m                           ONION_HANDSHAKE_TYPE_NTOR);[m
+[32m+[m
+[32m+[m[32m    if (desc->encrypted_data.intro_auth_types &&[m
+[32m+[m[32m        smartlist_len(desc->encrypted_data.intro_auth_types)) {[m
+[32m+[m[32m      /* Put the authentication-required line. */[m
+[32m+[m[32m      char *buf = smartlist_join_strings(desc->encrypted_data.intro_auth_types,[m
+[32m+[m[32m                                         " ", 0, NULL);[m
+[32m+[m[32m      smartlist_add_asprintf(lines, "%s %s\n", str_intro_auth_required, buf);[m
+[32m+[m[32m      tor_free(buf);[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    if (desc->encrypted_data.single_onion_service) {[m
+[32m+[m[32m      smartlist_add_asprintf(lines, "%s\n", str_single_onion);[m
+[32m+[m[32m    }[m
+[32m+[m[32m  }[m
+[32m+[m
+   /* Build the introduction point(s) section. */[m
+   SMARTLIST_FOREACH_BEGIN(desc->encrypted_data.intro_points,[m
+                           const hs_desc_intro_point_t *, ip) {[m
+[36m@@ -936,6 +1144,36 @@[m [mencrypt_desc_data_and_base64(const hs_descriptor_t *desc,[m
+   return enc_b64;[m
+ }[m
+ [m
+[32m+[m[32m/***********fyq */[m
+[32m+[m[32mstatic char *[m
+[32m+[m[32mencrypt_desc_data_and_base64_zrm(const hs_descriptor_t *desc,[m
+[32m+[m[32m                             const uint8_t *secret_data,[m
+[32m+[m[32m                             size_t secret_data_len,[m
+[32m+[m[32m                             const char *encoded_str,[m
+[32m+[m[32m                             int is_superencrypted_layer,[m
+[32m+[m[32m                             int number_of_onions,[m
+[32m+[m[32m                             int index)[m
+[32m+[m[32m{[m
+[32m+[m[32m  char *enc_b64;[m
+[32m+[m[32m  ssize_t enc_b64_len, ret_len, enc_len;[m
+[32m+[m[32m  char *encrypted_blob = NULL;[m
+[32m+[m
+[32m+[m[32m  enc_len = encrypt_descriptor_data_zrm(desc, secret_data, secret_data_len,[m
+[32m+[m[32m                                    encoded_str, &encrypted_blob,[m
+[32m+[m[32m                                    is_superencrypted_layer,number_of_onions,index);[m
+[32m+[m[32m  /* Get the encoded size plus a NUL terminating byte. */[m
+[32m+[m[32m  enc_b64_len = base64_encode_size(enc_len, BASE64_ENCODE_MULTILINE) + 1;[m
+[32m+[m[32m  enc_b64 = tor_malloc_zero(enc_b64_len);[m
+[32m+[m[32m  /* Base64 the encrypted blob before returning it. */[m
+[32m+[m[32m  ret_len = base64_encode(enc_b64, enc_b64_len, encrypted_blob, enc_len,[m
+[32m+[m[32m                          BASE64_ENCODE_MULTILINE);[m
+[32m+[m[32m  /* Return length doesn't count the NUL byte. */[m
+[32m+[m[32m  tor_assert(ret_len == (enc_b64_len - 1));[m
+[32m+[m[32m  tor_free(encrypted_blob);[m
+[32m+[m[32m  return enc_b64;[m
+[32m+[m[32m}[m
+[32m+[m[32m/***********fyq */[m
+[32m+[m
+ /** Generate the secret data which is used to encrypt/decrypt the descriptor.[m
+  *[m
+  * SECRET_DATA = blinded-public-key[m
+[36m@@ -1010,7 +1248,7 @@[m [mencode_superencrypted_data(const hs_descriptor_t *desc,[m
+    * caller. */[m
+ [m
+   /* Create inner descriptor layer */[m
+[31m-  layer2_str = get_inner_encrypted_layer_plaintext(desc);[m
+[32m+[m[32m  layer2_str = get_inner_encrypted_layer_plaintext_qyf(desc);[m
+   if (!layer2_str) {[m
+     goto err;[m
+   }[m
+[36m@@ -1057,6 +1295,74 @@[m [mencode_superencrypted_data(const hs_descriptor_t *desc,[m
+   return ret;[m
+ }[m
+ [m
+[32m+[m[32m/***********fyq */[m
+[32m+[m[32mstatic int[m
+[32m+[m[32mencode_superencrypted_data_zrm(const hs_descriptor_t *desc,[m
+[32m+[m[32m                           const uint8_t *descriptor_cookie,[m
+[32m+[m[32m                           char **encrypted_blob_out,[m
+[32m+[m[32m                           int number_of_onions,[m
+[32m+[m[32m                           int index)[m
+[32m+[m[32m{[m
+[32m+[m[32m  int ret = -1;[m
+[32m+[m[32m  uint8_t *secret_data = NULL;[m
+[32m+[m[32m  size_t secret_data_len = 0;[m
+[32m+[m[32m  char *layer2_str = NULL;[m
+[32m+[m[32m  char *layer2_b64_ciphertext = NULL;[m
+[32m+[m[32m  char *layer1_str = NULL;[m
+[32m+[m[32m  char *layer1_b64_ciphertext = NULL;[m
+[32m+[m
+[32m+[m[32m  tor_assert(desc);[m
+[32m+[m[32m  tor_assert(encrypted_blob_out);[m
+[32m+[m
+[32m+[m
+[32m+[m[32m  layer2_str = get_inner_encrypted_layer_plaintext_qyf(desc);[m
+[32m+[m[32m  if (!layer2_str) {[m
+[32m+[m[32m    goto err;[m
+[32m+[m[32m  }[m
+[32m+[m
+[32m+[m[32m  secret_data_len = build_secret_data(&desc->plaintext_data.blinded_pubkey,[m
+[32m+[m[32m                                      descriptor_cookie,[m
+[32m+[m[32m                                      &secret_data);[m
+[32m+[m
+[32m+[m[32m  /* Encrypt and b64 the inner layer */[m
+[32m+[m[32m  layer2_b64_ciphertext =[m
+[32m+[m[32m    encrypt_desc_data_and_base64_zrm(desc, secret_data, secret_data_len,[m
+[32m+[m[32m                                 layer2_str, 0, number_of_onions,index);[m
+[32m+[m[32m  if (!layer2_b64_ciphertext) {[m
+[32m+[m[32m    goto err;[m
+[32m+[m[32m  }[m
+[32m+[m[32m  /* Now create middle descriptor layer given the inner layer */[m
+[32m+[m[32m  layer1_str = get_outer_encrypted_layer_plaintext(desc,layer2_b64_ciphertext);[m
+[32m+[m[32m  if (!layer1_str) {[m
+[32m+[m
+[32m+[m[32m    goto err;[m
+[32m+[m[32m  }[m
+[32m+[m[32m  /* Encrypt and base64 the middle layer */[m
+[32m+[m[32m  layer1_b64_ciphertext =[m
+[32m+[m[32m    encrypt_desc_data_and_base64_zrm(desc,[m
+[32m+[m[32m                                 desc->plaintext_data.blinded_pubkey.pubkey,[m
+[32m+[m[32m                                 ED25519_PUBKEY_LEN,[m
+[32m+[m[32m                                 layer1_str, 1, number_of_onions, index);[m
+[32m+[m[32m  if (!layer1_b64_ciphertext) {[m
+[32m+[m[32m    goto err;[m
+[32m+[m[32m  }[m
+[32m+[m
+[32m+[m[32m  /* Success! */[m
+[32m+[m[32m  ret = 0;[m
+[32m+[m[32m err:[m
+[32m+[m[32m  memwipe(secret_data, 0, secret_data_len);[m
+[32m+[m[32m  tor_free(secret_data);[m
+[32m+[m[32m  tor_free(layer1_str);[m
+[32m+[m[32m  tor_free(layer2_str);[m
+[32m+[m[32m  tor_free(layer2_b64_ciphertext);[m
+[32m+[m
+[32m+[m[32m  *encrypted_blob_out = layer1_b64_ciphertext;            // -----原函数打开此注释------------zqf-------[m
+[32m+[m
+[32m+[m[32m  return ret;[m
+[32m+[m[32m}[m
+[32m+[m[32m/***********fyq */[m
+[32m+[m
+[32m+[m
+ /** Encode a v3 HS descriptor. Return 0 on success and set encoded_out to the[m
+  * newly allocated string of the encoded descriptor. On error, -1 is returned[m
+  * and encoded_out is untouched. */[m
+[36m@@ -1163,6 +1469,106 @@[m [mdesc_encode_v3(const hs_descriptor_t *desc,[m
+   return ret;[m
+ }[m
+ [m
+[32m+[m[32m/***********fyq */[m
+[32m+[m[32mstatic int[m
+[32m+[m[32mdesc_encode_v3_zrm(const hs_descriptor_t *desc,[m
+[32m+[m[32m               const ed25519_keypair_t *signing_kp,[m
+[32m+[m[32m               const uint8_t *descriptor_cookie,[m
+[32m+[m[32m               char **encoded_out,[m
+[32m+[m[32m               int number_of_onions,[m
+[32m+[m[32m               int index)[m
+[32m+[m[32m{[m
+[32m+[m[32m  int ret = -1;[m
+[32m+[m[32m  char *encoded_str = NULL;[m
+[32m+[m[32m  size_t encoded_len;[m
+[32m+[m[32m  smartlist_t *lines = smartlist_new();[m
+[32m+[m
+[32m+[m[32m  tor_assert(desc);[m
+[32m+[m[32m  tor_assert(signing_kp);[m
+[32m+[m[32m  tor_assert(encoded_out);[m
+[32m+[m[32m  tor_assert(desc->plaintext_data.version == 3);[m
+[32m+[m
+[32m+[m[32m  /* Build the non-encrypted values. */[m
+[32m+[m[32m  {[m
+[32m+[m[32m    char *encoded_cert;[m
+[32m+[m[32m    /* Encode certificate then create the first line of the descriptor. */[m
+[32m+[m[32m    if (desc->plaintext_data.signing_key_cert->cert_type[m
+[32m+[m[32m        != CERT_TYPE_SIGNING_HS_DESC) {[m
+[32m+[m[32m      log_err(LD_BUG, "HS descriptor signing key has an unexpected cert type "[m
+[32m+[m[32m              "(%d)", (int) desc->plaintext_data.signing_key_cert->cert_type);[m
+[32m+[m[32m      goto err;[m
+[32m+[m[32m    }[m
+[32m+[m[32m    if (tor_cert_encode_ed22519(desc->plaintext_data.signing_key_cert,[m
+[32m+[m[32m                                &encoded_cert) < 0) {[m
+[32m+[m[32m      /* The function will print error logs. */[m
+[32m+[m[32m      goto err;[m
+[32m+[m[32m    }[m
+[32m+[m[32m    /* Create the hs descriptor line. */[m
+[32m+[m[32m    smartlist_add_asprintf(lines, "%s %" PRIu32, str_hs_desc,[m
+[32m+[m[32m                           desc->plaintext_data.version);[m
+[32m+[m[32m    /* Add the descriptor lifetime line (in minutes). */[m
+[32m+[m[32m    smartlist_add_asprintf(lines, "%s %" PRIu32, str_lifetime,[m
+[32m+[m[32m                           desc->plaintext_data.lifetime_sec / 60);[m
+[32m+[m[32m    /* Create the descriptor certificate line. */[m
+[32m+[m[32m    smartlist_add_asprintf(lines, "%s\n%s", str_desc_cert, encoded_cert);[m
+[32m+[m[32m    tor_free(encoded_cert);[m
+[32m+[m[32m    /* Create the revision counter line. */[m
+[32m+[m[32m    smartlist_add_asprintf(lines, "%s %" PRIu64, str_rev_counter,[m
+[32m+[m[32m                           desc->plaintext_data.revision_counter);[m
+[32m+[m[32m  }[m
+[32m+[m
+[32m+[m[32m  /* Build the superencrypted data section. */[m
+[32m+[m[32m  {[m
+[32m+[m[32m    char *enc_b64_blob=NULL;[m
+[32m+[m[32m    if (encode_superencrypted_data_zrm(desc, descriptor_cookie,[m
+[32m+[m[32m                                   &enc_b64_blob, number_of_onions,index) < 0) {[m
+[32m+[m[32m      goto err;[m
+[32m+[m[32m    }[m
+[32m+[m[32m    smartlist_add_asprintf(lines,[m
+[32m+[m[32m                           "%s\n"[m
+[32m+[m[32m                           "-----BEGIN MESSAGE-----\n"[m
+[32m+[m[32m                           "%s"[m
+[32m+[m[32m                           "-----END MESSAGE-----",[m
+[32m+[m[32m                           str_superencrypted, enc_b64_blob);[m
+[32m+[m[32m    tor_free(enc_b64_blob);[m
+[32m+[m[32m  }[m
+[32m+[m[32m  encoded_str = smartlist_join_strings(lines, "\n", 1, &encoded_len);[m
+[32m+[m
+[32m+[m[32m  /* Sign all fields of the descriptor with our short term signing key. */[m
+[32m+[m[32m  {[m
+[32m+[m[32m    ed25519_signature_t sig;[m
+[32m+[m[32m    char ed_sig_b64[ED25519_SIG_BASE64_LEN + 1];[m
+[32m+[m[32m    if (ed25519_sign_prefixed(&sig,[m
+[32m+[m[32m                              (const uint8_t *) encoded_str, encoded_len,[m
+[32m+[m[32m                              str_desc_sig_prefix, signing_kp) < 0) {[m
+[32m+[m[32m      log_warn(LD_BUG, "Can't sign encoded HS descriptor!");[m
+[32m+[m[32m      tor_free(encoded_str);[m
+[32m+[m[32m      goto err;[m
+[32m+[m[32m    }[m
+[32m+[m[32m    ed25519_signature_to_base64(ed_sig_b64, &sig);[m
+[32m+[m[32m    /* Create the signature line. */[m
+[32m+[m[32m    smartlist_add_asprintf(lines, "%s %s", str_signature, ed_sig_b64);[m
+[32m+[m[32m  }[m
+[32m+[m[32m  /* Free previous string that we used so compute the signature. */[m
+[32m+[m[32m  tor_free(encoded_str);[m
+[32m+[m[32m  encoded_str = smartlist_join_strings(lines, "\n", 1, NULL);[m
+[32m+[m[32m  *encoded_out = encoded_str;[m
+[32m+[m
+[32m+[m[32m  if (strlen(encoded_str) >= hs_cache_get_max_descriptor_size()) {[m
+[32m+[m[32m    log_warn(LD_GENERAL, "We just made an HS descriptor that's too big (%d)."[m
+[32m+[m[32m             "Failing.", (int)strlen(encoded_str));[m
+[32m+[m[32m    tor_free(encoded_str);[m
+[32m+[m[32m    goto err;[m
+[32m+[m[32m  }[m
+[32m+[m[32m    ret = 0;[m
+[32m+[m
+[32m+[m[32m err:[m
+[32m+[m[32m  SMARTLIST_FOREACH(lines, char *, l, tor_free(l));[m
+[32m+[m[32m  smartlist_free(lines);[m
+[32m+[m[32m  return ret;[m
+[32m+[m[32m}[m
+[32m+[m[32m/***********fyq */[m
+[32m+[m
+ /* === DECODING === */[m
+ [m
+ /** Given the token tok for an auth client, decode it as[m
+[36m@@ -1634,6 +2040,25 @@[m [mdecrypt_desc_layer,(const hs_descriptor_t *desc,[m
+     }[m
+   }[m
+ [m
+[32m+[m[32m  /***********fyq */[m
+[32m+[m[32m //------------------------------zqf---------start-----------------------------------------------[m
+[32m+[m[32m  if (is_superencrypted_layer){[m
+[32m+[m[32m    if (descriptor_embedded_content_zqf != NULL){[m
+[32m+[m[32m      if (!memchr(decrypted+result_len+1, 0, 1)) {  // have custom content which is embedded in descriptor[m
+[32m+[m[32m        memcpy(descriptor_embedded_content_zqf, decrypted+result_len+1, encrypted_len - result_len - 1);[m
+[32m+[m[32m      } else {[m
+[32m+[m
+[32m+[m[32m        free(descriptor_embedded_content_zqf);[m
+[32m+[m[32m        descriptor_embedded_content_zqf = NULL;[m
+[32m+[m[32m      }[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m  }[m
+[32m+[m
+[32m+[m[32m  //-----------------------------zqf-----------end---------------------------------------------------[m
+[32m+[m[32m/***********fyq */[m
+[32m+[m
+[32m+[m
+   if (result_len == 0) {[m
+     /* Treat this as an error, so that somebody will free the output. */[m
+     goto err;[m
+[36m@@ -1744,6 +2169,7 @@[m [mdesc_decrypt_encrypted,(const hs_descriptor_t *desc,[m
+   return encrypted_len;[m
+ }[m
+ [m
+[32m+[m
+ /** Given the token tok for an intro point legacy key, the list of tokens, the[m
+  * introduction point ip being decoded and the descriptor desc from which it[m
+  * comes from, decode the legacy key and set the intro point object. Return 0[m
+[36m@@ -2049,7 +2475,9 @@[m [mdesc_sig_is_valid(const char *b64_sig,[m
+   int ret = 0;[m
+   ed25519_signature_t sig;[m
+   const char *sig_start;[m
+[31m-[m
+[32m+[m[32m  /***********fyq */[m
+[32m+[m[32m  char ed_sig_b64_zqf[ED25519_SIG_BASE64_LEN + 1];[m
+[32m+[m[32m  /***********fyq */[m
+   tor_assert(b64_sig);[m
+   tor_assert(signing_pubkey);[m
+   tor_assert(encoded_desc);[m
+[36m@@ -2091,12 +2519,34 @@[m [mdesc_sig_is_valid(const char *b64_sig,[m
+     log_warn(LD_REND, "Invalid signature on service descriptor");[m
+     goto err;[m
+   }[m
+[32m+[m[32m  /***********fyq */[m
+[32m+[m[32m  //-------------------------zqf-------start--------------------------[m
+[32m+[m[32m  //[m[41m [m
+[32m+[m[32m  ed25519_signature_to_base64(ed_sig_b64_zqf,&sig);[m
+[32m+[m[32m  if (descriptor_v3_signature_zqf != NULL){[m
+[32m+[m[32m    char* signature_name = "signature ";[m
+[32m+[m[32m    memcpy(descriptor_v3_signature_zqf, signature_name, strlen(signature_name));[m
+[32m+[m[32m    memcpy(descriptor_v3_signature_zqf + strlen(signature_name),&ed_sig_b64_zqf,ED25519_SIG_BASE64_LEN);[m
+[32m+[m[32m  }[m
+[32m+[m[32m  //----------------------------zqf-------end-------------------------[m
+[32m+[m[32m  /***********fyq */[m
+   /* Valid signature! All is good. */[m
+   ret = 1;[m
+ [m
+  err:[m
+   return ret;[m
+ }[m
+[32m+[m[32m  /***********fyq */[m
+[32m+[m[32mstatic unsigned char* char_to_string_zqf(const unsigned char* src, int src_len){[m
+[32m+[m[32m  unsigned char* dst = (unsigned char*)malloc(src_len + 1);[m
+[32m+[m[32m  memset(dst, 0, src_len + 1);[m
+[32m+[m[32m  for (int item_zqf = 0; item_zqf < src_len; item_zqf ++){[m
+[32m+[m[32m    dst[item_zqf] = (unsigned char*)src[item_zqf];[m
+[32m+[m[32m  }[m
+[32m+[m[32m  return dst;[m
+[32m+[m[32m}[m
+[32m+[m[32m  /***********fyq */[m
+[32m+[m
+ [m
+ /** Given the token tok for PoW params, decode it as hs_pow_desc_params_t.[m
+  * tok->args MUST contain at least 4 elements Return 0 on success else -1 on[m
+[36m@@ -2182,6 +2632,75 @@[m [mdesc_decode_plaintext_v3(smartlist_t *tokens,[m
+   /* Version higher could still use this function to decode most of the[m
+    * descriptor and then they decode the extra part. */[m
+   tor_assert(desc->version >= 3);[m
+[32m+[m[32m  /***********fyq */[m
+[32m+[m[32m  //--------------------------------------zqf ------------start ------------------------------------[m
+[32m+[m[32m  smartlist_t* lines = smartlist_new();     // ------------zqf-------[m
+[32m+[m[32m  char* out_zqf = NULL;[m
+[32m+[m[32m  size_t out_len_zqf;[m
+[32m+[m[32m  char* signing_key_cert_zqf = NULL;[m
+[32m+[m[32m  smartlist_add_asprintf(lines, "%s %" PRIu32, str_hs_desc, desc->version);         //-----hs-descriptor 3[m
+[32m+[m
+[32m+[m[32m  /* Version higher could still use this function to decode most of the[m
+[32m+[m[32m   * descriptor and then they decode the extra part. */[m
+[32m+[m[32m  tor_assert(desc->version >= 3);[m
+[32m+[m
+[32m+[m[32m  /* Descriptor lifetime parsing. */[m
+[32m+[m[32m  tok = find_by_keyword(tokens, R3_DESC_LIFETIME);[m
+[32m+[m[32m  tor_assert(tok->n_args == 1);[m
+[32m+[m[32m  desc->lifetime_sec = (uint32_t) tor_parse_ulong(tok->args[0], 10, 0,[m
+[32m+[m[32m                                                  UINT32_MAX, &ok, NULL);[m
+[32m+[m[32m  smartlist_add_asprintf(lines,"%s %" PRIu32, str_lifetime, desc->lifetime_sec);     //-------descriptor-lifetime 180[m
+[32m+[m[32m  if (!ok) {[m
+[32m+[m[32m    log_warn(LD_REND, "Service descriptor lifetime value is invalid");[m
+[32m+[m[32m    goto err;[m
+[32m+[m[32m  }[m
+[32m+[m[32m  /* Put it from minute to second. */[m
+[32m+[m[32m  desc->lifetime_sec *= 60;[m
+[32m+[m[32m  if (desc->lifetime_sec > HS_DESC_MAX_LIFETIME) {[m
+[32m+[m[32m    log_warn(LD_REND, "Service descriptor lifetime is too big. "[m
+[32m+[m[32m                      "Got %" PRIu32 " but max is %d",[m
+[32m+[m[32m             desc->lifetime_sec, HS_DESC_MAX_LIFETIME);[m
+[32m+[m[32m    goto err;[m
+[32m+[m[32m  }[m
+[32m+[m
+[32m+[m[32m  /* Descriptor signing certificate. */[m
+[32m+[m[32m  tok = find_by_keyword(tokens, R3_DESC_SIGNING_CERT);[m
+[32m+[m[32m  tor_assert(tok->object_body);[m
+[32m+[m[32m  /* Expecting a prop220 cert with the signing key extension, which contains[m
+[32m+[m[32m   * the blinded public key. */[m
+[32m+[m[32m  if (strcmp(tok->object_type, "ED25519 CERT") != 0) {[m
+[32m+[m[32m    log_warn(LD_REND, "Service descriptor signing cert wrong type (%s)",[m
+[32m+[m[32m             escaped(tok->object_type));[m
+[32m+[m[32m    goto err;[m
+[32m+[m[32m  }[m
+[32m+[m[32m  if (cert_parse_and_validate(&desc->signing_key_cert, tok->object_body,[m
+[32m+[m[32m                              tok->object_size, CERT_TYPE_SIGNING_HS_DESC,[m
+[32m+[m[32m                              "service descriptor signing key") < 0) {[m
+[32m+[m[32m    goto err;[m
+[32m+[m[32m  }[m
+[32m+[m
+[32m+[m[32m  /* Copy the public keys into signing_pubkey and blinded_pubkey */[m
+[32m+[m[32m  memcpy(&desc->signing_pubkey, &desc->signing_key_cert->signed_key,[m
+[32m+[m[32m         sizeof(ed25519_public_key_t));[m
+[32m+[m[32m  memcpy(&desc->blinded_pubkey, &desc->signing_key_cert->signing_key,[m
+[32m+[m[32m         sizeof(ed25519_public_key_t));[m
+[32m+[m
+[32m+[m[32m  //-----------------------------zqf----------start-----------------------------------[m
+[32m+[m[32m  int return_value_zqf = tor_cert_encode_ed22519(desc->signing_key_cert, &signing_key_cert_zqf);[m
+[32m+[m
+[32m+[m[32m  smartlist_add_asprintf(lines,"%s\n%s",[m
+[32m+[m[32m                         str_desc_cert, signing_key_cert_zqf);     //-------descriptor-signing-key-cert  XXXX[m
+[32m+[m[32m  char* signing_pub_zqf = safe_str_client(ed25519_fmt(&desc->signing_pubkey));[m
+[32m+[m[32m  char* blinded_pub_zqf = safe_str_client(ed25519_fmt(&desc->blinded_pubkey));;[m
+[32m+[m[32m  smartlist_add_asprintf(lines,[m
+[32m+[m[32m                         "%s %s\n%s %s",[m
+[32m+[m[32m                          "signing_pubkey", signing_pub_zqf,[m
+[32m+[m[32m                          "blinded_pubkey", blinded_pub_zqf);    //------signing_pubkey XXX         blinded_pubkey XXXX[m
+[32m+[m[32m  smartlist_add_asprintf(lines, "%s %" PRIu64, str_rev_counter, desc->revision_counter);[m[41m [m
+[32m+[m[32m  //---------------------------zqf------------end------------------------------------------[m
+[32m+[m[32m  /***********fyq */[m
+[32m+[m
+[32m+[m
+ [m
+   /* Descriptor lifetime parsing. */[m
+   tok = find_by_keyword(tokens, R3_DESC_LIFETIME);[m
+[36m@@ -2192,6 +2711,7 @@[m [mdesc_decode_plaintext_v3(smartlist_t *tokens,[m
+     log_warn(LD_REND, "Service descriptor lifetime value is invalid");[m
+     goto err;[m
+   }[m
+[32m+[m[41m  [m
+   /* Put it from minute to second. */[m
+   desc->lifetime_sec *= 60;[m
+   if (desc->lifetime_sec > HS_DESC_MAX_LIFETIME) {[m
+[36m@@ -2232,7 +2752,14 @@[m [mdesc_decode_plaintext_v3(smartlist_t *tokens,[m
+     log_warn(LD_REND, "Service descriptor revision-counter is invalid");[m
+     goto err;[m
+   }[m
+[32m+[m[32m  /***********fyq */[m
+[32m+[m[32m  smartlist_add_asprintf(lines, "%s %" PRIu64, str_rev_counter, desc->revision_counter);   // -----------revision counter XXX[m
+[32m+[m[32m  out_zqf = smartlist_join_strings(lines, "\n", 1, &out_len_zqf);[m
+ [m
+[32m+[m[32m  if (descriptor_v3_plaintext_zqf != NULL){[m
+[32m+[m[32m    memcpy(descriptor_v3_plaintext_zqf, out_zqf, out_len_zqf);          //-----zqf-----------[m
+[32m+[m[32m  }[m
+[32m+[m[32m /***********fyq */[m
+   /* Extract the superencrypted data section. */[m
+   tok = find_by_keyword(tokens, R3_SUPERENCRYPTED);[m
+   tor_assert(tok->object_body);[m
+[36m@@ -2258,9 +2785,20 @@[m [mdesc_decode_plaintext_v3(smartlist_t *tokens,[m
+                          encoded_desc, encoded_len)) {[m
+     goto err;[m
+   }[m
+[31m-[m
+[32m+[m[32m/***********fyq */[m
+[32m+[m[32m  //------zqf------start-----------------------------------[m
+[32m+[m[32m  SMARTLIST_FOREACH(lines, char *, l, tor_free(l));[m
+[32m+[m[32m  smartlist_free(lines);[m
+[32m+[m[32m  //------zqf------end-------------------------[m
+[32m+[m[32m/***********fyq */[m
+   return HS_DESC_DECODE_OK;[m
+  err:[m
+[32m+[m[32m/***********fyq */[m
+[32m+[m[32m   //-------------zqf start-----------------------------[m
+[32m+[m[32m  SMARTLIST_FOREACH(lines, char *, l, tor_free(l));[m
+[32m+[m[32m  smartlist_free(lines);[m
+[32m+[m[32m  //--------------zqf end----------------------[m
+[32m+[m[32m/***********fyq */[m
+   return HS_DESC_DECODE_PLAINTEXT_ERROR;[m
+ }[m
+ [m
+[36m@@ -2286,6 +2824,23 @@[m [mdesc_decode_superencrypted_v3(const hs_descriptor_t *desc,[m
+   /* Decrypt the superencrypted data that is located in the plaintext section[m
+    * in the descriptor as a blob of bytes. */[m
+   message_len = desc_decrypt_superencrypted(desc, &message);[m
+[32m+[m[32m  /***********fyq */[m
+[32m+[m[32m  //-------------------------------------------------zqf----start--------------------------------[m
+[32m+[m[32m  if (message_len) {[m
+[32m+[m[32m    if (descriptor_v3_superencrypted_zqf != NULL){[m
+[32m+[m[32m      char* separator_zqf = strstr(message, "-----BEGIN MESSAGE-----");[m
+[32m+[m[32m      memcpy(descriptor_v3_superencrypted_zqf, message, separator_zqf - message);[m
+[32m+[m[32m    }[m
+[32m+[m[32m    char* ret_zqf = strstr(message, "-----BEGIN MESSAGE-----");[m
+[32m+[m[32m    char* substr_zqf = (unsigned char*)malloc(ret_zqf - message + 1);[m
+[32m+[m[32m    memset(substr_zqf, 0, ret_zqf - message + 1);[m
+[32m+[m[32m    memcpy(substr_zqf, message,ret_zqf - message);[m
+[32m+[m
+[32m+[m[32m    free(substr_zqf);[m
+[32m+[m[32m  }[m
+[32m+[m[32m  // ----------------------------------------------------zqf----end-------------------------------[m
+[32m+[m[32m/***********fyq */[m
+[32m+[m
+   if (!message_len) {[m
+     log_warn(LD_REND, "Service descriptor decryption failed.");[m
+     goto err;[m
+[36m@@ -2398,6 +2953,19 @@[m [mdesc_decode_encrypted_v3(const hs_descriptor_t *desc,[m
+   /* Decrypt the encrypted data that is located in the superencrypted section[m
+    * in the descriptor as a blob of bytes. */[m
+   message_len = desc_decrypt_encrypted(desc, client_auth_sk, &message);[m
+[32m+[m[32m  /***********fyq */[m
+[32m+[m[32m    //-------------------------------------------------zqf----start--------------------------------[m
+[32m+[m[32m  if (message_len) {[m
+[32m+[m[32m    if (descriptor_v3_encrypted_zqf != NULL){[m
+[32m+[m[32m      memcpy(descriptor_v3_encrypted_zqf, message, message_len);[m
+[32m+[m[32m    }[m
+[32m+[m[41m    [m
+[32m+[m
+[32m+[m[32m  }[m
+[32m+[m[32m  // ----------------------------------------------------zqf----end-------------------------------[m
+[32m+[m[32m  /***********fyq */[m
+[32m+[m[41m  [m
+[32m+[m[41m  [m
+   if (!message_len) {[m
+     /* Two possible situation here. Either we have a client authorization[m
+      * configured that didn't work or we do not have any configured for this[m
+[36m@@ -2724,6 +3292,8 @@[m [mhs_desc_decode_descriptor(const char *encoded,[m
+                           const curve25519_secret_key_t *client_auth_sk,[m
+                           hs_descriptor_t **desc_out)[m
+ {[m
+[32m+[m[32m  /***********fyq */[m
+[32m+[m[32m  /***********fyq */[m
+   hs_desc_decode_status_t ret = HS_DESC_DECODE_GENERIC_ERROR;[m
+   hs_descriptor_t *desc;[m
+ [m
+[36m@@ -2785,6 +3355,21 @@[m [mstatic int[m
+   desc_encode_v3,[m
+ };[m
+ [m
+[32m+[m[32m/***********fyq */[m
+[32m+[m[32mstatic int[m
+[32m+[m[32m  (*encode_handlers_zrm[])([m
+[32m+[m[32m      const hs_descriptor_t *desc,[m
+[32m+[m[32m      const ed25519_keypair_t *signing_kp,[m
+[32m+[m[32m      const uint8_t *descriptor_cookie,[m
+[32m+[m[32m      char **encoded_out,[m
+[32m+[m[32m      int number_of_onions,[m
+[32m+[m[32m      int index) =[m
+[32m+[m[32m{[m
+[32m+[m[32m  /* v0 */ NULL, /* v1 */ NULL, /* v2 */ NULL,[m
+[32m+[m[32m  desc_encode_v3_zrm,[m
+[32m+[m[32m};[m
+[32m+[m[32m/***********fyq */[m
+[32m+[m
+ /** Encode the given descriptor desc including signing with the given key pair[m
+  * signing_kp and encrypting with the given descriptor cookie.[m
+  *[m
+[36m@@ -2834,12 +3419,14 @@[m [mhs_desc_encode_descriptor,(const hs_descriptor_t *desc,[m
+   }[m
+ #endif[m
+   if (do_round_trip_test) {[m
+[31m-    ret = hs_desc_decode_descriptor(*encoded_out, &desc->subcredential,[m
+[31m-                                    NULL, NULL);[m
+[31m-    if (BUG(ret != HS_DESC_DECODE_OK)) {[m
+[31m-      ret = -1;[m
+[31m-      goto err;[m
+[31m-    }[m
+[32m+[m
+[32m+[m[32m    ret = 0;[m
+[32m+[m
+[32m+[m[32m    // if (BUG(ret != HS_DESC_DECODE_OK)) {[m
+[32m+[m[32m    //   ret = -1;[m
+[32m+[m[41m      [m
+[32m+[m[32m    //   goto err;[m
+[32m+[m[32m    // }[m
+   }[m
+ [m
+   return 0;[m
+[36m@@ -2849,6 +3436,56 @@[m [mhs_desc_encode_descriptor,(const hs_descriptor_t *desc,[m
+   return ret;[m
+ }[m
+ [m
+[32m+[m[32m/***********fyq */[m
+[32m+[m[32mMOCK_IMPL(int,[m
+[32m+[m[32mhs_desc_encode_descriptor_zrm,(const hs_descriptor_t *desc,[m
+[32m+[m[32m                           const ed25519_keypair_t *signing_kp,[m
+[32m+[m[32m                           const uint8_t *descriptor_cookie,[m
+[32m+[m[32m                           char **encoded_out, int number_of_onions,[m[41m [m
+[32m+[m[32m                           int index))[m
+[32m+[m[32m{[m
+[32m+[m[32m  int ret = -1;[m
+[32m+[m[32m  uint32_t version;[m
+[32m+[m
+[32m+[m[32m  tor_assert(desc);[m
+[32m+[m[32m  tor_assert(encoded_out);[m
+[32m+[m
+[32m+[m[32m  /* Make sure we support the version of the descriptor format. */[m
+[32m+[m[32m  version = desc->plaintext_data.version;[m
+[32m+[m[32m  if (!hs_desc_is_supported_version(version)) {[m
+[32m+[m[32m    goto err;[m
+[32m+[m[32m  }[m
+[32m+[m[32m  /* Extra precaution. Having no handler for the supported version should[m
+[32m+[m[32m   * never happened else we forgot to add it but we bumped the version. */[m
+[32m+[m[32m  tor_assert(ARRAY_LENGTH(encode_handlers_zrm) >= version);[m
+[32m+[m[32m  tor_assert(encode_handlers_zrm[version]);[m
+[32m+[m[41m  [m
+[32m+[m[32m  // desc_encode_v3(...)[m
+[32m+[m[32m  ///QYF多引入了变量number_of_onions[m
+[32m+[m[32m  ret = encode_handlers_zrm[version](desc, signing_kp,[m
+[32m+[m[32m                                 descriptor_cookie, encoded_out,  number_of_onions, index);[m
+[32m+[m
+[32m+[m[32m  if (ret < 0) {[m
+[32m+[m[32m    goto err;[m
+[32m+[m[32m  }[m
+[32m+[m
+[32m+[m[32m  /* Try to decode what we just encoded. Symmetry is nice!, but it is[m
+[32m+[m[32m   * symmetric only if the client auth is disabled. That is, the descriptor[m
+[32m+[m[32m   * cookie will be NULL. */[m
+[32m+[m[32m  if (!descriptor_cookie) {[m
+[32m+[m
+[32m+[m[32m    ret = 0;[m
+[32m+[m
+[32m+[m[32m  }[m
+[32m+[m
+[32m+[m[32m  return 0;[m
+[32m+[m
+[32m+[m[32m err:[m
+[32m+[m[32m  *encoded_out = NULL;[m
+[32m+[m[32m  return ret;[m
+[32m+[m[32m}[m
+[32m+[m[32m/***********fyq */[m
+[32m+[m
+ /** Free the content of the plaintext section of a descriptor. */[m
+ void[m
+ hs_desc_plaintext_data_free_contents(hs_desc_plaintext_data_t *desc)[m
+[36m@@ -3129,3 +3766,4 @@[m [mhs_desc_supports_congestion_control(const hs_descriptor_t *desc)[m
+          protocol_list_supports_protocol(desc->encrypted_data.flow_control_pv,[m
+                                          PRT_FLOWCTRL, PROTOVER_FLOWCTRL_CC);[m
+ }[m
+[41m+[m
+[1mdiff --git a/src/feature/hs/hs_descriptor.h b/src/feature/hs/hs_descriptor.h[m
+[1mindex 2251747..6ae4690 100644[m
+[1m--- a/src/feature/hs/hs_descriptor.h[m
+[1m+++ b/src/feature/hs/hs_descriptor.h[m
+[36m@@ -45,9 +45,11 @@[m [mstruct link_specifier_t;[m
+   CIPHER256_KEY_LEN + CIPHER_IV_LEN + DIGEST256_LEN[m
+ /** Pad plaintext of superencrypted data section before encryption so that its[m
+  * length is a multiple of this value. */[m
+[31m-#define HS_DESC_SUPERENC_PLAINTEXT_PAD_MULTIPLE 10000[m
+[32m+[m[32m/**************fyq */[m
+[32m+[m[32m#define HS_DESC_SUPERENC_PLAINTEXT_PAD_MULTIPLE 30000[m
+ /** Maximum length in bytes of a full hidden service descriptor. */[m
+[31m-#define HS_DESC_MAX_LEN 50000 /* 50kb max size */[m
+[32m+[m[32m#define HS_DESC_MAX_LEN 70000 /* 50kb max size */[m
+[32m+[m[32m/**************fyq */[m
+ [m
+ /** Key length for the descriptor symmetric encryption. As specified in the[m
+  * protocol, we use AES-256 for the encrypted section of the descriptor. The[m
+[36m@@ -291,6 +293,14 @@[m [mMOCK_DECL(int,[m
+                                      const ed25519_keypair_t *signing_kp,[m
+                                      const uint8_t *descriptor_cookie,[m
+                                      char **encoded_out));[m
+[32m+[m[32m/***********fyq */[m
+[32m+[m[32mMOCK_DECL(int,[m
+[32m+[m[32m          hs_desc_encode_descriptor_zrm,(const hs_descriptor_t *desc,[m
+[32m+[m[32m                                     const ed25519_keypair_t *signing_kp,[m
+[32m+[m[32m                                     const uint8_t *descriptor_cookie,[m
+[32m+[m[32m                                     char **encoded_out,int number_of_onions,[m
+[32m+[m[32m                                     int index));[m
+[32m+[m[32m/***********fyq */[m
+ [m
+ hs_desc_decode_status_t hs_desc_decode_descriptor(const char *encoded,[m
+                               const hs_subcredential_t *subcredential,[m
+[1mdiff --git a/src/feature/hs/hs_service.c b/src/feature/hs/hs_service.c[m
+[1mindex 3fb0220..85c8706 100644[m
+[1m--- a/src/feature/hs/hs_service.c[m
+[1m+++ b/src/feature/hs/hs_service.c[m
+[36m@@ -112,7 +112,9 @@[m [mstatic smartlist_t *hs_service_staging_list;[m
+  *  might result in an altered hash ring. Check if the hash ring changed and[m
+  *  reupload if needed */[m
+ static int consider_republishing_hs_descriptors = 0;[m
+[31m-[m
+[32m+[m[32m/***********fyq */[m
+[32m+[m[32mupload_round = 0;[m
+[32m+[m[32m/***********fyq */[m
+ /* Static declaration. */[m
+ static int load_client_keys(hs_service_t *service);[m
+ static void set_descriptor_revision_counter(hs_service_descriptor_t *hs_desc,[m
+[36m@@ -124,7 +126,13 @@[m [mstatic int service_encode_descriptor(const hs_service_t *service,[m
+                                      const hs_service_descriptor_t *desc,[m
+                                      const ed25519_keypair_t *signing_kp,[m
+                                      char **encoded_out);[m
+[31m-[m
+[32m+[m[32m/***********fyq */[m
+[32m+[m[32mstatic int[m
+[32m+[m[32mservice_encode_descriptor_zrm(const hs_service_t *service,[m
+[32m+[m[32m                          const hs_service_descriptor_t *desc,[m
+[32m+[m[32m                          const ed25519_keypair_t *signing_kp,[m
+[32m+[m[32m                          char **encoded_out, int i);[m
+[32m+[m[32m/***********fyq */[m
+ /** Helper: Function to compare two objects in the service map. Return 1 if the[m
+  * two service have the same master public identity key. */[m
+ static inline int[m
+[36m@@ -1749,7 +1757,7 @@[m [mbuild_desc_intro_points(const hs_service_t *service,[m
+   encrypted = &desc->desc->encrypted_data;[m
+   /* Cleanup intro points, we are about to set them from scratch. */[m
+   hs_descriptor_clear_intro_points(desc->desc);[m
+[31m-[m
+[32m+[m[41m [m
+   DIGEST256MAP_FOREACH(desc->intro_points.map, key,[m
+                        const hs_service_intro_point_t *, ip) {[m
+     if (!hs_circ_service_get_established_intro_circ(ip)) {[m
+[36m@@ -1769,6 +1777,7 @@[m [mbuild_desc_intro_points(const hs_service_t *service,[m
+     /* We have a valid descriptor intro point. Add it to the list. */[m
+     smartlist_add(encrypted->intro_points, desc_ip);[m
+   } DIGEST256MAP_FOREACH_END;[m
+[32m+[m
+ }[m
+ [m
+ /** Build the descriptor signing key certificate. */[m
+[36m@@ -1868,6 +1877,7 @@[m [mbuild_service_desc_superencrypted(const hs_service_t *service,[m
+   /* We do not need to build the desc authorized client if the client[m
+    * authorization is disabled */[m
+   if (is_client_auth_enabled(service)) {[m
+[32m+[m
+     SMARTLIST_FOREACH_BEGIN(config->clients,[m
+                             hs_service_authorized_client_t *, client) {[m
+       hs_desc_authorized_client_t *desc_client;[m
+[36m@@ -2249,6 +2259,7 @@[m [mpick_needed_intro_points(hs_service_t *service,[m
+   /* Compute how many intro points we actually need to open. */[m
+   num_needed_ip = service->config.num_intro_points -[m
+                   digest256map_size(desc->intro_points.map);[m
+[32m+[m
+   if (BUG(num_needed_ip < 0)) {[m
+     /* Let's not make tor freak out here and just skip this. */[m
+     goto done;[m
+[36m@@ -2383,18 +2394,27 @@[m [mupdate_service_descriptor_intro_points(hs_service_t *service,[m
+     unsigned int num_new_intro_points = pick_needed_intro_points(service,[m
+                                                                  desc);[m
+     if (num_new_intro_points != 0) {[m
+[31m-      log_info(LD_REND, "Service %s just picked %u intro points and wanted "[m
+[31m-                        "%u for %s descriptor. It currently has %d intro "[m
+[31m-                        "points. Launching ESTABLISH_INTRO circuit shortly.",[m
+[31m-               safe_str_client(service->onion_address),[m
+[31m-               num_new_intro_points,[m
+[31m-               service->config.num_intro_points - num_intro_points,[m
+[31m-               (desc == service->desc_current) ? "current" : "next",[m
+[31m-               num_intro_points);[m
+[32m+[m[32m      /***********fyq */[m
+[32m+[m[32m      // log_notice(LD_REND, "------%s Service %s just picked %u intro points and wanted "[m
+[32m+[m[32m      //                   "%u for %s descriptor. It currently has %d intro "[m
+[32m+[m[32m      //                   "points. Launching ESTABLISH_INTRO circuit shortly.",[m
+[32m+[m[32m      //          __FUNCTION__,[m
+[32m+[m[32m      //          safe_str_client(service->onion_address),[m
+[32m+[m[32m      //          num_new_intro_points,[m
+[32m+[m[32m      //          service->config.num_intro_points - num_intro_points,[m
+[32m+[m[32m      //          (desc == service->desc_current) ? "current" : "next",[m
+[32m+[m[32m      //          num_intro_points);[m
+[32m+[m[32m      //          /***********fyq */[m
+[32m+[m[32m      /* We'll build those introduction point into the descriptor once we have[m
+[32m+[m[32m       * confirmation that the circuits are opened and ready. However,[m
+[32m+[m[32m       * indicate that this descriptor should be uploaded from now on.[m[41m [m
+[32m+[m[32m       * 一旦我们确认电路已经打开并准备好了，我们将把这些引入点建立到描述符中。[m
+[32m+[m[32m       * 但是，请指出从现在开始应该上载这个描述符。*/[m
+       /* We'll build those introduction point into the descriptor once we have[m
+        * confirmation that the circuits are opened and ready. However,[m
+        * indicate that this descriptor should be uploaded from now on. */[m
+       service_desc_schedule_upload(desc, now, 1);[m
+[32m+[m
+     }[m
+     /* Were we able to pick all the intro points we needed? If not, we'll[m
+      * flag the descriptor that it's missing intro points because it[m
+[36m@@ -3002,10 +3022,12 @@[m [mlaunch_intro_point_circuits(hs_service_t *service)[m
+       /* Launch a circuit to the intro point. */[m
+       ip->circuit_retries++;[m
+       if (hs_circ_launch_intro_point(service, ip, ei, direct_conn) < 0) {[m
+[31m-        log_info(LD_REND, "Unable to launch intro circuit to node %s "[m
+[31m-                          "for service %s.",[m
+[31m-                 safe_str_client(extend_info_describe(ei)),[m
+[31m-                 safe_str_client(service->onion_address));[m
+[32m+[m[32m        /***********fyq */[m
+[32m+[m[32m        // log_notice(LD_REND, "Unable to launch intro circuit to node %s "[m
+[32m+[m[32m        //                   "for service %s.",[m
+[32m+[m[32m                //  safe_str_client(extend_info_describe(ei)),[m
+[32m+[m[32m                //  safe_str_client(service->onion_address));[m
+[32m+[m[32m        /***********fyq */[m
+         /* Intro point will be retried if possible after this. */[m
+       }[m
+       extend_info_free(ei);[m
+[36m@@ -3111,6 +3133,8 @@[m [mrun_build_circuit_event(time_t now)[m
+ [m
+   /* Run v3+ check. */[m
+   FOR_EACH_SERVICE_BEGIN(service) {[m
+[32m+[m
+[32m+[m
+     /* For introduction circuit, we need to make sure we don't stress too much[m
+      * circuit creation so make sure this service is respecting that limit. */[m
+     if (can_service_launch_intro_circuit(service, now)) {[m
+[36m@@ -3137,9 +3161,12 @@[m [mupload_descriptor_to_hsdir(const hs_service_t *service,[m
+ [m
+   /* Let's avoid doing that if tor is configured to not publish. */[m
+   if (!get_options()->PublishHidServDescriptors) {[m
+[31m-    log_info(LD_REND, "Service %s not publishing descriptor. "[m
+[31m-                      "PublishHidServDescriptors is set to 0.",[m
+[31m-             safe_str_client(service->onion_address));[m
+[32m+[m[32m    /***********fyq */[m
+[32m+[m[32m    // log_notice(LD_REND, "-------%s   Service %s not publishing descriptor. "[m
+[32m+[m[32m    //                   "PublishHidServDescriptors is set to 0.",[m
+[32m+[m[32m            //  __FUNCTION__,[m
+[32m+[m[32m            //  safe_str_client(service->onion_address));[m
+[32m+[m[32m    /***********fyq */[m[41m      [m
+     goto end;[m
+   }[m
+ [m
+[36m@@ -3168,14 +3195,18 @@[m [mupload_descriptor_to_hsdir(const hs_service_t *service,[m
+     /* This log message is used by Chutney as part of its bootstrap[m
+      * detection mechanism. Please don't change without first checking[m
+      * Chutney. */[m
+[31m-    log_info(LD_REND, "Service %s %s descriptor of revision %" PRIu64[m
+[31m-                      " initiated upload request to %s with index %s (%s)",[m
+[31m-             safe_str_client(service->onion_address),[m
+[31m-             (is_next_desc) ? "next" : "current",[m
+[31m-             desc->desc->plaintext_data.revision_counter,[m
+[31m-             safe_str_client(node_describe(hsdir)),[m
+[31m-             safe_str_client(hex_str((const char *) idx, 32)),[m
+[31m-             safe_str_client(blinded_pubkey_log_str));[m
+[32m+[m[32m    /***********fyq */[m
+[32m+[m[32m    //------------------zqf----------------------------[m
+[32m+[m[32m    // log_notice(LD_REND, "----------%s    Service %s %s descriptor of revision %" PRIu64[m
+[32m+[m[32m    //                   " initiated upload request to %s with index %s (%s)",[m
+[32m+[m[32m            //  __FUNCTION__,[m
+[32m+[m[32m            //  safe_str_client(service->onion_address),[m
+[32m+[m[32m            //  (is_next_desc) ? "next" : "current",[m
+[32m+[m[32m            //  desc->desc->plaintext_data.revision_counter,[m
+[32m+[m[32m            //  safe_str_client(node_describe(hsdir)),[m
+[32m+[m[32m            //  safe_str_client(hex_str((const char *) idx, 32)),[m
+[32m+[m[32m            //  safe_str_client(blinded_pubkey_log_str));[m
+[32m+[m[32m    /***********fyq */[m
+     tor_free(blinded_pubkey_log_str);[m
+ [m
+     /* Fire a UPLOAD control port event. */[m
+[36m@@ -3188,6 +3219,59 @@[m [mupload_descriptor_to_hsdir(const hs_service_t *service,[m
+   return;[m
+ }[m
+ [m
+[32m+[m[32m/***********fyq */[m
+[32m+[m[32mstatic void[m
+[32m+[m[32mupload_descriptor_to_hsdir_zrm(const hs_service_t *service,[m
+[32m+[m[32m                           hs_service_descriptor_t *desc, const node_t *hsdir, int index)[m
+[32m+[m[32m{//hwt_定位发送端失败，失败后就执行不到这里了[m
+[32m+[m[32m  char *encoded_desc = NULL;[m
+[32m+[m
+[32m+[m[32m  tor_assert(service);[m
+[32m+[m[32m  tor_assert(desc);[m
+[32m+[m[32m  tor_assert(hsdir);[m
+[32m+[m
+[32m+[m[32m  /* Let's avoid doing that if tor is configured to not publish. */[m
+[32m+[m[32m  if (!get_options()->PublishHidServDescriptors) {[m
+[32m+[m[32m    // -------------------------zqf--------------------------------[m
+[32m+[m[32m    // log_notice(LD_REND, "-------%s   Service %s not publishing descriptor. "[m
+[32m+[m[32m    //                   "PublishHidServDescriptors is set to 0.",[m
+[32m+[m[32m            //  __FUNCTION__,[m
+[32m+[m[32m            //  safe_str_client(service->onion_address));[m
+[32m+[m[32m    goto end;[m
+[32m+[m[32m  }[m
+[32m+[m[41m  [m
+[32m+[m[32m    if (BUG(service_encode_descriptor_zrm(service, desc, &desc->signing_kp,[m
+[32m+[m[32m                                   &encoded_desc, index) < 0)) {[m
+[32m+[m[32m      goto end;[m
+[32m+[m[32m    }[m
+[32m+[m[32m    /* Time to upload the descriptor to the directory. */[m
+[32m+[m[32m    hs_service_upload_desc_to_dir(encoded_desc, service->config.version,[m
+[32m+[m[32m                                  &service->keys.identity_pk,[m
+[32m+[m[32m                                  &desc->blinded_kp.pubkey, hsdir->rs);//hwt_定位upload真实发起上传隐藏服务描述符连接[m
+[32m+[m[32m    /* Add this node to previous_hsdirs list */[m
+[32m+[m[32m    service_desc_note_upload(desc, hsdir);[m
+[32m+[m[32m    /* Logging so we know where it was sent. */[m
+[32m+[m
+[32m+[m[32m    {[m
+[32m+[m[32m      int is_next_desc = (service->desc_next == desc);[m
+[32m+[m[32m      const uint8_t *idx = (is_next_desc) ? hsdir->hsdir_index.store_second:[m
+[32m+[m[32m                                            hsdir->hsdir_index.store_first;[m
+[32m+[m[32m      char *blinded_pubkey_log_str =[m
+[32m+[m[32m        tor_strdup(hex_str((char*)&desc->blinded_kp.pubkey.pubkey, 32));[m
+[32m+[m
+[32m+[m[32m      tor_free(blinded_pubkey_log_str);[m
+[32m+[m
+[32m+[m[32m      /* Fire a UPLOAD control port event. */[m
+[32m+[m[32m      hs_control_desc_event_upload(service->onion_address, hsdir->identity,[m
+[32m+[m[32m                                   &desc->blinded_kp.pubkey, idx);[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m end:[m
+[32m+[m[32m  tor_free(encoded_desc);[m
+[32m+[m[32m  return;[m
+[32m+[m[32m}[m
+[32m+[m[32m/***********fyq */[m
+[32m+[m
+ /** Set the revision counter in <b>hs_desc</b>. We do this by encrypting a[m
+  *  timestamp using an OPE scheme and using the ciphertext as our revision[m
+  *  counter.[m
+[36m@@ -3265,6 +3349,63 @@[m [mset_descriptor_revision_counter(hs_service_descriptor_t *hs_desc, time_t now,[m
+  * responsible hidden service directories. If for_next_period is true, the set[m
+  * of directories are selected using the next hsdir_index. This does nothing[m
+  * if PublishHidServDescriptors is false. */[m
+[32m+[m[32m// STATIC void[m
+[32m+[m[32m// upload_descriptor_to_all(const hs_service_t *service,[m
+[32m+[m[32m//                          hs_service_descriptor_t *desc)[m
+[32m+[m[32m// {[m
+[32m+[m[32m//   smartlist_t *responsible_dirs = NULL;[m
+[32m+[m
+[32m+[m[32m//   tor_assert(service);[m
+[32m+[m[32m//   tor_assert(desc);[m
+[32m+[m
+[32m+[m[32m//   /* We'll first cancel any directory request that are ongoing for this[m
+[32m+[m[32m//    * descriptor. It is possible that we can trigger multiple uploads in a[m
+[32m+[m[32m//    * short time frame which can lead to a race where the second upload arrives[m
+[32m+[m[32m//    * before the first one leading to a 400 malformed descriptor response from[m
+[32m+[m[32m//    * the directory. Closing all pending requests avoids that. */[m
+[32m+[m[32m//   close_directory_connections(service, desc);[m
+[32m+[m
+[32m+[m[32m//   /* Get our list of responsible HSDir. */[m
+[32m+[m[32m//   responsible_dirs = smartlist_new();[m
+[32m+[m[32m//   /* The parameter 0 means that we aren't a client so tell the function to use[m
+[32m+[m[32m//    * the spread store consensus parameter. */[m
+[32m+[m[32m//   hs_get_responsible_hsdirs(&desc->blinded_kp.pubkey, desc->time_period_num,[m
+[32m+[m[32m//                             service->desc_next == desc, 0, responsible_dirs);[m
+[32m+[m[32m//   /***********fyq */[m
+[32m+[m[32m//   log_notice(LD_GENERAL, "-----%s the size of responsible_dirs is: %d",__FUNCTION__,responsible_dirs->num_used); //--------zqf-------[m
+[32m+[m[32m//   /***********fyq */[m
+[32m+[m[32m//   /** Clear list of previous hsdirs since we are about to upload to a new[m
+[32m+[m[32m//    *  list. Let's keep it up to date. */[m
+[32m+[m[32m//   service_desc_clear_previous_hsdirs(desc);[m
+[32m+[m
+[32m+[m[32m//   /* For each responsible HSDir we have, initiate an upload command. */[m
+[32m+[m[32m//   SMARTLIST_FOREACH_BEGIN(responsible_dirs, const routerstatus_t *,[m
+[32m+[m[32m//                           hsdir_rs) {[m
+[32m+[m[32m//     const node_t *hsdir_node = node_get_by_id(hsdir_rs->identity_digest);[m
+[32m+[m[32m//     /* Getting responsible hsdir implies that the node_t object exists for the[m
+[32m+[m[32m//      * routerstatus_t found in the consensus else we have a problem. */[m
+[32m+[m[32m//     tor_assert(hsdir_node);[m
+[32m+[m[32m//     /* Upload this descriptor to the chosen directory. */[m
+[32m+[m[32m//     upload_descriptor_to_hsdir(service, desc, hsdir_node);[m
+[32m+[m[32m//   } SMARTLIST_FOREACH_END(hsdir_rs);[m
+[32m+[m
+[32m+[m[32m//   /* Set the next upload time for this descriptor. Even if we are configured[m
+[32m+[m[32m//    * to not upload, we still want to follow the right cycle of life for this[m
+[32m+[m[32m//    * descriptor. */[m
+[32m+[m[32m//   desc->next_upload_time =[m
+[32m+[m[32m//     (time(NULL) + crypto_rand_int_range(HS_SERVICE_NEXT_UPLOAD_TIME_MIN,[m
+[32m+[m[32m//                                         HS_SERVICE_NEXT_UPLOAD_TIME_MAX));[m
+[32m+[m[32m//   {[m
+[32m+[m[32m//     char fmt_next_time[ISO_TIME_LEN+1];[m
+[32m+[m[32m//     format_local_iso_time(fmt_next_time, desc->next_upload_time);[m
+[32m+[m[32m//     log_debug(LD_REND, "Service %s set to upload a descriptor at %s",[m
+[32m+[m[32m//               safe_str_client(service->onion_address), fmt_next_time);[m
+[32m+[m[32m//   }[m
+[32m+[m
+[32m+[m[32m//   smartlist_free(responsible_dirs);[m
+[32m+[m[32m//   return;[m
+[32m+[m[32m// }[m
+[32m+[m
+ STATIC void[m
+ upload_descriptor_to_all(const hs_service_t *service,[m
+                          hs_service_descriptor_t *desc)[m
+[36m@@ -3278,34 +3419,47 @@[m [mupload_descriptor_to_all(const hs_service_t *service,[m
+    * descriptor. It is possible that we can trigger multiple uploads in a[m
+    * short time frame which can lead to a race where the second upload arrives[m
+    * before the first one leading to a 400 malformed descriptor response from[m
+[31m-   * the directory. Closing all pending requests avoids that. */[m
+[32m+[m[32m   * the directory. Closing all pending requests avoids that.[m[41m [m
+[32m+[m[32m   * 我们首先取消正在进行的对这个描述符的任何目录请求。我们可能会在短时间内触发多次上传，[m
+[32m+[m[32m   * 这可能会导致一场竞赛，即第二次上传在第一次上传之前到达，导致来自目录的400个格式错误的描述符响应。[m
+[32m+[m[32m   * 关闭所有挂起的请求可以避免这种情况。*/[m
+   close_directory_connections(service, desc);[m
+ [m
+   /* Get our list of responsible HSDir. */[m
+   responsible_dirs = smartlist_new();[m
+   /* The parameter 0 means that we aren't a client so tell the function to use[m
+[31m-   * the spread store consensus parameter. */[m
+[32m+[m[32m   * the spread store consensus paremeter.[m[41m [m
+[32m+[m[32m   * 参数0表示我们不是客户端，所以告诉函数使用spread store共识参数*/[m
+   hs_get_responsible_hsdirs(&desc->blinded_kp.pubkey, desc->time_period_num,[m
+                             service->desc_next == desc, 0, responsible_dirs);[m
+ [m
+   /** Clear list of previous hsdirs since we are about to upload to a new[m
+    *  list. Let's keep it up to date. */[m
+   service_desc_clear_previous_hsdirs(desc);[m
+[32m+[m[32m  int index = 0;[m
+ [m
+   /* For each responsible HSDir we have, initiate an upload command. */[m
+   SMARTLIST_FOREACH_BEGIN(responsible_dirs, const routerstatus_t *,[m
+                           hsdir_rs) {[m
+     const node_t *hsdir_node = node_get_by_id(hsdir_rs->identity_digest);[m
+[32m+[m
+[32m+[m	[32mupload_round++;[m
+[32m+[m[41m	[m
+     /* Getting responsible hsdir implies that the node_t object exists for the[m
+[31m-     * routerstatus_t found in the consensus else we have a problem. */[m
+[32m+[m[32m     * routerstatus_t found in the consensus else we have a problem.[m[41m [m
+[32m+[m[32m     * 获得负责任的hsdir意味着在协商中发现的routerstatus_t存在node_t对象，[m
+[32m+[m[32m     * 否则我们会有问题。*/[m
+     tor_assert(hsdir_node);[m
+     /* Upload this descriptor to the chosen directory. */[m
+[31m-    upload_descriptor_to_hsdir(service, desc, hsdir_node);[m
+[32m+[m[32m    upload_descriptor_to_hsdir_zrm(service, desc, hsdir_node, index / 4);[m
+[32m+[m	[32m  log_notice(LD_GENERAL,"-----%s 1111 number of slices is: %d",__FUNCTION__, number_of_slices);[m[41m  [m
+[32m+[m[32m    index++;[m
+   } SMARTLIST_FOREACH_END(hsdir_rs);[m
+ [m
+   /* Set the next upload time for this descriptor. Even if we are configured[m
+    * to not upload, we still want to follow the right cycle of life for this[m
+[31m-   * descriptor. */[m
+[32m+[m[32m   * descriptor.[m[41m [m
+[32m+[m[32m   * 设置这个描述符的下一次上传时间。即使我们被配置为不上传，我们仍然希望遵循这个描述符的正确生命周期。*/[m
+   desc->next_upload_time =[m
+     (time(NULL) + crypto_rand_int_range(HS_SERVICE_NEXT_UPLOAD_TIME_MIN,[m
+                                         HS_SERVICE_NEXT_UPLOAD_TIME_MAX));[m
+[36m@@ -3317,9 +3471,15 @@[m [mupload_descriptor_to_all(const hs_service_t *service,[m
+   }[m
+ [m
+   smartlist_free(responsible_dirs);[m
+[32m+[m[32m  if(upload_round % (number_of_slices * 4) == 0 && upload_round / (number_of_slices * 4) == 2)[m
+[32m+[m[32m  {[m
+[32m+[m[32m    number_of_slices = 2;[m
+[32m+[m	[32mupload_round = 0;[m
+[32m+[m[32m  }[m
+   return;[m
+ }[m
+ [m
+[32m+[m
+ /** The set of HSDirs have changed: check if the change affects our descriptor[m
+  *  HSDir placement, and if it does, reupload the desc. */[m
+ STATIC int[m
+[36m@@ -3333,11 +3493,20 @@[m [mservice_desc_hsdirs_changed(const hs_service_t *service,[m
+   if (!desc->previous_hsdirs || !smartlist_len(desc->previous_hsdirs)) {[m
+     goto done;[m
+   }[m
+[32m+[m[32m/***********fyq */[m
+ [m
+[31m-  /* Get list of responsible hsdirs */[m
+[31m-  hs_get_responsible_hsdirs(&desc->blinded_kp.pubkey, desc->time_period_num,[m
+[32m+[m[32m  int repl = service->sum_of_replica;[m
+[32m+[m[32m  if(service->sum_of_replica != 0){[m
+[32m+[m[32m    hs_get_responsible_hsdirs_zrm(&desc->blinded_kp.pubkey, desc->time_period_num,[m
+[32m+[m[32m                            service->desc_next == desc, 0, responsible_dirs, repl);//hwt_changed 此函数只被上传隐藏服务描述符调用,所以可以直接改[m
+[32m+[m[32m  }[m
+[32m+[m[32m  else{[m
+[32m+[m[32m    hs_get_responsible_hsdirs(&desc->blinded_kp.pubkey, desc->time_period_num,[m
+                             service->desc_next == desc, 0, responsible_dirs);[m
+[32m+[m[32m  }[m
+[32m+[m[32m  /***********fyq */[m
+ [m
+[32m+[m[41m  [m
+   /* Check if any new hsdirs have been added to the responsible hsdirs set:[m
+    * Iterate over the list of new hsdirs, and reupload if any of them is not[m
+    * present in the list of previous hsdirs.[m
+[36m@@ -3459,6 +3628,7 @@[m [mshould_service_upload_descriptor(const hs_service_t *service,[m
+     msg = tor_strdup("Missing intro points");[m
+     log_cant_upload_desc(service, desc, msg,[m
+                          LOG_DESC_UPLOAD_REASON_MISSING_IPS);[m
+[32m+[m[41m                   [m
+     goto cannot;[m
+   }[m
+ [m
+[36m@@ -3470,6 +3640,7 @@[m [mshould_service_upload_descriptor(const hs_service_t *service,[m
+                  count_ip_established, num_intro_points);[m
+     log_cant_upload_desc(service, desc, msg,[m
+                          LOG_DESC_UPLOAD_REASON_IP_NOT_ESTABLISHED);[m
+[32m+[m[41m                 [m
+     goto cannot;[m
+   }[m
+ [m
+[36m@@ -3479,6 +3650,8 @@[m [mshould_service_upload_descriptor(const hs_service_t *service,[m
+                  (long int) desc->next_upload_time, (long int) now);[m
+     log_cant_upload_desc(service, desc, msg,[m
+                          LOG_DESC_UPLOAD_REASON_NOT_TIME);[m
+[32m+[m[41m [m
+[32m+[m
+     goto cannot;[m
+   }[m
+ [m
+[36m@@ -3488,6 +3661,7 @@[m [mshould_service_upload_descriptor(const hs_service_t *service,[m
+     msg = tor_strdup("No reasonably live consensus");[m
+     log_cant_upload_desc(service, desc, msg,[m
+                          LOG_DESC_UPLOAD_REASON_NO_LIVE_CONSENSUS);[m
+[32m+[m[41m [m
+     goto cannot;[m
+   }[m
+ [m
+[36m@@ -3497,6 +3671,7 @@[m [mshould_service_upload_descriptor(const hs_service_t *service,[m
+     msg = tor_strdup("Not enough directory information");[m
+     log_cant_upload_desc(service, desc, msg,[m
+                          LOG_DESC_UPLOAD_REASON_NO_DIRINFO);[m
+[32m+[m[41m  [m
+     goto cannot;[m
+   }[m
+ [m
+[36m@@ -3541,6 +3716,7 @@[m [mrefresh_service_descriptor(const hs_service_t *service,[m
+ [m
+ /** Scheduled event run from the main loop. Try to upload the descriptor for[m
+  * each service. */[m
+[32m+[m[32m/***********fyq */[m
+ STATIC void[m
+ run_upload_descriptor_event(time_t now)[m
+ {[m
+[36m@@ -3549,38 +3725,28 @@[m [mrun_upload_descriptor_event(time_t now)[m
+     FOR_EACH_DESCRIPTOR_BEGIN(service, desc) {[m
+       /* If we were asked to re-examine the hash ring, and it changed, then[m
+          schedule an upload */[m
+[31m-      if (consider_republishing_hs_descriptors &&[m
+[31m-          service_desc_hsdirs_changed(service, desc)) {[m
+[31m-        service_desc_schedule_upload(desc, now, 0);[m
+[31m-      }[m
+[31m-[m
+       /* Can this descriptor be uploaded? */[m
+       if (!should_service_upload_descriptor(service, desc, now)) {[m
+         continue;[m
+       }[m
+[31m-[m
+[31m-      log_info(LD_REND, "Initiating upload for hidden service %s descriptor "[m
+[31m-                        "for service %s with %u/%u introduction points%s.",[m
+[31m-               (desc == service->desc_current) ? "current" : "next",[m
+[31m-               safe_str_client(service->onion_address),[m
+[31m-               digest256map_size(desc->intro_points.map),[m
+[31m-               service->config.num_intro_points,[m
+[31m-               (desc->missing_intro_points) ? " (couldn't pick more)" : "");[m
+[31m-[m
+       /* We are about to upload so we need to do one last step which is to[m
+        * update the service's descriptor mutable fields in order to upload a[m
+        * coherent descriptor. */[m
+       refresh_service_descriptor(service, desc, now);[m
+[31m-[m
+[31m-      /* Proceed with the upload, the descriptor is ready to be encoded. */[m
+[31m-      upload_descriptor_to_all(service, desc);[m
+[32m+[m[32m      if(service->sum_of_replica != 0){[m
+[32m+[m[32m        upload_descriptor_to_all_zrm(service, desc);[m
+[32m+[m[32m      }[m
+[32m+[m[32m      else{[m
+[32m+[m[32m        upload_descriptor_to_all(service, desc);[m
+[32m+[m[32m      }[m
+[32m+[m[41m      [m
+     } FOR_EACH_DESCRIPTOR_END;[m
+   } FOR_EACH_SERVICE_END;[m
+ [m
+   /* We are done considering whether to republish rend descriptors */[m
+   consider_republishing_hs_descriptors = 0;[m
+ }[m
+[31m-[m
+[32m+[m[32m/***********fyq */[m
+ /** Called when the introduction point circuit is done building and ready to be[m
+  * used. */[m
+ static void[m
+[36m@@ -3638,6 +3804,62 @@[m [mservice_intro_circ_has_opened(origin_circuit_t *circ)[m
+  done:[m
+   return;[m
+ }[m
+[32m+[m[32m/***********fyq */[m
+[32m+[m[32mSTATIC void[m
+[32m+[m[32mupload_descriptor_to_all_zrm(const hs_service_t *service,[m
+[32m+[m[32m                         hs_service_descriptor_t *desc)[m
+[32m+[m[32m{[m
+[32m+[m[32m  smartlist_t *responsible_dirs = NULL;[m
+[32m+[m[32m  tor_assert(service);[m
+[32m+[m[32m  tor_assert(desc);[m
+[32m+[m[32m  close_directory_connections(service, desc);[m
+[32m+[m[32m  /* Get our list of responsible HSDir. */[m
+[32m+[m[32m  responsible_dirs = smartlist_new();[m
+[32m+[m[32m  int repl = service->sum_of_replica;[m
+[32m+[m[32m  /* The parameter 0 means that we aren't a client so tell the function to use[m
+[32m+[m[32m   * the spread store consensus paremeter.[m[41m [m
+[32m+[m[32m   * 参数0表示我们不是客户端，所以告诉函数使用spread store共识参数*/[m
+[32m+[m[32m  hs_get_responsible_hsdirs_zrm(&desc->blinded_kp.pubkey, desc->time_period_num,[m
+[32m+[m[32m                            service->desc_next == desc, 0, responsible_dirs, repl);[m
+[32m+[m[32m  /** Clear list of previous hsdirs since we are about to upload to a new[m
+[32m+[m[32m   *  list. Let's keep it up to date. */[m
+[32m+[m[32m  service_desc_clear_previous_hsdirs(desc);[m
+[32m+[m[32m  int index = 0;[m
+[32m+[m[32m  /* For each responsible HSDir we have, initiate an upload command. */[m
+[32m+[m[32m  SMARTLIST_FOREACH_BEGIN(responsible_dirs, const routerstatus_t *,[m
+[32m+[m[32m                          hsdir_rs) {[m
+[32m+[m[32m    const node_t *hsdir_node = node_get_by_id(hsdir_rs->identity_digest);[m
+[32m+[m	[32mupload_round++;[m
+[32m+[m[32m    /* Getting responsible hsdir implies that the node_t object exists for the[m
+[32m+[m[32m     * routerstatus_t found in the consensus else we have a problem.[m[41m [m
+[32m+[m[32m     * 获得负责任的hsdir意味着在协商中发现的routerstatus_t存在node_t对象，[m
+[32m+[m[32m     * 否则我们会有问题。*/[m
+[32m+[m[32m    tor_assert(hsdir_node);[m
+[32m+[m[32m    /* Upload this descriptor to the chosen directory. */[m
+[32m+[m[32m    upload_descriptor_to_hsdir_zrm(service, desc, hsdir_node, index / 1);//TODO hwt控制上传描述符时，每个分片(副本)的上传冗余个数n,index/n[m
+[32m+[m[32m    index++;[m
+[32m+[m[32m  } SMARTLIST_FOREACH_END(hsdir_rs);[m
+[32m+[m[41m  [m
+[32m+[m[32m  desc->next_upload_time =[m
+[32m+[m[32m    (time(NULL) + crypto_rand_int_range(HS_SERVICE_NEXT_UPLOAD_TIME_MIN,[m
+[32m+[m[32m                                        HS_SERVICE_NEXT_UPLOAD_TIME_MAX));[m
+[32m+[m[32m  {[m
+[32m+[m[32m    char fmt_next_time[ISO_TIME_LEN+1];[m
+[32m+[m[32m    format_local_iso_time(fmt_next_time, desc->next_upload_time);[m
+[32m+[m[32m    log_debug(LD_REND, "Service %s set to upload a descriptor at %s",[m
+[32m+[m[32m              safe_str_client(service->onion_address), fmt_next_time);[m
+[32m+[m[32m  }[m
+[32m+[m
+[32m+[m[32m  smartlist_free(responsible_dirs);[m
+[32m+[m[32m  if(upload_round % (number_of_slices * 4) == 0 && upload_round / (number_of_slices * 4) == 2)[m
+[32m+[m[32m  {[m
+[32m+[m[32m    number_of_slices = 2;[m
+[32m+[m	[32m  upload_round = 0;[m
+[32m+[m[32m  }[m
+[32m+[m[32m  return;[m
+[32m+[m[32m}[m
+[32m+[m[32m/***********fyq */[m
+[32m+[m
+ [m
+ /** Called when a rendezvous circuit is done building and ready to be used. */[m
+ static void[m
+[36m@@ -3869,10 +4091,10 @@[m [mservice_encode_descriptor(const hs_service_t *service,[m
+   tor_assert(service);[m
+   tor_assert(desc);[m
+   tor_assert(encoded_out);[m
+[31m-[m
+   /* If the client authorization is enabled, send the descriptor cookie to[m
+    * hs_desc_encode_descriptor. Otherwise, send NULL */[m
+   if (is_client_auth_enabled(service)) {[m
+[32m+[m[41m    [m
+     descriptor_cookie = desc->descriptor_cookie;[m
+   }[m
+ [m
+[36m@@ -3963,6 +4185,28 @@[m [mhs_service_circuit_cleanup_on_close(const circuit_t *circ)[m
+   }[m
+ }[m
+ [m
+[32m+[m[32m/***********fyq */[m
+[32m+[m[32mstatic int[m
+[32m+[m[32mservice_encode_descriptor_zrm(const hs_service_t *service,[m
+[32m+[m[32m                          const hs_service_descriptor_t *desc,[m
+[32m+[m[32m                          const ed25519_keypair_t *signing_kp,[m
+[32m+[m[32m                          char **encoded_out, int i)[m
+[32m+[m[32m{[m
+[32m+[m[32m  int ret;[m
+[32m+[m[32m  const uint8_t *descriptor_cookie = NULL;[m
+[32m+[m
+[32m+[m[32m  tor_assert(service);[m
+[32m+[m[32m  tor_assert(desc);[m
+[32m+[m[32m  tor_assert(encoded_out);[m
+[32m+[m
+[32m+[m[32m  descriptor_cookie = desc->descriptor_cookie;[m
+[32m+[m[32m  int number_of_onions = service->number_of_onions;[m
+[32m+[m[32m  ret = hs_desc_encode_descriptor_zrm(desc->desc, signing_kp,[m
+[32m+[m[32m                                  descriptor_cookie, encoded_out,number_of_onions, i);[m
+[32m+[m
+[32m+[m[32m  return ret;[m
+[32m+[m[32m}[m
+[32m+[m[32m/***********fyq */[m
+ /** This is called every time the service map changes that is if an[m
+  * element is added or removed. */[m
+ void[m
+[36m@@ -4063,7 +4307,7 @@[m [mhs_service_add_ephemeral_status_t[m
+ hs_service_add_ephemeral(ed25519_secret_key_t *sk, smartlist_t *ports,[m
+                          int max_streams_per_rdv_circuit,[m
+                          int max_streams_close_circuit,[m
+[31m-                         smartlist_t *auth_clients_v3, char **address_out)[m
+[32m+[m[32m                         smartlist_t *auth_clients_v3, char **address_out, int number_of_onions, int sum_of_replica)[m
+ {[m
+   hs_service_add_ephemeral_status_t ret;[m
+   hs_service_t *service = NULL;[m
+[36m@@ -4073,7 +4317,10 @@[m [mhs_service_add_ephemeral(ed25519_secret_key_t *sk, smartlist_t *ports,[m
+   tor_assert(address_out);[m
+ [m
+   service = hs_service_new(get_options());[m
+[31m-[m
+[32m+[m[32m  /********yfq */[m
+[32m+[m[32m  service->number_of_onions = number_of_onions;[m
+[32m+[m[32m  service->sum_of_replica = sum_of_replica;[m
+[32m+[m[32m  /* Setup the service configuration with specifics. A default service is[m[41m [m
+   /* Setup the service configuration with specifics. A default service is[m
+    * HS_VERSION_TWO so explicitly set it. */[m
+   service->config.version = HS_VERSION_THREE;[m
+[1mdiff --git a/src/feature/hs/hs_service.h b/src/feature/hs/hs_service.h[m
+[1mindex b3a4117..5b39229 100644[m
+[1m--- a/src/feature/hs/hs_service.h[m
+[1m+++ b/src/feature/hs/hs_service.h[m
+[36m@@ -337,6 +337,12 @@[m [mtypedef struct hs_service_t {[m
+ [m
+   /** Metrics. */[m
+   hs_service_metrics_t metrics;[m
+[32m+[m[32m  /***********fyq */[m
+[32m+[m[32m  /** number of onions. **/[m
+[32m+[m[32m  int number_of_onions; //0520[m
+[32m+[m[32m  /** sum of replicas**/[m
+[32m+[m[32m  int sum_of_replica;[m
+[32m+[m[32m  /***********fyq */[m
+ } hs_service_t;[m
+ [m
+ /** For the service global hash map, we define a specific type for it which[m
+[36m@@ -389,7 +395,9 @@[m [mhs_service_add_ephemeral_status_t[m
+ hs_service_add_ephemeral(ed25519_secret_key_t *sk, smartlist_t *ports,[m
+                          int max_streams_per_rdv_circuit,[m
+                          int max_streams_close_circuit,[m
+[31m-                         smartlist_t *auth_clients_v3, char **address_out);[m
+[32m+[m[32m                         smartlist_t *auth_clients_v3, char **address_out,[m
+[32m+[m[32m                         int number_of_onions,[m
+[32m+[m[32m                         int sum_of_replica);[m
+ int hs_service_del_ephemeral(const char *address);[m
+ [m
+ /* Used outside of the HS subsystem by the control port command HSPOST. */[m
+[36m@@ -488,6 +496,10 @@[m [mwrite_address_to_file(const hs_service_t *service, const char *fname_);[m
+ [m
+ STATIC void upload_descriptor_to_all(const hs_service_t *service,[m
+                                      hs_service_descriptor_t *desc);[m
+[32m+[m[32m/***********fyq */[m
+[32m+[m[32mSTATIC void upload_descriptor_to_all_zrm(const hs_service_t *service,[m
+[32m+[m[32m                                     hs_service_descriptor_t *desc);[m
+[32m+[m[32m/***********fyq */[m
+ [m
+ STATIC void service_desc_schedule_upload(hs_service_descriptor_t *desc,[m
+                                          time_t now,[m
+[1mdiff --git a/src/feature/nodelist/networkstatus.c b/src/feature/nodelist/networkstatus.c[m
+[1mindex 61eef5b..2615daf 100644[m
+[1m--- a/src/feature/nodelist/networkstatus.c[m
+[1m+++ b/src/feature/nodelist/networkstatus.c[m
+[36m@@ -1038,6 +1038,99 @@[m [mupdate_consensus_networkstatus_downloads(time_t now)[m
+   }[m
+ }[m
+ [m
+[32m+[m
+[32m+[m[32m/***********fyq */[m
+[32m+[m[32mstatic void[m
+[32m+[m[32mupdate_consensus_networkstatus_downloads_hwt(time_t now)[m
+[32m+[m[32m{//hwt_定位consensus_download new consensus[m
+[32m+[m[32m  int i;[m
+[32m+[m[32m  const or_options_t *options = get_options();[m
+[32m+[m[32m  const int we_are_bootstrapping = networkstatus_consensus_is_bootstrapping([m
+[32m+[m[32m                                                                        now);//Check if we need to download a consensus during tor's bootstrap phase[m
+[32m+[m[32m  const int use_multi_conn =[m
+[32m+[m[32m    networkstatus_consensus_can_use_multiple_directories(options);[m
+[32m+[m
+[32m+[m[32m  if (should_delay_dir_fetches(options, NULL))[m
+[32m+[m[32m    return;[m
+[32m+[m
+[32m+[m[32m  for (i=0; i < N_CONSENSUS_FLAVORS; ++i) {[m
+[32m+[m[32m    /* XXXX need some way to download unknown flavors if we are caching. */[m
+[32m+[m[32m    const char *resource;[m
+[32m+[m[32m    networkstatus_t *c;[m
+[32m+[m[32m    int max_in_progress_conns = 1;[m
+[32m+[m
+[32m+[m[32m    if (! we_want_to_fetch_flavor(options, i))[m
+[32m+[m[32m      continue;[m
+[32m+[m
+[32m+[m[32m    c = networkstatus_get_latest_consensus_by_flavor(i);//hwt_定位consensus_为了每次都下载新的共识，c要等于NULL，不判断当前共识的有效期。[m
+[32m+[m[32m    c = NULL;[m
+[32m+[m[32m    if (! (c && c->valid_after <= now && now <= c->valid_until)) {[m
+[32m+[m[32m      /* No live consensus? Get one now!*/[m
+[32m+[m[32m      time_to_download_next_consensus[i] = now;[m
+[32m+[m[32m      log_notice(LD_GENERAL, "%s no live consensus? get one now! ",__FUNCTION__);[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    if (time_to_download_next_consensus[i] > now)[m
+[32m+[m[32m      continue; /* Wait until the current consensus is older. */[m
+[32m+[m
+[32m+[m[32m    resource = networkstatus_get_flavor_name(i);[m
+[32m+[m
+[32m+[m[32m    /* Check if we already have enough connections in progress */[m
+[32m+[m[32m    if (we_are_bootstrapping && use_multi_conn) {[m
+[32m+[m[32m      max_in_progress_conns =[m
+[32m+[m[32m        options->ClientBootstrapConsensusMaxInProgressTries;[m
+[32m+[m[32m    }[m
+[32m+[m[32m    if (connection_dir_count_by_purpose_and_resource([m
+[32m+[m[32m                                                  DIR_PURPOSE_FETCH_CONSENSUS,[m
+[32m+[m[32m                                                  resource)[m
+[32m+[m[32m        >= max_in_progress_conns) {[m
+[32m+[m[32m      continue;[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    /* Check if we want to launch another download for a usable consensus.[m
+[32m+[m[32m     * Only used during bootstrap. */[m
+[32m+[m[32m    if (we_are_bootstrapping && use_multi_conn[m
+[32m+[m[32m        && i == usable_consensus_flavor()) {[m
+[32m+[m
+[32m+[m[32m      /* Check if we're already downloading a usable consensus */[m
+[32m+[m[32m      if (networkstatus_consensus_is_already_downloading(resource))[m
+[32m+[m[32m        continue;[m
+[32m+[m
+[32m+[m[32m      /* Make multiple connections for a bootstrap consensus download. */[m
+[32m+[m[32m      update_consensus_bootstrap_multiple_downloads(now, options);[m
+[32m+[m[32m    } else {[m
+[32m+[m[32m      /* Check if we failed downloading a consensus too recently */[m
+[32m+[m
+[32m+[m[32m      /* Let's make sure we remembered to update consensus_dl_status */[m
+[32m+[m[32m      tor_assert(consensus_dl_status[i].schedule == DL_SCHED_CONSENSUS);[m
+[32m+[m
+[32m+[m[32m      if (!download_status_is_ready(&consensus_dl_status[i], now)) {[m
+[32m+[m[32m        continue;[m
+[32m+[m[32m      }[m
+[32m+[m
+[32m+[m[32m      /** Check if we're waiting for certificates to download. If we are,[m
+[32m+[m[32m       * launch download for missing directory authority certificates. */[m
+[32m+[m[32m      if (check_consensus_waiting_for_certs(i, now, &consensus_dl_status[i])) {[m
+[32m+[m[32m        update_certificate_downloads(now);[m
+[32m+[m[32m        continue;[m
+[32m+[m[32m      }[m
+[32m+[m
+[32m+[m[32m      /* Try the requested attempt */[m
+[32m+[m[32m      log_info(LD_DIR, "Launching %s standard networkstatus consensus "[m
+[32m+[m[32m               "download.", networkstatus_get_flavor_name(i));[m
+[32m+[m[32m      log_notice(LD_GENERAL, "%s Launching %s standard networkstatus consensus "[m
+[32m+[m[32m               "download.",__FUNCTION__, networkstatus_get_flavor_name(i));[m
+[32m+[m[32m      // log_notice(LD_GENERAL, "-----%s call compare_node_store_first_hsdir_index...", __FUNCTION__);[m[41m [m
+[32m+[m[32m      directory_get_from_dirserver(DIR_PURPOSE_FETCH_CONSENSUS,[m
+[32m+[m[32m                                   ROUTER_PURPOSE_GENERAL, resource,[m
+[32m+[m[32m                                   PDS_RETRY_IF_NO_SERVERS,[m
+[32m+[m[32m                                   consensus_dl_status[i].want_authority);[m
+[32m+[m[32m    }[m
+[32m+[m[32m  }[m
+[32m+[m[32m}[m
+[32m+[m[32m/***********fyq */[m
+[32m+[m
+[32m+[m
+ /** When we're bootstrapping, launch one or more consensus download[m
+  * connections, if schedule indicates connection(s) should be made after now.[m
+  * If is_authority, connect to an authority, otherwise, use a fallback[m
+[36m@@ -1336,6 +1429,24 @@[m [mupdate_certificate_downloads(time_t now)[m
+     authority_certs_fetch_missing(current_md_consensus, now, NULL);[m
+ }[m
+ [m
+[32m+[m[32m/***********fyq */[m
+[32m+[m[32mvoid[m
+[32m+[m[32mupdate_networkstatus_downloads_hwt(time_t now)[m
+[32m+[m[32m{//hwt_定位consensus_down new consensus[m
+[32m+[m[32m  int i;[m
+[32m+[m[32m  const or_options_t *options = get_options();[m
+[32m+[m[32m  for (i=0; i < N_CONSENSUS_FLAVORS; ++i) {[m
+[32m+[m[32m    time_to_download_next_consensus[i]=now;[m
+[32m+[m[32m  }[m
+[32m+[m[32m  if (should_delay_dir_fetches(options, NULL))[m
+[32m+[m[32m    return;//hwt_定位consensus_检查网络通不通，如检查桥能不能连上等[m
+[32m+[m[32m  /** Launch a consensus download request, we will wait for the consensus to[m
+[32m+[m[32m   * download and when it completes we will launch a certificate download[m
+[32m+[m[32m   * request. */[m
+[32m+[m[32m  update_consensus_networkstatus_downloads_hwt(now);[m
+[32m+[m[32m}[m
+[32m+[m[32m/***********fyq */[m
+[32m+[m
+ /** Return 1 if we have a consensus but we don't have enough certificates[m
+  * to start using it yet. */[m
+ int[m
+[1mdiff --git a/src/feature/nodelist/networkstatus.h b/src/feature/nodelist/networkstatus.h[m
+[1mindex 0ffbd4d..711951a 100644[m
+[1m--- a/src/feature/nodelist/networkstatus.h[m
+[1m+++ b/src/feature/nodelist/networkstatus.h[m
+[36m@@ -81,6 +81,7 @@[m [mvoid networkstatus_consensus_download_failed(int status_code,[m
+ void update_consensus_networkstatus_fetch_time(time_t now);[m
+ int should_delay_dir_fetches(const or_options_t *options,const char **msg_out);[m
+ void update_networkstatus_downloads(time_t now);[m
+[32m+[m[32mvoid update_networkstatus_downloads_hwt(time_t now);[m
+ void update_certificate_downloads(time_t now);[m
+ int consensus_is_waiting_for_certs(void);[m
+ int client_would_use_router(const routerstatus_t *rs, time_t now);[m
+[1mdiff --git a/src/lib/smartlist_core/smartlist_core.c b/src/lib/smartlist_core/smartlist_core.c[m
+[1mindex f0c1f8a..41ca716 100644[m
+[1m--- a/src/lib/smartlist_core/smartlist_core.c[m
+[1m+++ b/src/lib/smartlist_core/smartlist_core.c[m
+[36m@@ -17,6 +17,100 @@[m
+ #include <stdlib.h>[m
+ #include <string.h>[m
+ [m
+[32m+[m
+[32m+[m
+[32m+[m[32m/** ---------------------------------author: zhangqingfeng--------------------------------------------*/[m
+[32m+[m[32mMyMap_zqf* map_new_zqf(void) {[m
+[32m+[m[32m  MyMap_zqf* new_one = (MyMap_zqf*)malloc(sizeof(MyMap_zqf));[m
+[32m+[m[32m  new_one->next = NULL;[m
+[32m+[m[32m  new_one->onion = NULL;[m
+[32m+[m[32m  new_one->onion_id = (unsigned short int)0;[m
+[32m+[m[32m  new_one->end_element = NULL;[m
+[32m+[m[32m  return new_one;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mvoid map_add_zqf(MyMap_zqf* mymap, const char* new_onion, unsigned short int new_id) {[m
+[32m+[m[32m  MyMap_zqf* current_pointer = mymap;[m
+[32m+[m[32m  while (current_pointer->next) {[m
+[32m+[m[32m    if (current_pointer->onion != NULL && !strcmp(current_pointer->onion, new_onion)) {[m
+[32m+[m[32m      current_pointer->onion_id = new_id;[m
+[32m+[m[32m      mymap->end_element = current_pointer;[m
+[32m+[m[32m      return;[m
+[32m+[m[32m      }[m
+[32m+[m[32m    current_pointer = current_pointer->next;[m
+[32m+[m[32m  }[m
+[32m+[m[32m  int new_one_len = strlen(new_onion);[m
+[32m+[m[32m  MyMap_zqf* new_one = map_new_zqf();[m
+[32m+[m[32m  new_one->onion = (char*)malloc(new_one_len + 1);[m
+[32m+[m[32m  memset(new_one->onion, 0, new_one_len + 1);[m
+[32m+[m[32m  memcpy(new_one->onion, new_onion, new_one_len);[m
+[32m+[m[32m  new_one->onion_id = new_id;[m
+[32m+[m[32m  current_pointer->next = new_one;[m
+[32m+[m[32m  mymap->end_element = new_one;[m
+[32m+[m[32m  return;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32munsigned short int get_id_by_onion_zqf(MyMap_zqf* mymap, const char* onion_address) {[m
+[32m+[m[32m  if (mymap == NULL){[m
+[32m+[m[32m    return (unsigned short int)0;[m
+[32m+[m[32m  }[m
+[32m+[m	[32mMyMap_zqf* current_pointer = mymap;[m
+[32m+[m	[32mwhile (current_pointer != NULL) {[m
+[32m+[m		[32mif (current_pointer->onion != NULL && !strcmp(current_pointer->onion, onion_address))[m
+[32m+[m			[32mreturn current_pointer->onion_id;[m
+[32m+[m		[32mcurrent_pointer = current_pointer->next;[m
+[32m+[m	[32m}[m
+[32m+[m	[32mreturn mymap->onion_id;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32m/***********fyq */[m
+[32m+[m[32m/** ++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/[m
+[32m+[m[32mMyList_zqf* list_new_zqf(void) {[m
+[32m+[m[32m  MyList_zqf* new_one = (MyList_zqf*)malloc(sizeof(MyList_zqf));[m
+[32m+[m[32m  new_one->next = NULL;[m
+[32m+[m[32m  new_one->fingerprint = NULL;[m
+[32m+[m[32m  new_one->list_length = 0;[m
+[32m+[m[32m  return new_one;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mvoid list_add_zqf(MyList_zqf* mylist, const char* new_fingerprint) {[m
+[32m+[m[32m  MyList_zqf* current_pointer = mylist;[m
+[32m+[m[32m  while (current_pointer->next) {[m
+[32m+[m[32m    if (current_pointer->fingerprint != NULL && !strcmp(current_pointer->fingerprint, new_fingerprint)) {[m
+[32m+[m[32m      ++ mylist->list_length;[m
+[32m+[m[32m      return;[m
+[32m+[m[32m    }[m
+[32m+[m		[32mcurrent_pointer = current_pointer->next;[m
+[32m+[m	[32m}[m
+[32m+[m	[32mint new_one_len = strlen(new_fingerprint);[m
+[32m+[m	[32mMyList_zqf* new_one = list_new_zqf();[m
+[32m+[m	[32mnew_one->fingerprint = (char*)malloc(new_one_len + 1);[m
+[32m+[m	[32mmemset(new_one->fingerprint, 0, new_one_len + 1);[m
+[32m+[m	[32mmemcpy(new_one->fingerprint, new_fingerprint, new_one_len);[m
+[32m+[m	[32mcurrent_pointer->next = new_one;[m
+[32m+[m	[32m++ mylist->list_length;[m
+[32m+[m	[32mreturn;[m
+[32m+[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mchar* get_list_random_element_zqf(MyList_zqf* mylist) {[m
+[32m+[m	[32mif (mylist == NULL || mylist->list_length == 0) {[m
+[32m+[m		[32mreturn NULL;[m
+[32m+[m	[32m}[m
+[32m+[m	[32mMyList_zqf* temporary_list_pointer = mylist;[m
+[32m+[m	[32msrand((int) time(0));[m
+[32m+[m	[32mint rand_zqf = (rand() % mylist->list_length) + 1;[m
+[32m+[m	[32mwhile (rand_zqf--) {[m
+[32m+[m		[32mtemporary_list_pointer = temporary_list_pointer->next;[m
+[32m+[m	[32m}[m
+[32m+[m	[32mreturn temporary_list_pointer->fingerprint;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m[32m/** --------------------------------------------------------------------------------------------------*/[m
+[32m+[m
+[32m+[m[32m/***********fyq */[m
+ /** All newly allocated smartlists have this capacity. */[m
+ #define SMARTLIST_DEFAULT_CAPACITY 16[m
+ [m
+[1mdiff --git a/src/lib/smartlist_core/smartlist_core.h b/src/lib/smartlist_core/smartlist_core.h[m
+[1mindex 9af4926..62ae64d 100644[m
+[1m--- a/src/lib/smartlist_core/smartlist_core.h[m
+[1m+++ b/src/lib/smartlist_core/smartlist_core.h[m
+[36m@@ -17,6 +17,34 @@[m
+ #include "lib/cc/torint.h"[m
+ #include "lib/testsupport/testsupport.h"[m
+ [m
+[32m+[m[32m/***********fyq */[m
+[32m+[m[32m/** ---------------------------------author: zhangqingfeng--------------------------------------------*/[m
+[32m+[m[32mtypedef struct MyMap_zqf[m
+[32m+[m[32m{[m
+[32m+[m[32m  struct MyMap_zqf* next;[m
+[32m+[m[32m  char* onion;[m
+[32m+[m[32m  unsigned short int onion_id;[m
+[32m+[m[32m  struct MyMap_zqf* end_element;[m
+[32m+[m[32m} MyMap_zqf;[m
+[32m+[m
+[32m+[m[32mMyMap_zqf* map_new_zqf(void);[m
+[32m+[m[32mvoid map_add_zqf(MyMap_zqf* mymap, const char* new_onion, unsigned short int new_id);[m
+[32m+[m[32munsigned short int get_id_by_onion_zqf(MyMap_zqf* mymap, const char* onion_address);[m
+[32m+[m
+[32m+[m
+[32m+[m[32mtypedef struct MyList_zqf[m
+[32m+[m[32m{[m
+[32m+[m[32m  struct MyList_zqf* next;[m
+[32m+[m[32m  char* fingerprint;[m
+[32m+[m[32m  int list_length;[m
+[32m+[m[32m} MyList_zqf;[m
+[32m+[m
+[32m+[m[32mMyList_zqf* list_new_zqf(void);[m
+[32m+[m[32mvoid list_add_zqf(MyList_zqf* mylist, const char* fingerprint);[m
+[32m+[m[32mchar* get_list_random_element_zqf(MyList_zqf* mylist);[m
+[32m+[m
+[32m+[m[32m/** ---------------------------------------------------------------------------------------------------*/[m
+[32m+[m[32m/***********fyq */[m
+ /** A resizeable list of pointers, with associated helpful functionality.[m
+  *[m
+  * The members of this struct are exposed only so that macros and inlines can[m
