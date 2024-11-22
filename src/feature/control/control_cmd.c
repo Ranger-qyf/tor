@@ -51,7 +51,7 @@
 #include "feature/control/control_connection_st.h"
 #include "feature/nodelist/node_st.h"
 #include "feature/nodelist/routerinfo_st.h"
-
+#include "feature/nodelist/networkstatus.h"
 #include "app/config/statefile.h"
 
 static int control_setconf_helper(control_connection_t *conn,

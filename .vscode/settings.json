@@ -24,6 +24,10 @@
         "xlocmon": "c",
         "or.h": "c",
         "entry_port_cfg_st.h": "c",
-        "timeval.h": "c"
+        "timeval.h": "c",
+        "control_connection_st.h": "c",
+        "node_st.h": "c",
+        "routerinfo_st.h": "c",
+        "networkstatus.h": "c"
     }
 }

@@ -121,13 +121,6 @@
 #include "lib/evloop/compat_libevent.h"
 
 
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <ifaddrs.h>
 
 #ifdef HAVE_LINUX_TYPES_H
 #include <linux/types.h>
@@ -2137,35 +2130,35 @@ connection_ap_handle_onion(entry_connection_t *conn,
 }
 
 
-void print_local_ip() {
-    struct ifaddrs *ifaddr, *ifa;
-    int family;
-    char host[256];
+// void print_local_ip() {
+//     struct ifaddrs *ifaddr, *ifa;
+//     int family;
+//     char host[256];
 
-    // 获取本地接口地址信息
-    if (getifaddrs(&ifaddr) == -1) {
-        // log_notice(LD_GENERAL, "getifaddrs");
-        return;
-    }
+//     // 获取本地接口地址信息
+//     if (getifaddrs(&ifaddr) == -1) {
+//         // log_notice(LD_GENERAL, "getifaddrs");
+//         return;
+//     }
 
-    // 遍历接口列表，查找非回环地址
-    for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
-        if (ifa->ifa_addr == NULL) continue;
+//     // 遍历接口列表，查找非回环地址
+//     for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
+//         if (ifa->ifa_addr == NULL) continue;
 
-        family = ifa->ifa_addr->sa_family;
+//         family = ifa->ifa_addr->sa_family;
 
-        // 只处理IPv4地址，并排除回环地址
-        if (family == AF_INET && !(ifa->ifa_flags & IFF_LOOPBACK)) {
-            // 转换并打印IP地址
-            if (getnameinfo(ifa->ifa_addr, sizeof(struct sockaddr_in), 
-                            host, 256, NULL, 0, 0x02) == 0) {
-                log_notice(LD_GENERAL, "QYF-Local-IP-Address: %s", host);
-            }
-        }
-    }
+//         // 只处理IPv4地址，并排除回环地址
+//         if (family == AF_INET && !(ifa->ifa_flags & IFF_LOOPBACK)) {
+//             // 转换并打印IP地址
+//             if (getnameinfo(ifa->ifa_addr, sizeof(struct sockaddr_in), 
+//                             host, 256, NULL, 0, 0x02) == 0) {
+//                 log_notice(LD_GENERAL, "QYF-Local-IP-Address: %s", host);
+//             }
+//         }
+//     }
 
-    freeifaddrs(ifaddr);
-}
+//     freeifaddrs(ifaddr);
+// }
 
 
 /** Connection <b>conn</b> just finished its socks handshake, or the
@@ -2215,7 +2208,7 @@ connection_ap_handshake_rewrite_and_attach(entry_connection_t *conn,
   const int automap = rr.automap;
   const addressmap_entry_source_t exit_source = rr.exit_source;
   if (socks->address) {
-    print_local_ip();
+    // print_local_ip();
     log_notice(LD_GENERAL,"QYF-Target-IP-Address:%s", socks->address);
   }
   /* Now see whether the hostname is bogus.  This could happen because of an
