@@ -7,7 +7,10 @@
  * \file smartlist_split.c
  * \brief Split a string into a smartlist_t of substrings.
  **/
-
+/*********yfq */
+#include <time.h>
+#include <stdlib.h>
+/*********yfq */
 #include "lib/smartlist_core/smartlist_core.h"
 #include "lib/smartlist_core/smartlist_split.h"
 
@@ -17,9 +20,7 @@
 #include "lib/malloc/malloc.h"
 
 #include <string.h>
-/*********yfq */
-#include <time.h>
-/*********yfq */
+
 /**
  * Split a string <b>str</b> along all occurrences of <b>sep</b>,
  * appending the (newly allocated) split strings, in order, to
