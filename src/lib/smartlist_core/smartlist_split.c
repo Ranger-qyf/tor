@@ -7,10 +7,7 @@
  * \file smartlist_split.c
  * \brief Split a string into a smartlist_t of substrings.
  **/
-/*********yfq */
-#include <time.h>
-#include <stdlib.h>
-/*********yfq */
+
 #include "lib/smartlist_core/smartlist_core.h"
 #include "lib/smartlist_core/smartlist_split.h"
 

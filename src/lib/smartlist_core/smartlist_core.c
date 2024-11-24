@@ -16,7 +16,10 @@
 
 #include <stdlib.h>
 #include <string.h>
-
+/*********yfq */
+#include <time.h>
+#include <stdlib.h>
+/*********yfq */
 
 
 /** ---------------------------------author: zhangqingfeng--------------------------------------------*/

@@ -28,6 +28,8 @@
         "types.h": "c",
         "routerlist.h": "c",
         "networkstatus.h": "c",
-        "time.h": "c"
+        "time.h": "c",
+        "smartlist_split.h": "c",
+        "smartlist_core.h": "c"
     }
 }
