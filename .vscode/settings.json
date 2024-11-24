@@ -31,6 +31,8 @@
         "time.h": "c",
         "smartlist_split.h": "c",
         "smartlist_core.h": "c",
-        "control_cmd.h": "c"
+        "control_cmd.h": "c",
+        "complex": "c",
+        "format": "c"
     }
 }

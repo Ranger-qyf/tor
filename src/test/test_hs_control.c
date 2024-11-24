@@ -803,7 +803,8 @@ test_hs_control_add_onion_helper_add_service(void *arg)
   char *address_out_good = NULL, *address_out_bad = NULL;
   hs_service_t *service_good = NULL;
   hs_service_t *service_bad = NULL;
-
+  int number_of_onions = 0;
+  int sum_of_replica = 0;
   (void) arg;
 
   hs_init();
@@ -832,7 +833,7 @@ test_hs_control_add_onion_helper_add_service(void *arg)
   smartlist_add(list_good, client_good);
 
   add_onion_helper_add_service(HS_VERSION_THREE, &sk_good, portcfgs, 1, 1,
-                               list_good, &address_out_good);
+                               list_good, &address_out_good,number_of_onions,sum_of_replica);
 
   service_good = find_service(global_map, &pk_good);
   tt_int_op(smartlist_len(service_good->config.clients), OP_EQ, 1);
@@ -848,7 +849,7 @@ test_hs_control_add_onion_helper_add_service(void *arg)
   smartlist_add(portcfgs, portcfg);
 
   add_onion_helper_add_service(HS_VERSION_THREE, &sk_bad, portcfgs, 1, 1,
-                               list_bad, &address_out_bad);
+                               list_bad, &address_out_bad,number_of_onions,sum_of_replica);
 
   service_bad = find_service(global_map, &pk_bad);
 
