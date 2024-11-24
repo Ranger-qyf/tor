@@ -27,6 +27,7 @@
         "timeval.h": "c",
         "types.h": "c",
         "routerlist.h": "c",
-        "networkstatus.h": "c"
+        "networkstatus.h": "c",
+        "time.h": "c"
     }
 }
