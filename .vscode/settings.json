@@ -30,6 +30,7 @@
         "networkstatus.h": "c",
         "time.h": "c",
         "smartlist_split.h": "c",
-        "smartlist_core.h": "c"
+        "smartlist_core.h": "c",
+        "control_cmd.h": "c"
     }
 }

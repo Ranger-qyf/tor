@@ -30,7 +30,9 @@
 #include "feature/nodelist/routerstatus_st.h"
 #include "lib/container/smartlist.h"
 #include "lib/crypt_ops/crypto_format.h"
-
+/*****fyq */
+#include "feature/control/control_cmd.h"
+/*****fyq */
 #ifdef HAVE_SYS_STAT_H
 #include <sys/stat.h>
 #endif
