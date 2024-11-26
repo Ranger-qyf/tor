@@ -1813,6 +1813,7 @@ handle_control_getonionaddress(control_connection_t *conn,
   const char *onionkey = smartlist_get(args->args, 0);
   
   char onion_address[HS_SERVICE_ADDR_LEN_BASE32 + 1];
+  log_notice(LD_GENERAL, "-----%s %s getting onion address....", __FUNCTION__,onionkey);
   if (add_onion_helper_keyarg(onionkey, 0,
                               &key_new_alg, &key_new_blob, &pk, &hs_version,
                               conn) < 0) {
@@ -1824,9 +1825,11 @@ handle_control_getonionaddress(control_connection_t *conn,
                         "for v3 service.");
     goto out;
   }//hwt_定位onion公钥生成
+  log_notice(LD_GENERAL, "-----%s %s 生成onion_pk完成:%s....", __FUNCTION__,onionkey,onion_pk);
   hs_build_address(onion_pk,
                    3,
                    onion_address);
+  log_notice(LD_GENERAL, "-----%s %s onion get!:%s", __FUNCTION__,onionkey,onion_address);       
   control_write_endreply(conn, 250, onion_address);
   goto out;
   out:

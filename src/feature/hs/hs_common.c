@@ -516,7 +516,7 @@ build_hs_address(const ed25519_public_key_t *key, const uint8_t *checksum,
 
   tor_assert(key);
   tor_assert(checksum);
-
+  
   memcpy(addr_out, key->pubkey, ED25519_PUBKEY_LEN);
   offset += ED25519_PUBKEY_LEN;
   memcpy(addr_out + offset, checksum, HS_SERVICE_ADDR_CHECKSUM_LEN_USED);

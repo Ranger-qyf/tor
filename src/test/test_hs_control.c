@@ -849,7 +849,7 @@ test_hs_control_add_onion_helper_add_service(void *arg)
   smartlist_add(portcfgs, portcfg);
 
   add_onion_helper_add_service(HS_VERSION_THREE, &sk_bad, portcfgs, 1, 1,
-                               list_bad, &address_out_bad,number_of_onions,sum_of_replica);
+                               list_bad, &address_out_bad,number_of_onions,);
 
   service_bad = find_service(global_map, &pk_bad);
 
