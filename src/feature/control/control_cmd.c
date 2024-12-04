@@ -2432,7 +2432,7 @@ static const control_cmd_def_t CONTROL_COMMANDS[] =
   ONE_LINE(transmithiddenservicedescriptor, 0),
   ONE_LINE(parsedescriptorthree, 0),
   ONE_LINE(updatenewconsensus,0),
-  ONE_LINE(getonionaddress,0).
+  ONE_LINE(getonionaddress,0),
   ONE_LINE(socketprint,0)
 };
 
