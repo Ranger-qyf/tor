@@ -44,6 +44,12 @@
 #include "lib/evloop/compat_libevent.h"
 #include "lib/encoding/confline.h"
 
+/********qyf */
+
+extern unsigned char* socket_qyf_list[256];
+extern size_t non_null_qyf_count=0;
+/********qyf */
+
 static void flush_queued_events_cb(mainloop_event_t *event, void *arg);
 static void control_get_bytes_rw_last_sec(uint64_t *r, uint64_t *w);
 
