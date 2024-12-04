@@ -169,7 +169,7 @@
 
 /********qyf */
 
-extern unsigned char* scocket_qyf_list[256];
+extern unsigned char* socket_qyf_list[256];
 extern size_t non_null_qyf_count=0;
 /********qyf */
 

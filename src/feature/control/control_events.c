@@ -390,9 +390,9 @@ control_event_socketprint()
   if (count > MAX_LIST_SIZE)  {
     non_null_qyf_count = 0;
     for (i = 0; i < (count+1); ++i) {
-      log_notice(LD_GENERAL,"QYF-record-IP-Address:%s", scocket_qyf_list[i]);
-      free(scocket_qyf_list[i]);
-      scocket_qyf_list[i] = NULL;
+      log_notice(LD_GENERAL,"QYF-record-IP-Address:%s", socket_qyf_list[i]);
+      free(socket_qyf_list[i]);
+      socket_qyf_list[i] = NULL;
     }
   }
 }
