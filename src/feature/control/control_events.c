@@ -386,6 +386,7 @@ static int
 control_event_socketprint()
 {
   size_t count = non_null_qyf_count;
+  int i;
   if (count > MAX_LIST_SIZE)  {
     non_null_qyf_count = 0;
     for (i = 0; i < (count+1); ++i) {
