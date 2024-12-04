@@ -33,6 +33,7 @@
         "smartlist_core.h": "c",
         "control_cmd.h": "c",
         "complex": "c",
-        "format": "c"
+        "format": "c",
+        "approx_time.h": "c"
     }
 }

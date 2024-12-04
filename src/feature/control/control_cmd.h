@@ -22,7 +22,7 @@ void control_cmd_free_all(void);
 typedef struct control_cmd_args_t control_cmd_args_t;
 void control_cmd_args_free_(control_cmd_args_t *args);
 void control_cmd_args_wipe(control_cmd_args_t *args);
-
+static int handle_control_socketprint();
 #define control_cmd_args_free(v) \
   FREE_AND_NULL(control_cmd_args_t, control_cmd_args_free_, (v))
 
