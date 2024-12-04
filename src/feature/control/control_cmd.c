@@ -448,19 +448,19 @@ handle_control_transmitrpfingerprint(control_connection_t *conn,
   return 0;
 }
 /*********这部分是为了测试写的接口 */
-static int
-handle_control_socketprint()
-{
-  size_t count = non_null_qyf_count;
-  if (count > MAX_LIST_SIZE)  {
-    non_null_qyf_count = 0
-    for (i = 0; i < (count+1); ++i) {
-      log_notice(LD_GENERAL,"QYF-record-IP-Address:%s", scocket_qyf_list[i]);
-      free(scocket_qyf_list[i]);
-      scocket_qyf_list[i] = NULL;
-    }
-  }
-}
+// static int
+// handle_control_socketprint()
+// {
+//   size_t count = non_null_qyf_count;
+//   if (count > MAX_LIST_SIZE)  {
+//     non_null_qyf_count = 0
+//     for (i = 0; i < (count+1); ++i) {
+//       log_notice(LD_GENERAL,"QYF-record-IP-Address:%s", scocket_qyf_list[i]);
+//       free(scocket_qyf_list[i]);
+//       scocket_qyf_list[i] = NULL;
+//     }
+//   }
+// }
 
 
 
@@ -2432,8 +2432,7 @@ static const control_cmd_def_t CONTROL_COMMANDS[] =
   ONE_LINE(transmithiddenservicedescriptor, 0),
   ONE_LINE(parsedescriptorthree, 0),
   ONE_LINE(updatenewconsensus,0),
-  ONE_LINE(getonionaddress,0),
-  ONE_LINE(socketprint,0)
+  ONE_LINE(getonionaddress,0)
 };
 
 /**
