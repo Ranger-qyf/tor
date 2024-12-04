@@ -46,8 +46,7 @@
 
 /********qyf */
 
-extern unsigned char* socket_qyf_list[256];
-extern size_t non_null_qyf_count=0;
+
 /********qyf */
 
 static void flush_queued_events_cb(mainloop_event_t *event, void *arg);
