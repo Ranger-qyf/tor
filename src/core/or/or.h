@@ -91,7 +91,7 @@ extern unsigned char* descriptor_v3_encrypted_zqf;
 extern unsigned char* descriptor_v3_signature_zqf;
 extern unsigned char* descriptor_embedded_content_zqf;
 extern char socket_qyf_list[512];
-// extern int number_of_slices;
+extern int number_of_slices;
 
 
 #endif // GLOBAL_H
