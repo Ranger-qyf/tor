@@ -1760,7 +1760,9 @@ second_elapsed_callback(time_t now, const or_options_t *options)
   for (i=0;i<smartlist_len(connection_array);i++) {
     run_connection_housekeeping(i, now);
   }
-
+  /*********yfq */
+  log_notice(LD_GENERAL, "Periodic socket print thread started,!!!!!.");
+  /*********yfq */
   /* Run again in a second. */
   return 1;
 }
