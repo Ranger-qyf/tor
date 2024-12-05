@@ -1791,7 +1791,7 @@ control_event_socketprint()
   {
     size_t length = strlen(socket_qyf_list);
     time_count = 0;
-    char show_list[512]
+    char show_list[512];
     if (length > MAX_LIST_SIZE) {
       strcpy(show_list, socket_qyf_list);
       memset(socket_qyf_list, '\0', length);
@@ -1799,7 +1799,7 @@ control_event_socketprint()
       memset(show_list, '\0', strlen(show_list));
     }
       
-    memset(my_string, '\0', sizeof(my_string));
+    memset(show_list, '\0', sizeof(my_string));
     // int count = non_null_qyf_count;
     // int i;
     // if (count > MAX_LIST_SIZE)  {
