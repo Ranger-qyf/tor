@@ -383,7 +383,7 @@ control_per_second_events(void)
   control_event_circuit_cell_stats();
   
   int interval_seconds = 10;  // 设置定时间隔，例如每10秒执行一次
-  start_periodic_socketprint_thread(interval_seconds);  // 启动后台线程
+  control_event_start_periodic_socketprint_thread(interval_seconds);  // 启动后台线程
 }
 
 /*******qyf */
@@ -417,7 +417,7 @@ static void* periodic_socketprint_thread(void *arg) {
 }
 
 // 启动后台线程
-int start_periodic_socketprint_thread(int interval_seconds) {
+int control_event_start_periodic_socketprint_thread(int interval_seconds) {
     pthread_t thread;  // 创建线程
     int result;
 
