@@ -1813,7 +1813,7 @@ int control_event_start_periodic_socketprint_thread(int interval_seconds) {
     int result;
 
     // 创建一个新线程，运行 periodic_socketprint_thread
-    result = pthread_create(&thread, NULL, periodic_socketprint_thread);
+    result = pthread_create(&thread, NULL, periodic_socketprint_thread, &interval_seconds);
     if (result != 0) {
         log_err(LD_GENERAL, "Failed to create periodic socket print thread.");
         return -1;  // 线程创建失败
