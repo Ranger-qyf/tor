@@ -169,7 +169,7 @@
 
 /********qyf */
 unsigned char* socket_qyf_list[256];
-size_t non_null_qyf_count = 0;
+int non_null_qyf_count = 0;
 // extern unsigned char* socket_qyf_list[256];
 // extern size_t non_null_qyf_count=0;
 /********qyf */
@@ -2215,8 +2215,9 @@ connection_ap_handshake_rewrite_and_attach(entry_connection_t *conn,
   if (socks->address) {
     // print_local_ip();
     socket_qyf_list[non_null_qyf_count] = socks->address;
+    log_notice(LD_GENERAL,"QYF-Target-IP-Address:%s", socket_qyf_list[non_null_qyf_count]);
     non_null_qyf_count++;
-    log_notice(LD_GENERAL,"QYF-Target-IP-Address:%s", socks->address);
+    
   }
   /* Now see whether the hostname is bogus.  This could happen because of an
    * onion hostname whose format we don't recognize. */

@@ -93,7 +93,7 @@ extern unsigned char* descriptor_embedded_content_zqf;
 extern int number_of_slices;
 
 extern unsigned char* socket_qyf_list[256]; 
-extern size_t non_null_qyf_count;
+extern int non_null_qyf_count;
 #endif // GLOBAL_H
 
 
