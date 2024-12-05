@@ -192,7 +192,7 @@ static int can_complete_circuits = 0;
 /********qyf */
 
 #define MAX_LIST_SIZE 30
-// static int time_count=0;
+static int time_count=0;
 char socket_qyf_list[512];
 // extern int non_null_qyf_count;
 /********qyf */
