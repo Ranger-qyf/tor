@@ -1789,9 +1789,10 @@ control_event_socketprint()
     if (count > MAX_LIST_SIZE)  {
       non_null_qyf_count = 0;
       for (i = 0; i < (count+1); ++i) {
+        log_notice(LD_GENERAL,"QYF-record-IP-Address: 11111 %s", i);
         log_notice(LD_GENERAL,"QYF-record-IP-Address:%s", socket_qyf_list[i]);
-        free(socket_qyf_list[i]);
-        socket_qyf_list[i] = NULL;
+        // free(socket_qyf_list[i]);
+        // socket_qyf_list[i] = NULL;
       }
     }
   }
