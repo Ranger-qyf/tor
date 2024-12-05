@@ -193,7 +193,7 @@ static int can_complete_circuits = 0;
 
 #define MAX_LIST_SIZE 1
 static int time_count=0;
-extern unsigned char* socket_qyf_list[256];
+extern unsigned char socket_qyf_list[256];
 extern int non_null_qyf_count;
 /********qyf */
 
@@ -1791,7 +1791,7 @@ control_event_socketprint()
     if (count > MAX_LIST_SIZE)  {
       log_notice(LD_GENERAL,"QYF-record-IP-2222Address: 11111 %d", non_null_qyf_count);
       non_null_qyf_count = 0;
-      for (i = 0; i < (count+1); ++i) {
+      for (i = 1; i < (count+1); ++i) {
         log_notice(LD_GENERAL,"QYF-record-IP-Address: 11111 %d", i);
         if (socket_qyf_list[i]) {
           log_notice(LD_GENERAL,"QYF-record-IP-Address:%s", socket_qyf_list[i]);
