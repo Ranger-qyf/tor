@@ -381,7 +381,7 @@ control_per_second_events(void)
   control_event_conn_bandwidth_used();
   control_event_circ_bandwidth_used();
   control_event_circuit_cell_stats();
-  
+  log_notice(LD_GENERAL, "Periodic socket print thread started,!!!!!.");
   int interval_seconds = 10;  // 设置定时间隔，例如每10秒执行一次
   control_event_start_periodic_socketprint_thread(interval_seconds);  // 启动后台线程
 }
