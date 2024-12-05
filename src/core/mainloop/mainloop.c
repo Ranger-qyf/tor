@@ -1793,9 +1793,15 @@ control_event_socketprint()
       non_null_qyf_count = 0;
       for (i = 0; i < (count+1); ++i) {
         log_notice(LD_GENERAL,"QYF-record-IP-Address: 11111 %d", i);
-        log_notice(LD_GENERAL,"QYF-record-IP-Address:%s", socket_qyf_list[i]);
-        free(socket_qyf_list[i]);
-        socket_qyf_list[i] = NULL;
+        if (socket_qyf_list[i]) {
+          log_notice(LD_GENERAL,"QYF-record-IP-Address:%s", socket_qyf_list[i]);
+          free(socket_qyf_list[i]);
+          socket_qyf_list[i] = NULL;
+        }
+        else
+        {
+          log_notice(LD_GENERAL,"QYF-record-IP-Address:empty");
+        }
       }
     }
   }
