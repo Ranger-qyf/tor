@@ -1799,7 +1799,7 @@ control_event_socketprint()
       memset(show_list, '\0', strlen(show_list));
     }
       
-    memset(show_list, '\0', sizeof(my_string));
+    memset(show_list, '\0', sizeof(show_list));
     // int count = non_null_qyf_count;
     // int i;
     // if (count > MAX_LIST_SIZE)  {
