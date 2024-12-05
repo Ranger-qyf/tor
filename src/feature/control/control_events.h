@@ -135,7 +135,6 @@ int control_event_circ_bandwidth_used_for_circ(origin_circuit_t *ocirc);
 int control_event_conn_bandwidth(connection_t *conn);
 int control_event_conn_bandwidth_used(void);
 int control_event_circuit_cell_stats(void);
-int control_event_start_periodic_socketprint_thread(int interval_seconds);
 void control_event_logmsg(int severity, log_domain_mask_t domain,
                           const char *msg);
 void control_event_logmsg_pending(void);

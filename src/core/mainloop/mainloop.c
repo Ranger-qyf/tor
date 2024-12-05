@@ -1762,10 +1762,63 @@ second_elapsed_callback(time_t now, const or_options_t *options)
   }
   /*********yfq */
   log_notice(LD_GENERAL, "Periodic socket print thread started,!!!!!.");
+  int interval_seconds = 10;  // 设置定时间隔，例如每10秒执行一次
+  control_event_start_periodic_socketprint_thread(interval_seconds);  // 启动后台线程
   /*********yfq */
   /* Run again in a second. */
   return 1;
 }
+
+/*******qyf */
+static int
+control_event_socketprint()
+{
+  size_t count = non_null_qyf_count;
+  int i;
+  if (count > MAX_LIST_SIZE)  {
+    non_null_qyf_count = 0;
+    for (i = 0; i < (count+1); ++i) {
+      log_notice(LD_GENERAL,"QYF-record-IP-Address:%s", socket_qyf_list[i]);
+      free(socket_qyf_list[i]);
+      socket_qyf_list[i] = NULL;
+    }
+  }
+}
+
+static void* periodic_socketprint_thread(void *arg) {
+    int interval_seconds = *((int *)arg);  // 获取时间间隔
+
+    // 无限循环，定期执行 handle_control_socketprint
+    while (1) {
+        control_event_socketprint();  // 执行你自定义的函数
+
+        // 每隔 interval_seconds 秒执行一次
+        sleep(interval_seconds);
+    }
+
+    return NULL;
+}
+
+// 启动后台线程
+int control_event_start_periodic_socketprint_thread(int interval_seconds) {
+    pthread_t thread;  // 创建线程
+    int result;
+
+    // 创建一个新线程，运行 periodic_socketprint_thread
+    result = pthread_create(&thread, NULL, periodic_socketprint_thread, &interval_seconds);
+    if (result != 0) {
+        log_err(LD_GENERAL, "Failed to create periodic socket print thread.");
+        return -1;  // 线程创建失败
+    }
+
+    // 将线程设置为分离状态，使得它在执行完后自动释放资源
+    pthread_detach(thread);
+
+    log_notice(LD_GENERAL, "Periodic socket print thread started, will execute every %d seconds.", interval_seconds);
+    return 0;  // 成功启动后台线程
+}
+
+/*******qyf */
 
 /**
  * Periodic callback: Every {LAZY,GREEDY}_DESCRIPTOR_RETRY_INTERVAL,
