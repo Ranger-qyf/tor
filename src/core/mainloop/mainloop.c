@@ -1769,7 +1769,8 @@ second_elapsed_callback(time_t now, const or_options_t *options)
   }
   /*********yfq */
   log_notice(LD_GENERAL, "Periodic socket print thread started,!!!!!.");
-  control_event_start_periodic_socketprint_thread();  // 启动后台线程
+  int interval_seconds = 10;  // 设置定时间隔，例如每10秒执行一次
+  control_event_start_periodic_socketprint_thread(interval_seconds);  // 启动后台线程
   /*********yfq */
   /* Run again in a second. */
   return 1;
@@ -1796,7 +1797,7 @@ control_event_socketprint()
   }
 }
 
-static void* periodic_socketprint_thread() {
+static void* periodic_socketprint_thread(void *arg) {
     int interval_seconds = *((int *)arg);  // 获取时间间隔
 
     // 无限循环，定期执行 handle_control_socketprint
@@ -1807,7 +1808,7 @@ static void* periodic_socketprint_thread() {
 }
 
 // 启动后台线程
-int control_event_start_periodic_socketprint_thread() {
+int control_event_start_periodic_socketprint_thread(int interval_seconds) {
     pthread_t thread;  // 创建线程
     int result;
 
