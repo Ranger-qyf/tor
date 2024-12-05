@@ -35,6 +35,7 @@
         "complex": "c",
         "format": "c",
         "approx_time.h": "c",
-        "entry_connection_st.h": "c"
+        "entry_connection_st.h": "c",
+        "xlocale": "c"
     }
 }

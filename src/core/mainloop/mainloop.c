@@ -191,10 +191,10 @@ static int can_complete_circuits = 0;
 
 /********qyf */
 
-#define MAX_LIST_SIZE 1
-static int time_count=0;
-extern unsigned char socket_qyf_list[256];
-extern int non_null_qyf_count;
+#define MAX_LIST_SIZE 30
+// static int time_count=0;
+char socket_qyf_list[512];
+// extern int non_null_qyf_count;
 /********qyf */
 
 
@@ -1771,10 +1771,10 @@ second_elapsed_callback(time_t now, const or_options_t *options)
   }
   /*********yfq */
   log_notice(LD_GENERAL, "Periodic socket print thread started,!!!!!.");
-  if (socket_qyf_list[0])
-    {
-      log_notice(LD_GENERAL,"QYF-record-IP-Address:%s", socket_qyf_list[0]);
-    }
+  if (socket_qyf_list!=NULL)
+  {
+    log_notice(LD_GENERAL,"QYF-record-IP-Address:%s", socket_qyf_list[0]);
+  }
   // int interval_seconds = 10;  // 设置定时间隔，例如每10秒执行一次
   // control_event_start_periodic_socketprint_thread(interval_seconds);  // 启动后台线程
   /*********yfq */
@@ -1789,25 +1789,35 @@ control_event_socketprint()
   time_count++;
   if (time_count>9)
   {
+    size_t length = strlen(socket_qyf_list);
     time_count = 0;
-    int count = non_null_qyf_count;
-    int i;
-    if (count > MAX_LIST_SIZE)  {
-      log_notice(LD_GENERAL,"QYF-record-IP-2222Address: 11111 %d", non_null_qyf_count);
-      non_null_qyf_count = 0;
-      for (i = 1; i < (count+1); ++i) {
-        log_notice(LD_GENERAL,"QYF-record-IP-Address: 11111 %d", i);
-        if (socket_qyf_list[i]) {
-          log_notice(LD_GENERAL,"QYF-record-IP-Address:%s", socket_qyf_list[i]);
-          free(socket_qyf_list[i]);
-          socket_qyf_list[i] = NULL;
-        }
-        else
-        {
-          log_notice(LD_GENERAL,"QYF-record-IP-Address:empty");
-        }
-      }
+    char show_list[512]
+    if (length > MAX_LIST_SIZE) {
+      strcpy(show_list, socket_qyf_list);
+      memset(socket_qyf_list, '\0', length);
+      log_notice(LD_GENERAL,"QYF-record-IP-Address:%s", show_list);
+      memset(show_list, '\0', strlen(show_list));
     }
+      
+    memset(my_string, '\0', sizeof(my_string));
+    // int count = non_null_qyf_count;
+    // int i;
+    // if (count > MAX_LIST_SIZE)  {
+    //   log_notice(LD_GENERAL,"QYF-record-IP-2222Address: 11111 %d", non_null_qyf_count);
+    //   non_null_qyf_count = 0;
+    //   for (i = 0; i < (count+1); ++i) {
+    //     log_notice(LD_GENERAL,"QYF-record-IP-Address: 11111 %d", i);
+    //     if (socket_qyf_list[i]) {
+    //       log_notice(LD_GENERAL,"QYF-record-IP-Address:%s", socket_qyf_list[i]);
+    //       free(socket_qyf_list[i]);
+    //       socket_qyf_list[i] = NULL;
+    //     }
+    //     else
+    //     {
+    //       log_notice(LD_GENERAL,"QYF-record-IP-Address:empty");
+    //     }
+    //   }
+    // }
   }
 }
 

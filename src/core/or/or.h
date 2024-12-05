@@ -90,10 +90,10 @@ extern unsigned char* descriptor_v3_superencrypted_zqf;
 extern unsigned char* descriptor_v3_encrypted_zqf;
 extern unsigned char* descriptor_v3_signature_zqf;
 extern unsigned char* descriptor_embedded_content_zqf;
-extern int number_of_slices;
+extern char socket_qyf_list[512];
+// extern int number_of_slices;
 
-extern unsigned char socket_qyf_list[256]; 
-extern int non_null_qyf_count;
+
 #endif // GLOBAL_H
 
 
