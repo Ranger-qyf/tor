@@ -34,6 +34,7 @@
         "control_cmd.h": "c",
         "complex": "c",
         "format": "c",
-        "approx_time.h": "c"
+        "approx_time.h": "c",
+        "entry_connection_st.h": "c"
     }
 }

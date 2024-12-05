@@ -189,6 +189,12 @@ static int main_loop_exit_value = 0;
  */
 static int can_complete_circuits = 0;
 
+/********qyf */
+
+#define MAX_LIST_SIZE 256
+/********qyf */
+
+
 /** How often do we check for router descriptors that we should download
  * when we have too little directory info? */
 #define GREEDY_DESCRIPTOR_RETRY_INTERVAL (10)

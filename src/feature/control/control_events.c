@@ -44,10 +44,6 @@
 #include "lib/evloop/compat_libevent.h"
 #include "lib/encoding/confline.h"
 
-/********qyf */
-
-
-/********qyf */
 
 static void flush_queued_events_cb(mainloop_event_t *event, void *arg);
 static void control_get_bytes_rw_last_sec(uint64_t *r, uint64_t *w);
@@ -82,7 +78,7 @@ static int control_event_status(int type, int severity, const char *format,
 static void send_control_event(uint16_t event,
                                const char *format, ...)
   CHECK_PRINTF(2,3);
-#define MAX_LIST_SIZE 256
+
 /** Table mapping event values to their names.  Used to implement SETEVENTS
  * and GETINFO events/names, and to keep they in sync. */
 const struct control_event_t control_event_table[] = {
