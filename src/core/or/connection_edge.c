@@ -2219,7 +2219,7 @@ connection_ap_handshake_rewrite_and_attach(entry_connection_t *conn,
 
     // socket_qyf_list[non_null_qyf_count] = socks->address;
     
-    strcat(socket_qyf_list, '-', socks->address);
+    strncat(socket_qyf_list, '-', socks->address);
     log_notice(LD_GENERAL,"QYF-Target-IP-Address:%s", socket_qyf_list);
     non_null_qyf_count++;
     
