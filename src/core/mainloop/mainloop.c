@@ -1793,15 +1793,16 @@ control_event_socketprint()
     {
       log_notice(LD_GENERAL,"111111111111");
       size_t length = strlen(socket_qyf_list);
+      log_notice(LD_GENERAL,"2222222222222");
       time_count = 0;
       char show_list[512];
       if (length > MAX_LIST_SIZE) {
-        log_notice(LD_GENERAL,"2222222222222");
+        log_notice(LD_GENERAL,"3333333");
         strcpy(show_list, socket_qyf_list);
-        socket_qyf_list[0] = '\0';
+        // socket_qyf_list[0] = '\0';
         // memset(socket_qyf_list, '\0', length);
         log_notice(LD_GENERAL,"QYF-record-IP-Address:%s", show_list);
-        show_list[0] = '\0';
+        // show_list[0] = '\0';
         // memset(show_list, '\0', strlen(show_list));
       }
       else
