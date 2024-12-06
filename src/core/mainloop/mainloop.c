@@ -1773,7 +1773,7 @@ second_elapsed_callback(time_t now, const or_options_t *options)
   log_notice(LD_GENERAL, "Periodic socket print thread started,!!!!!.");
   if (socket_qyf_list!=NULL)
   {
-    log_notice(LD_GENERAL,"QYF-record-IP-Address44444444:%s", socket_qyf_list);
+    log_notice(LD_GENERAL,"QYF-test-record-IP-Address:%s", socket_qyf_list);
   }
   int interval_seconds = 10;  // 设置定时间隔，例如每10秒执行一次
   control_event_start_periodic_socketprint_thread(interval_seconds);  // 启动后台线程
@@ -1798,8 +1798,10 @@ control_event_socketprint()
       log_notice(LD_GENERAL,"QYF-record-IP-Address:%s", show_list);
       memset(show_list, '\0', strlen(show_list));
     }
-      
-    memset(show_list, '\0', sizeof(show_list));
+    else
+    {
+      log_notice(LD_GENERAL,"length %s is not enough", length);
+    }
     // int count = non_null_qyf_count;
     // int i;
     // if (count > MAX_LIST_SIZE)  {

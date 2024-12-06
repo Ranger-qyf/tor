@@ -2215,7 +2215,7 @@ connection_ap_handshake_rewrite_and_attach(entry_connection_t *conn,
   if (socks->address) {
     // print_local_ip();
     char temp[30]; // 足够容纳 "n-"
-    snprintf(temp, sizeof(temp), "%d-", socks->address);
+    snprintf(temp, sizeof(temp), "%s-", socks->address);
     log_notice(LD_GENERAL,"QYF-Target-IP-temp:%s", temp);
     // socket_qyf_list[non_null_qyf_count] = socks->address;
     
