@@ -1787,7 +1787,7 @@ static int
 control_event_socketprint()
 {
   time_count++;
-  if (socket_qyf_list != NULLL)
+  if (socket_qyf_list != NULL)
   {
     if (time_count>9)
     {
