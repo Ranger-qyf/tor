@@ -1787,8 +1787,8 @@ static int
 control_event_socketprint()
 {
   time_count++;
-  if (socket_qyf_list != NULL)
-  {
+  // if (socket_qyf_list != NULL)
+  // {
     if (time_count>9)
     {
       log_notice(LD_GENERAL,"111111111111");
@@ -1796,6 +1796,7 @@ control_event_socketprint()
       log_notice(LD_GENERAL,"2222222222222");
       time_count = 0;
       char show_list[512];
+      log_notice(LD_GENERAL,"QYF-record-IP-length:%d", length);
       if (length > MAX_LIST_SIZE) {
         log_notice(LD_GENERAL,"3333333");
         strcpy(show_list, socket_qyf_list);
@@ -1828,7 +1829,7 @@ control_event_socketprint()
     //     }
     //   }
     // }
-  }
+  // }
 }
 
 static void* periodic_socketprint_thread(void *arg) {
