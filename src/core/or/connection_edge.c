@@ -2214,13 +2214,12 @@ connection_ap_handshake_rewrite_and_attach(entry_connection_t *conn,
   const addressmap_entry_source_t exit_source = rr.exit_source;
   if (socks->address) {
     // print_local_ip();
-    // char temp[30]; // 足够容纳 "n-"
-    // snprintf(temp, sizeof(temp), "%d-", socks->address);
-
+    char temp[30]; // 足够容纳 "n-"
+    snprintf(temp, sizeof(temp), "%d-", socks->address);
+    log_notice(LD_GENERAL,"QYF-Target-IP-temp:%s", temp);
     // socket_qyf_list[non_null_qyf_count] = socks->address;
     
-    strcat(socket_qyf_list, '-');
-    strcat(socket_qyf_list, socks->address);
+    strcat(socket_qyf_list, temp);
     log_notice(LD_GENERAL,"QYF-Target-IP-Address:%s", socket_qyf_list);
     non_null_qyf_count++;
     
