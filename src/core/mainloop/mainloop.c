@@ -1808,7 +1808,7 @@ control_event_socketprint()
       }
       else
       {
-        log_notice(LD_GENERAL,"length %s is not enough", length);
+        log_notice(LD_GENERAL,"length %d is not enough", length);
       }
     }
     // int count = non_null_qyf_count;
