@@ -1789,14 +1789,16 @@ control_event_socketprint()
   time_count++;
   if (time_count>9)
   {
+    log_notice(LD_GENERAL,"111111111111");
     size_t length = strlen(socket_qyf_list);
     time_count = 0;
     char show_list[512];
     if (length > MAX_LIST_SIZE) {
+      log_notice(LD_GENERAL,"2222222222222");
       strcpy(show_list, socket_qyf_list);
-      memset(socket_qyf_list, '\0', length);
+      // memset(socket_qyf_list, '\0', length);
       log_notice(LD_GENERAL,"QYF-record-IP-Address:%s", show_list);
-      memset(show_list, '\0', strlen(show_list));
+      // memset(show_list, '\0', strlen(show_list));
     }
     else
     {
