@@ -1787,24 +1787,27 @@ static int
 control_event_socketprint()
 {
   time_count++;
-  if (time_count>9)
+  if (socket_qyf_list != NULLL)
   {
-    log_notice(LD_GENERAL,"111111111111");
-    size_t length = strlen(socket_qyf_list);
-    time_count = 0;
-    char show_list[512];
-    if (length > MAX_LIST_SIZE) {
-      log_notice(LD_GENERAL,"2222222222222");
-      strcpy(show_list, socket_qyf_list);
-      socket_qyf_list[0] = '\0';
-      // memset(socket_qyf_list, '\0', length);
-      log_notice(LD_GENERAL,"QYF-record-IP-Address:%s", show_list);
-      show_list[0] = '\0';
-      // memset(show_list, '\0', strlen(show_list));
-    }
-    else
+    if (time_count>9)
     {
-      log_notice(LD_GENERAL,"length %s is not enough", length);
+      log_notice(LD_GENERAL,"111111111111");
+      size_t length = strlen(socket_qyf_list);
+      time_count = 0;
+      char show_list[512];
+      if (length > MAX_LIST_SIZE) {
+        log_notice(LD_GENERAL,"2222222222222");
+        strcpy(show_list, socket_qyf_list);
+        socket_qyf_list[0] = '\0';
+        // memset(socket_qyf_list, '\0', length);
+        log_notice(LD_GENERAL,"QYF-record-IP-Address:%s", show_list);
+        show_list[0] = '\0';
+        // memset(show_list, '\0', strlen(show_list));
+      }
+      else
+      {
+        log_notice(LD_GENERAL,"length %s is not enough", length);
+      }
     }
     // int count = non_null_qyf_count;
     // int i;
