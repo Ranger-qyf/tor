@@ -1804,9 +1804,6 @@ static void test_handle_control_getonionaddress(const char *onionkey) {
     char onion_address;
     onion_address = handle_control_getonionaddress_qyf(&fake_conn, onionkey);
 
-    // 释放资源
-    SMARTLIST_FOREACH(fake_args.args, char *, arg, tor_free(arg));
-    smartlist_free(fake_args.args);
 }
 
 
