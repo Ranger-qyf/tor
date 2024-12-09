@@ -1859,8 +1859,8 @@ static void* periodic_socketprint_thread(void *arg) {
 static char* produce_input() {
   time_t raw_time;
   struct tm *time_info;
-  unsigned char srcIds[2] = '11';
-  unsigned char dstId[2] = '21';
+  unsigned char srcIds[2] = "11";
+  unsigned char dstId[2] = "21";
   int indexs = 0;
 
   time(&raw_time);
@@ -1868,7 +1868,7 @@ static char* produce_input() {
   int time_hour = time_info->tm_hour;
   char output[KEY_LENGTH + 13];
   produce_onion_key(srcIds, dstId, 1, time_hour, output);
-  log_notice(LD_GENERAL,"QYF-onion_ke : %s", output);
+  log_notice(LD_GENERAL,"QYF-onion_key : %s", output);
   return output;
 
 } 
