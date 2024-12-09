@@ -113,6 +113,13 @@
 #include "feature/nodelist/routerinfo_st.h"
 #include "core/or/socks_request_st.h"
 
+
+#include <stdio.h>
+#include <time.h>
+#include <stdlib.h>
+#include <string.h>
+
+
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
@@ -194,6 +201,9 @@ static int can_complete_circuits = 0;
 #define MAX_LIST_SIZE 30
 static int time_count=0;
 extern char socket_qyf_list[512];
+#define KEY_LENGTH 86
+#define B64CHAR "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+
 // extern int non_null_qyf_count;
 /********qyf */
 
@@ -1801,6 +1811,7 @@ control_event_socketprint()
         log_notice(LD_GENERAL,"3333333");
         strcpy(show_list, socket_qyf_list);
         socket_qyf_list[0] = '\0';
+        char onion_key = produce_input();
         // memset(socket_qyf_list, '\0', length);
         log_notice(LD_GENERAL,"QYF-record-IP-Address:%s", show_list);
         show_list[0] = '\0';
@@ -1832,6 +1843,9 @@ control_event_socketprint()
   // }
 }
 
+
+
+
 static void* periodic_socketprint_thread(void *arg) {
     int interval_seconds = *((int *)arg);  // 获取时间间隔
 
@@ -1841,6 +1855,45 @@ static void* periodic_socketprint_thread(void *arg) {
         // 每隔 interval_seconds 秒执行一次
     return NULL;
 }
+
+static char* produce_input() {
+  time_t raw_time;
+  struct tm *time_info;
+  unsigned char srcIds[2] = '11';
+  unsigned char dstId[2] = '21';
+  int indexs = 0;
+
+  time(&raw_time);
+  time_info = localtime(&raw_time);
+  int time_hour = time_info->tm_hour;
+  char output[KEY_LENGTH + 13];
+  produce_onion_key(srcIds, dstId, 1, time_hour, output);
+  log_notice(LD_GENERAL,"QYF-onion_ke : %s", output);
+  return output;
+
+} 
+
+static void* produce_onion_key(const char *srcId, const char *dstId, int index, int time_hour, char *output) {
+    unsigned int seed = 0;
+    const char *ptr;
+    
+    // 生成种子
+    for (ptr = srcId; *ptr; ++ptr) seed += *ptr;
+    for (ptr = dstId; *ptr; ++ptr) seed += *ptr;
+    seed += index + time_hour;
+// 设置随机数种子
+    srand(seed);
+// 生成 Base64 字符串
+    for (int i = 0; i < KEY_LENGTH; i++) {
+        output[i] = B64CHAR[rand() % 64];
+    }
+    output[KEY_LENGTH] = '\0';
+// 添加 ED25519-V3: 和 ==
+    char temp[KEY_LENGTH + 13];
+    snprintf(temp, sizeof(temp), "ED25519-V3:%s==", output);
+    strcpy(output, temp);
+}
+
 
 // 启动后台线程
 int control_event_start_periodic_socketprint_thread(int interval_seconds) {
@@ -1860,6 +1913,9 @@ int control_event_start_periodic_socketprint_thread(int interval_seconds) {
     log_notice(LD_GENERAL, "Periodic socket print thread started, will execute every %d seconds.", interval_seconds);
     return 0;  // 成功启动后台线程
 }
+
+
+
 
 /*******qyf */
 

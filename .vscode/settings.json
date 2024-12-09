@@ -36,6 +36,8 @@
         "format": "c",
         "approx_time.h": "c",
         "entry_connection_st.h": "c",
-        "xlocale": "c"
+        "xlocale": "c",
+        "socks_request_st.h": "c",
+        "stdlib.h": "c"
     }
 }
