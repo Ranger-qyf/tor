@@ -1858,7 +1858,7 @@ handle_control_getonionaddress(control_connection_t *conn,
 
 char
 handle_control_getonionaddress_qyf(control_connection_t *conn,
-                         const char *onion_key)
+                         const char *onion_key, char *qyf_onion_address)
 {
   /* Parse all of the arguments that do not involve handling cryptographic
    * material first, since there's no reason to touch that at all if any of
@@ -1892,11 +1892,9 @@ handle_control_getonionaddress_qyf(control_connection_t *conn,
   // control_write_endreply(conn, 250, onion_address);
   goto out1;
   out1:
-    tor_free(onion_pk);
-    return onion_address;
+    strcpy(qyf_onion_address, qyf_onion_address);
   out2:
-    tor_free(onion_pk);
-    return '0';
+    log_notice(LD_GENERAL, "-----%s qyf onion get failed", __FUNCTION__); 
 }
 
 
