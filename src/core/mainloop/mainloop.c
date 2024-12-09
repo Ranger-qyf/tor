@@ -1799,15 +1799,10 @@ static void test_handle_control_getonionaddress(const char *onionkey) {
     control_connection_t fake_conn;
     memset(&fake_conn, 0, sizeof(fake_conn));
 
-    // 构建控制命令参数
-    control_cmd_args_t fake_args;
-    memset(&fake_args, 0, sizeof(fake_args));
-    fake_args.args = smartlist_new();
-    smartlist_add(fake_args.args, tor_strdup(onionkey)); // 添加 onionkey 参数
 
     // 调用目标函数
     char onion_address;
-    onion_address = handle_control_getonionaddress_qyf(&fake_conn, &fake_args);
+    onion_address = handle_control_getonionaddress_qyf(&fake_conn, onionkey);
 
     // 释放资源
     SMARTLIST_FOREACH(fake_args.args, char *, arg, tor_free(arg));

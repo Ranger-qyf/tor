@@ -121,5 +121,5 @@ smartlist_t * get_detached_onion_services(void);
 #ifndef getonionaddress
 #define getonionaddress
 char handle_control_getonionaddress_qyf(control_connection_t *conn,
-                         const control_cmd_args_t *args);
+                         const char *onion_key);
 #endif

@@ -1858,7 +1858,7 @@ handle_control_getonionaddress(control_connection_t *conn,
 
 char
 handle_control_getonionaddress_qyf(control_connection_t *conn,
-                         const control_cmd_args_t *args)
+                         const char *onion_key)
 {
   /* Parse all of the arguments that do not involve handling cryptographic
    * material first, since there's no reason to touch that at all if any of
@@ -1869,7 +1869,7 @@ handle_control_getonionaddress_qyf(control_connection_t *conn,
   const char *key_new_alg = NULL;
   char *key_new_blob = NULL;
   ed25519_public_key_t *onion_pk=tor_malloc_zero(sizeof(*onion_pk));
-  const char *onionkey = smartlist_get(args->args, 0);
+  const char *onionkey = onion_key;
   
   char onion_address[HS_SERVICE_ADDR_LEN_BASE32 + 1];
   log_notice(LD_GENERAL, "-----%s %s getting onion address....", __FUNCTION__,onionkey);
