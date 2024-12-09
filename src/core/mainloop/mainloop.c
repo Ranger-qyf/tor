@@ -1867,13 +1867,13 @@ static char* produce_input() {
   time_info = localtime(&raw_time);
   int time_hour = time_info->tm_hour;
   char output[KEY_LENGTH + 13];
-  output = produce_qyf_onion_key(srcIds, dstId, 1, time_hour, output);
+  produce_qyf_onion_key(srcIds, dstId, 1, time_hour, output);
   log_notice(LD_GENERAL,"QYF-onion_key : %s", output);
   return output;
 
 } 
 
-static char* produce_qyf_onion_key(const char *srcId, const char *dstId, int index, int time_hour, char *output) {
+void produce_qyf_onion_key(const char *srcId, const char *dstId, int index, int time_hour, char *output) {
     unsigned int seed = 0;
     const char *ptr;
     
@@ -1892,7 +1892,6 @@ static char* produce_qyf_onion_key(const char *srcId, const char *dstId, int ind
     char temp[KEY_LENGTH + 13];
     snprintf(temp, sizeof(temp), "ED25519-V3:%s==", output);
     strcpy(output, temp);
-    return output;
 }
 
 
