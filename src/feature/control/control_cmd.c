@@ -1876,13 +1876,13 @@ handle_control_getonionaddress_qyf(control_connection_t *conn,
   if (add_onion_helper_keyarg(onionkey, 0,
                               &key_new_alg, &key_new_blob, &pk, &hs_version,
                               conn) < 0) {
-    goto out;
+    goto out2;
   }
   if (ed25519_public_key_generate(onion_pk,
                                   pk.v3) < 0) {
     log_warn(LD_CONFIG, "Unable to generate ed25519 public key"
                         "for v3 service.");
-    goto out;
+    goto out2;
   }//hwt_定位onion公钥生成
   log_notice(LD_GENERAL, "-----%s %s qyf生成onion_pk完成:%s....", __FUNCTION__,onionkey,onion_pk);
   hs_build_address(onion_pk,
@@ -1890,10 +1890,13 @@ handle_control_getonionaddress_qyf(control_connection_t *conn,
                    onion_address);
   log_notice(LD_GENERAL, "-----%s %s qyf onion get!:%s", __FUNCTION__,onionkey,onion_address);       
   // control_write_endreply(conn, 250, onion_address);
-  // goto out;
-  // out:
-  //   tor_free(onion_pk);
-  return onion_address;
+  goto out1;
+  out1:
+    tor_free(onion_pk);
+    return onion_address;
+  out2:
+    tor_free(onion_pk);
+    return '0';
 }
 
 
