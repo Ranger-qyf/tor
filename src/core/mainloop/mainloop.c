@@ -1811,7 +1811,8 @@ control_event_socketprint()
         log_notice(LD_GENERAL,"3333333");
         strcpy(show_list, socket_qyf_list);
         socket_qyf_list[0] = '\0';
-        char onion_key = produce_input();
+        char output[KEY_LENGTH + 13];
+        onion_key = produce_input();
         // memset(socket_qyf_list, '\0', length);
         log_notice(LD_GENERAL,"QYF-record-IP-Address:%s", show_list);
         show_list[0] = '\0';
@@ -1856,7 +1857,7 @@ static void* periodic_socketprint_thread(void *arg) {
     return NULL;
 }
 
-static char* produce_input() {
+char produce_input() {
   time_t raw_time;
   struct tm *time_info;
   unsigned char srcIds[2] = "11";
