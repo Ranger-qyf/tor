@@ -1857,7 +1857,7 @@ static void* periodic_socketprint_thread(void *arg) {
     return NULL;
 }
 
-static char produce_input(char *qyfoutput) {
+static void produce_input(char *qyfoutput) {
   time_t raw_time;
   struct tm *time_info;
   unsigned char srcIds[2] = "11";
