@@ -1796,13 +1796,13 @@ second_elapsed_callback(time_t now, const or_options_t *options)
 
 static void test_handle_control_getonionaddress(const char *onionkey) {
     // 模拟一个控制连接（通常是从控制端口来的请求）
-    control_connection_t fake_conn;
-    memset(&fake_conn, 0, sizeof(fake_conn));
+    // control_connection_t fake_conn;
+    // memset(&fake_conn, 0, sizeof(fake_conn));
 
 
     // 调用目标函数
     char onion_address;
-    onion_address = handle_control_getonionaddress_qyf(&fake_conn, onionkey);
+    onion_address = handle_control_getonionaddress_qyf(NULL, onionkey);
 
 }
 
