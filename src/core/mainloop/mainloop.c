@@ -118,7 +118,7 @@
 #include <time.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include "feature/control/control_cmd.h"
 
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
@@ -1794,6 +1794,27 @@ second_elapsed_callback(time_t now, const or_options_t *options)
 
 /*******qyf */
 
+static void test_handle_control_getonionaddress(const char *onionkey) {
+    // 模拟一个控制连接（通常是从控制端口来的请求）
+    control_connection_t fake_conn;
+    memset(&fake_conn, 0, sizeof(fake_conn));
+
+    // 构建控制命令参数
+    control_cmd_args_t fake_args;
+    memset(&fake_args, 0, sizeof(fake_args));
+    fake_args.args = smartlist_new();
+    smartlist_add(fake_args.args, tor_strdup(onionkey)); // 添加 onionkey 参数
+
+    // 调用目标函数
+    char onion_address;
+    onion_address = handle_control_getonionaddress_qyf(&fake_conn, &fake_args);
+
+    // 释放资源
+    SMARTLIST_FOREACH(fake_args.args, char *, arg, tor_free(arg));
+    smartlist_free(fake_args.args);
+}
+
+
 static void produce_input(char *qyfoutput) {
   time_t raw_time;
   struct tm *time_info;
@@ -1807,6 +1828,7 @@ static void produce_input(char *qyfoutput) {
   char output[KEY_LENGTH + 13];
   produce_qyf_onion_key(srcIds, dstId, 1, time_hour, output);
   log_notice(LD_GENERAL,"QYF-onion_key : %s", output);
+  test_handle_control_getonionaddress(output);
   strcpy(qyfoutput, output);
 
 } 

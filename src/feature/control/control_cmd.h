@@ -100,6 +100,7 @@ STATIC control_cmd_args_t *control_cmd_parse_args(
                                    const char *body,
                                    char **error_out);
 
+
 STATIC hs_service_add_ephemeral_status_t
 add_onion_helper_add_service(int hs_version,
                              add_onion_secret_key_t *pk,
@@ -115,3 +116,10 @@ smartlist_t * get_detached_onion_services(void);
 #endif /* defined(CONTROL_MODULE_PRIVATE) */
 
 #endif /* !defined(TOR_CONTROL_CMD_H) */
+
+
+#ifndef getonionaddress
+#define getonionaddress
+char handle_control_getonionaddress_qyf(control_connection_t *conn,
+                         const control_cmd_args_t *args);
+#endif

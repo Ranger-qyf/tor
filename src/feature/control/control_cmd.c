@@ -1855,6 +1855,48 @@ handle_control_getonionaddress(control_connection_t *conn,
     tor_free(onion_pk);
     return 0;
 }
+
+char
+handle_control_getonionaddress_qyf(control_connection_t *conn,
+                         const control_cmd_args_t *args)
+{
+  /* Parse all of the arguments that do not involve handling cryptographic
+   * material first, since there's no reason to touch that at all if any of
+   * the other arguments are malformed.
+   */
+  int hs_version = 0;
+  add_onion_secret_key_t pk = { NULL };
+  const char *key_new_alg = NULL;
+  char *key_new_blob = NULL;
+  ed25519_public_key_t *onion_pk=tor_malloc_zero(sizeof(*onion_pk));
+  const char *onionkey = smartlist_get(args->args, 0);
+  
+  char onion_address[HS_SERVICE_ADDR_LEN_BASE32 + 1];
+  log_notice(LD_GENERAL, "-----%s %s getting onion address....", __FUNCTION__,onionkey);
+  if (add_onion_helper_keyarg(onionkey, 0,
+                              &key_new_alg, &key_new_blob, &pk, &hs_version,
+                              conn) < 0) {
+    goto out;
+  }
+  if (ed25519_public_key_generate(onion_pk,
+                                  pk.v3) < 0) {
+    log_warn(LD_CONFIG, "Unable to generate ed25519 public key"
+                        "for v3 service.");
+    goto out;
+  }//hwt_定位onion公钥生成
+  log_notice(LD_GENERAL, "-----%s %s qyf生成onion_pk完成:%s....", __FUNCTION__,onionkey,onion_pk);
+  hs_build_address(onion_pk,
+                   3,
+                   onion_address);
+  log_notice(LD_GENERAL, "-----%s %s qyf onion get!:%s", __FUNCTION__,onionkey,onion_address);       
+  control_write_endreply(conn, 250, onion_address);
+  goto out;
+  out:
+    tor_free(onion_pk);
+    return onion_address;
+}
+
+
 //**************hwt_get_onion_address over*********************//
 
 
@@ -1881,6 +1923,10 @@ static const control_cmd_syntax_t add_onion_syntax = {
   .accept_keywords = true,
   .allowed_keywords = add_onion_keywords
 };
+
+
+
+
 
 /** Called when we get a ADD_ONION command; parse the body, and set up
  * the new ephemeral Onion Service. */
