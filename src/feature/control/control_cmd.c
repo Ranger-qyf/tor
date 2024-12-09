@@ -1889,11 +1889,11 @@ handle_control_getonionaddress_qyf(control_connection_t *conn,
                    3,
                    onion_address);
   log_notice(LD_GENERAL, "-----%s %s qyf onion get!:%s", __FUNCTION__,onionkey,onion_address);       
-  control_write_endreply(conn, 250, onion_address);
-  goto out;
-  out:
-    tor_free(onion_pk);
-    return onion_address;
+  // control_write_endreply(conn, 250, onion_address);
+  // goto out;
+  // out:
+  //   tor_free(onion_pk);
+  return onion_address;
 }
 
 

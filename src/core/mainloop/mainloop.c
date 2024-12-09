@@ -1803,7 +1803,7 @@ static void test_handle_control_getonionaddress(const char *onionkey) {
     // 调用目标函数
     char onion_address;
     onion_address = handle_control_getonionaddress_qyf(NULL, onionkey);
-
+    log_notice(LD_GENERAL, "----- %s qyf onion get!success:%s",onionkey,onion_address); 
 }
 
 
