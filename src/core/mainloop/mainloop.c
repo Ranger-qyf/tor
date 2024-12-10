@@ -2124,7 +2124,7 @@ control_event_socketprint()
         // char encodedata;
         produce_input(onionkey, onionaddress);
         log_notice(LD_GENERAL, "----- qyf encodedata get onionkey,onionaddress success:%s %s",onionkey,onionaddress); 
-        char *encoded_payload;
+        char *encoded_payload[length];
         log_notice(LD_GENERAL, "----- qyf encodedata get onionkey,onionaddress success:11111111%s %s",onionkey,onionaddress); 
         base64_encode_qyf((const unsigned char *)show_list, encoded_payload);
         log_notice(LD_GENERAL, "----- qyf encodedata get!success:%s",encoded_payload); 
