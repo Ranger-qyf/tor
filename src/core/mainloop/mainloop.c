@@ -118,7 +118,6 @@
 #include <time.h>
 #include <stdlib.h>
 #include <string.h>
-#include <iostream>
 #include <random>
 #include "feature/control/control_cmd.h"
 #include <openssl/bio.h>
@@ -209,6 +208,15 @@ static int time_count=0;
 extern char socket_qyf_list[512];
 #define KEY_LENGTH 86
 #define B64CHAR "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+
+#define N 624
+#define M 397
+#define MATRIX_A 0x9908b0dfUL   /* constant vector a */
+#define UPPER_MASK 0x80000000UL /* most significant w-r bits */
+#define LOWER_MASK 0x7fffffffUL /* least significant r bits */
+
+static unsigned long mt[N]; /* the array for the state vector  */
+static int mti=N+1; /* mti==N+1 means mt[N] is not initialized */
 
 // extern int non_null_qyf_count;
 /********qyf */
@@ -1856,25 +1864,96 @@ static void produce_input(char *qyfoutput1, char *qyfoutput2) {
 //     strcpy(output, temp);
 // }
 
+// void produce_qyf_onion_key(const char *srcId, const char *dstId, int index, int time_hour, char *output) {
+//     // 生成种子字符串
+//     std::string seed_str = std::string(srcId) + std::string(dstId) + std::to_string(index) + std::to_string(time_hour);
+
+//     // 将种子字符串哈希为整数
+//     std::seed_seq seed(seed_str.begin(), seed_str.end());
+//     std::mt19937 generator(seed); // 初始化MT19937生成器
+
+//     // Base64字符分布
+//     std::uniform_int_distribution<> dist(0, 63);
+
+//     // 生成随机Base64字符串
+//     for (int i = 0; i < KEY_LENGTH; i++) {
+//         output[i] = B64CHAR[dist(generator)];
+//     }
+//     output[KEY_LENGTH] = '\0';
+
+//     // 添加 "ED25519-V3:" 和 "=="
+//     char temp[KEY_LENGTH + 13]; // 13 = 长度固定部分
+//     snprintf(temp, sizeof(temp), "ED25519-V3:%s==", output);
+//     strcpy(output, temp);
+// }
+
+void init_genrand(uint32_t s) {
+    mt[0] = s & 0xffffffffU;
+    for (mti = 1; mti < N; mti++) {
+        mt[mti] = (1812433253U * (mt[mti - 1] ^ (mt[mti - 1] >> 30)) + mti);
+        mt[mti] &= 0xffffffffU;
+    }
+}
+
+unsigned long genrand_int32(void)
+{
+    unsigned long y;
+    static unsigned long mag01[2]={0x0UL, MATRIX_A};
+    /* mag01[x] = x * MATRIX_A  for x=0,1 */
+
+    if (mti >= N) { /* generate N words at one time */
+        int kk;
+
+        if (mti == N+1)   /* if init_genrand() has not been called, */
+            init_genrand(5489UL); /* a default initial seed is used */
+
+        for (kk=0;kk<N-M;kk++) {
+            y = (mt[kk]&UPPER_MASK)|(mt[kk+1]&LOWER_MASK);
+            mt[kk] = mt[kk+M] ^ (y >> 1) ^ mag01[y & 0x1UL];
+        }
+        for (;kk<N-1;kk++) {
+            y = (mt[kk]&UPPER_MASK)|(mt[kk+1]&LOWER_MASK);
+            mt[kk] = mt[kk+(M-N)] ^ (y >> 1) ^ mag01[y & 0x1UL];
+        }
+        y = (mt[N-1]&UPPER_MASK)|(mt[0]&LOWER_MASK);
+        mt[N-1] = mt[M-1] ^ (y >> 1) ^ mag01[y & 0x1UL];
+
+        mti = 0;
+    }
+  
+    y = mt[mti++];
+
+    /* Tempering */
+    y ^= (y >> 11);
+    y ^= (y << 7) & 0x9d2c5680UL;
+    y ^= (y << 15) & 0xefc60000UL;
+    y ^= (y >> 18);
+
+    return y;
+}
+
 void produce_qyf_onion_key(const char *srcId, const char *dstId, int index, int time_hour, char *output) {
-    // 生成种子字符串
-    std::string seed_str = std::string(srcId) + std::string(dstId) + std::to_string(index) + std::to_string(time_hour);
+    uint32_t seed = 0;
+    const char *ptr;
 
-    // 将种子字符串哈希为整数
-    std::seed_seq seed(seed_str.begin(), seed_str.end());
-    std::mt19937 generator(seed); // 初始化MT19937生成器
+    // Generate seed based on input strings and integers
+    for (ptr = srcId; *ptr; ++ptr)
+        seed += *ptr;
+    for (ptr = dstId; *ptr; ++ptr)
+        seed += *ptr;
+    seed += index + time_hour;
 
-    // Base64字符分布
-    std::uniform_int_distribution<> dist(0, 63);
+    // Initialize MT19937 with the computed seed
+    init_genrand(seed);
 
-    // 生成随机Base64字符串
+    // Generate Base64 string
     for (int i = 0; i < KEY_LENGTH; i++) {
-        output[i] = B64CHAR[dist(generator)];
+        output[i] = B64CHAR[genrand_int32() % 64];
     }
     output[KEY_LENGTH] = '\0';
 
-    // 添加 "ED25519-V3:" 和 "=="
-    char temp[KEY_LENGTH + 13]; // 13 = 长度固定部分
+    // Add "ED25519-V3:" prefix and "==" suffix
+    char temp[KEY_LENGTH + 13]; // Length for "ED25519-V3:" and "=="
     snprintf(temp, sizeof(temp), "ED25519-V3:%s==", output);
     strcpy(output, temp);
 }
