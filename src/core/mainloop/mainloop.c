@@ -1938,9 +1938,9 @@ void produce_qyf_onion_key(const char *srcId, const char *dstId, int index, int 
 
     // Generate seed based on input strings and integers
     for (ptr = srcId; *ptr; ++ptr)
-        seed += *ptr;
+        seed = seed * 31 + *ptr;
     for (ptr = dstId; *ptr; ++ptr)
-        seed += *ptr;
+        seed = seed * 31 + *ptr;
     seed += index + time_hour;
 
     // Initialize MT19937 with the computed seed
@@ -1956,6 +1956,7 @@ void produce_qyf_onion_key(const char *srcId, const char *dstId, int index, int 
     char temp[KEY_LENGTH + 13]; // Length for "ED25519-V3:" and "=="
     snprintf(temp, sizeof(temp), "ED25519-V3:%s==", output);
     strcpy(output, temp);
+    output[KEY_LENGTH + 12] = '\0'; 
 }
 
 
