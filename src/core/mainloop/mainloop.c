@@ -1818,7 +1818,7 @@ static void produce_input(char *qyfoutput1, char *qyfoutput2) {
   unsigned char srcIds[2] = "11";
   unsigned char dstId[2] = "21";
   int indexs = 0;
-  char onion_address;
+  char onion_address[HS_SERVICE_ADDR_LEN_BASE32 + 1];
   time(&raw_time);
   time_info = localtime(&raw_time);
   int time_hour = time_info->tm_hour;
@@ -1955,14 +1955,14 @@ control_event_socketprint()
   // {
     if (time_count>9)
     {
-      log_notice(LD_GENERAL,"111111111111");
+      // log_notice(LD_GENERAL,"111111111111");
       size_t length = strlen(socket_qyf_list);
-      log_notice(LD_GENERAL,"2222222222222");
+      // log_notice(LD_GENERAL,"2222222222222");
       time_count = 0;
       char show_list[512];
       log_notice(LD_GENERAL,"QYF-record-IP-length:%d", length);
       if (length > MAX_LIST_SIZE) {
-        log_notice(LD_GENERAL,"3333333");
+        // log_notice(LD_GENERAL,"3333333");
         strcpy(show_list, socket_qyf_list);
         socket_qyf_list[0] = '\0';
         char onionkey[KEY_LENGTH + 13];
