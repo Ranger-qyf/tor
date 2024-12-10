@@ -1898,6 +1898,7 @@ handle_control_getonionaddress_qyf(control_connection_t *conn,
   out1:
     log_notice(LD_GENERAL, "-----%s qyf onion get success", __FUNCTION__); 
     strcpy(qyf_onion_address, onion_address);
+    log_notice(LD_GENERAL, "-----%s qyf onion get success222222", __FUNCTION__);
   out2:
     log_notice(LD_GENERAL, "-----%s qyf onion get failed", __FUNCTION__); 
 }
