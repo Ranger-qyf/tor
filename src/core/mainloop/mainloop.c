@@ -118,7 +118,6 @@
 #include <time.h>
 #include <stdlib.h>
 #include <string.h>
-#include <cstring>
 #include <iostream>
 #include <random>
 #include "feature/control/control_cmd.h"
