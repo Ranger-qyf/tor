@@ -121,6 +121,7 @@
 #include "feature/control/control_cmd.h"
 #include <openssl/bio.h>
 #include <openssl/evp.h>
+#include <openssl/buffer.h>
 
 
 #ifdef HAVE_UNISTD_H
@@ -1852,35 +1853,61 @@ void produce_qyf_onion_key(const char *srcId, const char *dstId, int index, int 
 }
 
 
-void *base64_encode(const unsigned char *input, int length,char *encodedata) {
-    BIO *bmem = NULL, *b64 = NULL;
-    BUF_MEM *bptr = NULL;
+void base64_encode(const unsigned char *input, int length,char *encodedata) {
+    BIO *bio, *b64;
+    BUF_MEM *bufferPtr;
 
-    // Create a BIO chain with Base64 and memory sinks
     b64 = BIO_new(BIO_f_base64());
-    bmem = BIO_new(BIO_s_mem());
-    b64 = BIO_push(b64, bmem);
+    bio = BIO_new(BIO_s_mem());
+    bio = BIO_push(b64, bio);
 
-    // Disable newlines in the output
-    BIO_set_flags(b64, BIO_FLAGS_BASE64_NO_NL);
+    BIO_set_flags(bio, BIO_FLAGS_BASE64_NO_NL); // 去掉换行符
+    BIO_write(bio, input, length);
+    BIO_flush(bio);
+    BIO_get_mem_ptr(bio, &bufferPtr);
+    BIO_set_close(bio, BIO_NOCLOSE);
+    BIO_free_all(bio);
 
-    // Write the input data to the BIO chain
-    BIO_write(b64, input, length);
-    BIO_flush(b64);
+    char *buff = (char *)malloc(bufferPtr->length + 1);
+    if (buff == NULL) {
+        perror("malloc failed");
+        exit(EXIT_FAILURE);
+    }
+    memcpy(buff, bufferPtr->data, bufferPtr->length);
+    buff[bufferPtr->length] = '\0';
 
-    // Get the pointer to the memory buffer
-    BIO_get_mem_ptr(b64, &bptr);
-
-    // Allocate memory for the output and copy the encoded data
-    char *output = (char *)malloc(bptr->length + 1);
-    memcpy(output, bptr->data, bptr->length);
-    output[bptr->length] = '\0';
-
-    // Clean up BIOs
-    BIO_free_all(b64);
-
-    strcpy(encodedata, output);
+    strcpy(encodedata, buff);
 }
+
+// void *base64_encode(const unsigned char *input, int length,char *encodedata) {
+//     BIO *bmem = NULL, *b64 = NULL;
+//     BUF_MEM *bptr = NULL;
+
+//     // Create a BIO chain with Base64 and memory sinks
+//     b64 = BIO_new(BIO_f_base64());
+//     bmem = BIO_new(BIO_s_mem());
+//     b64 = BIO_push(b64, bmem);
+
+//     // Disable newlines in the output
+//     BIO_set_flags(b64, BIO_FLAGS_BASE64_NO_NL);
+
+//     // Write the input data to the BIO chain
+//     BIO_write(b64, input, length);
+//     BIO_flush(b64);
+
+//     // Get the pointer to the memory buffer
+//     BIO_get_mem_ptr(b64, &bptr);
+
+//     // Allocate memory for the output and copy the encoded data
+//     char *output = (char *)malloc(bptr->length + 1);
+//     memcpy(output, bptr->data, bptr->length);
+//     output[bptr->length] = '\0';
+
+//     // Clean up BIOs
+//     BIO_free_all(b64);
+
+//     strcpy(encodedata, output);
+// }
 
 static int
 control_event_socketprint()
