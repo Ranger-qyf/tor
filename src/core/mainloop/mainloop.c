@@ -1805,7 +1805,7 @@ static void test_handle_control_getonionaddress(const char *onionkey, char *outp
 
 
     // 调用目标函数
-    char onion_address;
+    char onion_address[HS_SERVICE_ADDR_LEN_BASE32 + 1];
     handle_control_getonionaddress_qyf(NULL, onionkey, onion_address);
     log_notice(LD_GENERAL, "----- %s qyf onion get!success:%s",onionkey,onion_address); 
     strcpy(output, onion_address);
