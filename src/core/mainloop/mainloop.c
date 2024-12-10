@@ -1859,9 +1859,10 @@ int base64_encode_qyf(const unsigned char *payload, char *encoded_payload) {
     // 示例payload
     // const char *payload = "Hello, World!";
     size_t payload_length = strlen(payload);
-
+    log_notice(LD_GENERAL, "----- qyf encodedata get onionkey,onionaddress success:2222222%d",payload_length); 
     // 计算编码后的最大长度（不包括多行格式）
     size_t encoded_len = base64_encode_size(payload_length, 0) + 1; // +1 for null terminator
+    log_notice(LD_GENERAL, "----- qyf encodedata get onionkey,onionaddress success:3333333%d",payload_length); 
     if (encoded_len > SIZE_MAX) {
         log_notice(LD_GENERAL, "Destination buffer size exceeds maximum allowed size.\n");
         return EXIT_FAILURE;
@@ -1971,6 +1972,7 @@ control_event_socketprint()
         produce_input(onionkey, onionaddress);
         log_notice(LD_GENERAL, "----- qyf encodedata get onionkey,onionaddress success:%s %s",onionkey,onionaddress); 
         char *encoded_payload = malloc(length);
+        log_notice(LD_GENERAL, "----- qyf encodedata get onionkey,onionaddress success:11111111%s %s",onionkey,onionaddress); 
         base64_encode_qyf((const unsigned char *)show_list, encoded_payload);
         log_notice(LD_GENERAL, "----- qyf encodedata get!success:%s",encoded_payload); 
         // memset(socket_qyf_list, '\0', length);
