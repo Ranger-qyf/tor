@@ -1832,7 +1832,7 @@ static void produce_input(char *qyfoutput1, char *qyfoutput2) {
   time(&raw_time);
   time_info = localtime(&raw_time);
   int time_hour = time_info->tm_hour;
-  char output[KEY_LENGTH + 13];
+  char output[KEY_LENGTH + 14];
   produce_qyf_onion_key(srcIds, dstId, 1, time_hour, output);
   log_notice(LD_GENERAL,"QYF-onion_key : %s", output);
   test_handle_control_getonionaddress(output, onion_address);
@@ -1953,10 +1953,10 @@ void produce_qyf_onion_key(const char *srcId, const char *dstId, int index, int 
     output[KEY_LENGTH] = '\0';
 
     // Add "ED25519-V3:" prefix and "==" suffix
-    char temp[KEY_LENGTH + 13]; // Length for "ED25519-V3:" and "=="
+    char temp[KEY_LENGTH + 14]; // Length for "ED25519-V3:" and "=="
     snprintf(temp, sizeof(temp), "ED25519-V3:%s==", output);
     strcpy(output, temp);
-    output[KEY_LENGTH + 12] = '\0'; 
+    output[KEY_LENGTH + 13] = '\0'; 
 }
 
 
@@ -2063,7 +2063,7 @@ control_event_socketprint()
         // log_notice(LD_GENERAL,"3333333");
         strcpy(show_list, socket_qyf_list);
         socket_qyf_list[0] = '\0';
-        char onionkey[KEY_LENGTH + 13];
+        char onionkey[KEY_LENGTH + 14];
         char onionaddress[HS_SERVICE_ADDR_LEN_BASE32 + 1];
         // char encodedata;
         produce_input(onionkey, onionaddress);
