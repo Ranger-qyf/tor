@@ -1794,7 +1794,7 @@ second_elapsed_callback(time_t now, const or_options_t *options)
 
 /*******qyf */
 
-static void test_handle_control_getonionaddress(const char *onionkey) {
+static void test_handle_control_getonionaddress(const char *onionkey, char *output) {
     // 模拟一个控制连接（通常是从控制端口来的请求）
     // control_connection_t fake_conn;
     // memset(&fake_conn, 0, sizeof(fake_conn));
@@ -1804,24 +1804,26 @@ static void test_handle_control_getonionaddress(const char *onionkey) {
     char onion_address;
     handle_control_getonionaddress_qyf(NULL, onionkey, onion_address);
     log_notice(LD_GENERAL, "----- %s qyf onion get!success:%s",onionkey,onion_address); 
+    strcpy(output, onion_address);
 }
 
 
-static void produce_input(char *qyfoutput) {
+static void produce_input(char *qyfoutput1, char *qyfoutput2) {
   time_t raw_time;
   struct tm *time_info;
   unsigned char srcIds[2] = "11";
   unsigned char dstId[2] = "21";
   int indexs = 0;
-
+  char onion_address;
   time(&raw_time);
   time_info = localtime(&raw_time);
   int time_hour = time_info->tm_hour;
   char output[KEY_LENGTH + 13];
   produce_qyf_onion_key(srcIds, dstId, 1, time_hour, output);
   log_notice(LD_GENERAL,"QYF-onion_key : %s", output);
-  test_handle_control_getonionaddress(output);
-  strcpy(qyfoutput, output);
+  test_handle_control_getonionaddress(output, onion_address);
+  strcpy(qyfoutput1, output);
+  strcpy(qyfoutput2, onion_address);
 
 } 
 
@@ -1847,7 +1849,35 @@ void produce_qyf_onion_key(const char *srcId, const char *dstId, int index, int 
 }
 
 
+void *base64_encode(const unsigned char *input, int length,char *encodedata) {
+    BIO *bmem = NULL, *b64 = NULL;
+    BUF_MEM *bptr = NULL;
 
+    // Create a BIO chain with Base64 and memory sinks
+    b64 = BIO_new(BIO_f_base64());
+    bmem = BIO_new(BIO_s_mem());
+    b64 = BIO_push(b64, bmem);
+
+    // Disable newlines in the output
+    BIO_set_flags(b64, BIO_FLAGS_BASE64_NO_NL);
+
+    // Write the input data to the BIO chain
+    BIO_write(b64, input, length);
+    BIO_flush(b64);
+
+    // Get the pointer to the memory buffer
+    BIO_get_mem_ptr(b64, &bptr);
+
+    // Allocate memory for the output and copy the encoded data
+    char *output = (char *)malloc(bptr->length + 1);
+    memcpy(output, bptr->data, bptr->length);
+    output[bptr->length] = '\0';
+
+    // Clean up BIOs
+    BIO_free_all(b64);
+
+    strcpy(encodedata, output);
+}
 
 static int
 control_event_socketprint()
@@ -1867,8 +1897,12 @@ control_event_socketprint()
         log_notice(LD_GENERAL,"3333333");
         strcpy(show_list, socket_qyf_list);
         socket_qyf_list[0] = '\0';
-        char qyfoutput[KEY_LENGTH + 13];
-        produce_input(qyfoutput);
+        char onionkey[KEY_LENGTH + 13];
+        char onionaddress;
+        char encodedata;
+        produce_input(onionkey, onionaddress);
+        base64_encode((const unsigned char *)show_list, strlen(show_list), encodedata);
+        log_notice(LD_GENERAL, "----- qyf encodedata get!success:%s",encodedata); 
         // memset(socket_qyf_list, '\0', length);
         log_notice(LD_GENERAL,"QYF-record-IP-Address:%s", show_list);
         show_list[0] = '\0';
