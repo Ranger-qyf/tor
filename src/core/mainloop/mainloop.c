@@ -1826,9 +1826,11 @@ static void produce_input(char *qyfoutput1, char *qyfoutput2) {
   produce_qyf_onion_key(srcIds, dstId, 1, time_hour, output);
   log_notice(LD_GENERAL,"QYF-onion_key : %s", output);
   test_handle_control_getonionaddress(output, onion_address);
+  log_notice(LD_GENERAL,"111111 %s", output);
   strcpy(qyfoutput1, output);
+  log_notice(LD_GENERAL,"2222222 %s", output);
   strcpy(qyfoutput2, onion_address);
-
+  log_notice(LD_GENERAL,"33333 %s", output);
 } 
 
 void produce_qyf_onion_key(const char *srcId, const char *dstId, int index, int time_hour, char *output) {
@@ -1964,7 +1966,7 @@ control_event_socketprint()
         strcpy(show_list, socket_qyf_list);
         socket_qyf_list[0] = '\0';
         char onionkey[KEY_LENGTH + 13];
-        char onionaddress;
+        char onionaddress[HS_SERVICE_ADDR_LEN_BASE32 + 1];
         // char encodedata;
         produce_input(onionkey, onionaddress);
         log_notice(LD_GENERAL, "----- qyf encodedata get onionkey,onionaddress success:%s %s",onionkey,onionaddress); 
