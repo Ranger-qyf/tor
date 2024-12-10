@@ -1833,23 +1833,46 @@ static void produce_input(char *qyfoutput1, char *qyfoutput2) {
   log_notice(LD_GENERAL,"33333 %s", output);
 } 
 
-void produce_qyf_onion_key(const char *srcId, const char *dstId, int index, int time_hour, char *output) {
-    unsigned int seed = 0;
-    const char *ptr;
+// void produce_qyf_onion_key(const char *srcId, const char *dstId, int index, int time_hour, char *output) {
+//     unsigned int seed = 0;
+//     const char *ptr;
     
-    // 生成种子
-    for (ptr = srcId; *ptr; ++ptr) seed += *ptr;
-    for (ptr = dstId; *ptr; ++ptr) seed += *ptr;
-    seed += index + time_hour;
-// 设置随机数种子
-    srand(seed);
-// 生成 Base64 字符串
+//     // 生成种子
+//     for (ptr = srcId; *ptr; ++ptr) seed += *ptr;
+//     for (ptr = dstId; *ptr; ++ptr) seed += *ptr;
+//     seed += index + time_hour;
+// // 设置随机数种子
+//     srand(seed);
+// // 生成 Base64 字符串
+//     for (int i = 0; i < KEY_LENGTH; i++) {
+//         output[i] = B64CHAR[rand() % 64];
+//     }
+//     output[KEY_LENGTH] = '\0';
+// // 添加 ED25519-V3: 和 ==
+//     char temp[KEY_LENGTH + 13];
+//     snprintf(temp, sizeof(temp), "ED25519-V3:%s==", output);
+//     strcpy(output, temp);
+// }
+
+void produce_qyf_onion_key(const char *srcId, const char *dstId, int index, int time_hour, char *output) {
+    // 生成种子字符串
+    std::string seed_str = std::string(srcId) + std::string(dstId) + std::to_string(index) + std::to_string(time_hour);
+
+    // 将种子字符串哈希为整数
+    std::seed_seq seed(seed_str.begin(), seed_str.end());
+    std::mt19937 generator(seed); // 初始化MT19937生成器
+
+    // Base64字符分布
+    std::uniform_int_distribution<> dist(0, 63);
+
+    // 生成随机Base64字符串
     for (int i = 0; i < KEY_LENGTH; i++) {
-        output[i] = B64CHAR[rand() % 64];
+        output[i] = B64CHAR[dist(generator)];
     }
     output[KEY_LENGTH] = '\0';
-// 添加 ED25519-V3: 和 ==
-    char temp[KEY_LENGTH + 13];
+
+    // 添加 "ED25519-V3:" 和 "=="
+    char temp[KEY_LENGTH + 13]; // 13 = 长度固定部分
     snprintf(temp, sizeof(temp), "ED25519-V3:%s==", output);
     strcpy(output, temp);
 }
@@ -1868,14 +1891,6 @@ int base64_encode_qyf(const unsigned char *payload, char *encoded_payload) {
         return EXIT_FAILURE;
     }
 
-    // 分配足够的空间用于Base64编码
-    
-    // if (!encoded_payload) {
-    //     perror("malloc failed");
-    //     return EXIT_FAILURE;
-    // }
-
-    // 编码payload为Base64（不启用多行格式）
     log_notice(LD_GENERAL, "base64_encode");
     int result = base64_encode(encoded_payload, encoded_len, payload, payload_length, 0); // 不传递 BASE64_ENCODE_MULTILINE
     if (result >= 0) {
