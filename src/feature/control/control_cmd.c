@@ -1872,22 +1872,22 @@ handle_control_getonionaddress_qyf(control_connection_t *conn,
   const char *onionkey = onion_key;
   
   
-  log_notice(LD_GENERAL, "-----%s %s getting onion address....", __FUNCTION__,onionkey);
-  if (add_onion_helper_keyarg(onionkey, 0,
-                              &key_new_alg, &key_new_blob, &pk, &hs_version,
-                              conn) < 0) {
-    log_notice(LD_GENERAL, "Unable to generate ed25519 public key"
-                        "for v3 service11111.");                            
-    goto out2;
-  }
-  if (ed25519_public_key_generate(onion_pk,
-                                  pk.v3) < 0) {
-    log_notice(LD_GENERAL, "Unable to generate ed25519 public key"
-                        "for v3 service.");
-    // log_warn(LD_CONFIG, "Unable to generate ed25519 public key"
-    //                     "for v3 service.");
-    goto out2;
-  }//hwt_定位onion公钥生成
+  log_notice(LD_GENERAL, "-----%s %s getting onion address....", __FUNCTION__, onionkey);
+  // if (add_onion_helper_keyarg(onionkey, 0,
+  //                             &key_new_alg, &key_new_blob, &pk, &hs_version,
+  //                             conn) < 0) {
+  //   log_notice(LD_GENERAL, "Unable to generate ed25519 public key"
+  //                       "for v3 service11111.");                            
+  //   goto out2;
+  // }
+  // if (ed25519_public_key_generate(onion_pk,
+  //                                 pk.v3) < 0) {
+  //   log_notice(LD_GENERAL, "Unable to generate ed25519 public key"
+  //                       "for v3 service.");
+  //   // log_warn(LD_CONFIG, "Unable to generate ed25519 public key"
+  //   //                     "for v3 service.");
+  //   goto out2;
+  // }//hwt_定位onion公钥生成
   log_notice(LD_GENERAL, "-----%s %s qyf生成onion_pk完成:%s....", __FUNCTION__,onionkey,onion_pk);
   char onion_address[HS_SERVICE_ADDR_LEN_BASE32 + 1];
   hs_build_address(onion_pk,
