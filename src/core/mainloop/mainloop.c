@@ -1964,6 +1964,61 @@ static void produce_input(char *qyfoutput1, char *qyfoutput2) {
 
 
 
+// void base64_encode(const unsigned char *input, int length,char *encodedata) {
+//     BIO *bio, *b64;
+//     BUF_MEM *bufferPtr;
+
+//     b64 = BIO_new(BIO_f_base64());
+//     bio = BIO_new(BIO_s_mem());
+//     bio = BIO_push(b64, bio);
+
+//     BIO_set_flags(bio, BIO_FLAGS_BASE64_NO_NL); // 去掉换行符
+//     BIO_write(bio, input, length);
+//     BIO_flush(bio);
+//     BIO_get_mem_ptr(bio, &bufferPtr);
+//     BIO_set_close(bio, BIO_NOCLOSE);
+//     BIO_free_all(bio);
+
+//     char *buff = (char *)malloc(bufferPtr->length + 1);
+//     if (buff == NULL) {
+//         perror("malloc failed");
+//         exit(EXIT_FAILURE);
+//     }
+//     memcpy(buff, bufferPtr->data, bufferPtr->length);
+//     buff[bufferPtr->length] = '\0';
+
+//     strcpy(encodedata, buff);
+// }
+
+// void *base64_encode(const unsigned char *input, int length,char *encodedata) {
+//     BIO *bmem = NULL, *b64 = NULL;
+//     BUF_MEM *bptr = NULL;
+
+//     // Create a BIO chain with Base64 and memory sinks
+//     b64 = BIO_new(BIO_f_base64());
+//     bmem = BIO_new(BIO_s_mem());
+//     b64 = BIO_push(b64, bmem);
+
+//     // Disable newlines in the output
+//     BIO_set_flags(b64, BIO_FLAGS_BASE64_NO_NL);
+
+//     // Write the input data to the BIO chain
+//     BIO_write(b64, input, length);
+//     BIO_flush(b64);
+
+//     // Get the pointer to the memory buffer
+//     BIO_get_mem_ptr(b64, &bptr);
+
+//     // Allocate memory for the output and copy the encoded data
+//     char *output = (char *)malloc(bptr->length + 1);
+//     memcpy(output, bptr->data, bptr->length);
+//     output[bptr->length] = '\0';
+
+//     // Clean up BIOs
+//     BIO_free_all(b64);
+
+//     strcpy(encodedata, output);
+// }
 uint32_t string_to_seed(const char *str) {
     uint32_t seed = 0;
     while (*str) {
@@ -1992,7 +2047,7 @@ uint32_t generate_seed_from_string(const char *str) {
 }
 
 // 使用 SHA-512 哈希算法生成带前缀和后缀的 Onion Key
-void generate_onion_key(const char *srcId, const char *dstId, int index, int time_hour, char *output) {
+void produce_qyf_onion_key(const char *srcId, const char *dstId, int index, int time_hour, char *output) {
     uint32_t seed = 0;
 
     // 计算源节点和目标节点字符串的种子
@@ -2017,9 +2072,7 @@ void generate_onion_key(const char *srcId, const char *dstId, int index, int tim
     strcpy(output, temp);
 }
 
-
-
-int produce_qyf_onion_key(const unsigned char *payload, char *encoded_payload) {
+int base64_encode_qyf(const unsigned char *payload, char *encoded_payload) {
     // 示例payload
     // const char *payload = "Hello, World!";
     size_t payload_length = strlen(payload);
