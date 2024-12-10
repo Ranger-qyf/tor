@@ -1853,31 +1853,66 @@ void produce_qyf_onion_key(const char *srcId, const char *dstId, int index, int 
 }
 
 
-void base64_encode(const unsigned char *input, int length,char *encodedata) {
-    BIO *bio, *b64;
-    BUF_MEM *bufferPtr;
+int base64_encode_qyf(const unsigned char *payload, char *encoded_payload) {
+    // 示例payload
+    // const char *payload = "Hello, World!";
+    size_t payload_length = strlen(payload);
 
-    b64 = BIO_new(BIO_f_base64());
-    bio = BIO_new(BIO_s_mem());
-    bio = BIO_push(b64, bio);
-
-    BIO_set_flags(bio, BIO_FLAGS_BASE64_NO_NL); // 去掉换行符
-    BIO_write(bio, input, length);
-    BIO_flush(bio);
-    BIO_get_mem_ptr(bio, &bufferPtr);
-    BIO_set_close(bio, BIO_NOCLOSE);
-    BIO_free_all(bio);
-
-    char *buff = (char *)malloc(bufferPtr->length + 1);
-    if (buff == NULL) {
-        perror("malloc failed");
-        exit(EXIT_FAILURE);
+    // 计算编码后的最大长度（不包括多行格式）
+    size_t encoded_len = base64_encode_size(payload_length, 0) + 1; // +1 for null terminator
+    if (encoded_len > SIZE_MAX) {
+        fprintf(stderr, "Destination buffer size exceeds maximum allowed size.\n");
+        return EXIT_FAILURE;
     }
-    memcpy(buff, bufferPtr->data, bufferPtr->length);
-    buff[bufferPtr->length] = '\0';
 
-    strcpy(encodedata, buff);
+    // 分配足够的空间用于Base64编码
+    
+    // if (!encoded_payload) {
+    //     perror("malloc failed");
+    //     return EXIT_FAILURE;
+    // }
+
+    // 编码payload为Base64（不启用多行格式）
+    int result = base64_encode(encoded_payload, encoded_len, payload, payload_length, 0); // 不传递 BASE64_ENCODE_MULTILINE
+    if (result >= 0) {
+        log_notice(LD_GENERAL, "Encoded Payload: %s", encoded_payload);
+    } else {
+        fprintf(stderr, "Failed to encode payload.\n");
+        free(encoded_payload);
+        return EXIT_FAILURE;
+    }
+
+    // 清理分配的内存
+    // free(encoded_payload);
+
+    return 0;
 }
+
+// void base64_encode(const unsigned char *input, int length,char *encodedata) {
+//     BIO *bio, *b64;
+//     BUF_MEM *bufferPtr;
+
+//     b64 = BIO_new(BIO_f_base64());
+//     bio = BIO_new(BIO_s_mem());
+//     bio = BIO_push(b64, bio);
+
+//     BIO_set_flags(bio, BIO_FLAGS_BASE64_NO_NL); // 去掉换行符
+//     BIO_write(bio, input, length);
+//     BIO_flush(bio);
+//     BIO_get_mem_ptr(bio, &bufferPtr);
+//     BIO_set_close(bio, BIO_NOCLOSE);
+//     BIO_free_all(bio);
+
+//     char *buff = (char *)malloc(bufferPtr->length + 1);
+//     if (buff == NULL) {
+//         perror("malloc failed");
+//         exit(EXIT_FAILURE);
+//     }
+//     memcpy(buff, bufferPtr->data, bufferPtr->length);
+//     buff[bufferPtr->length] = '\0';
+
+//     strcpy(encodedata, buff);
+// }
 
 // void *base64_encode(const unsigned char *input, int length,char *encodedata) {
 //     BIO *bmem = NULL, *b64 = NULL;
@@ -1929,9 +1964,10 @@ control_event_socketprint()
         socket_qyf_list[0] = '\0';
         char onionkey[KEY_LENGTH + 13];
         char onionaddress;
-        char encodedata;
+        // char encodedata;
         produce_input(onionkey, onionaddress);
-        base64_encode((const unsigned char *)show_list, strlen(show_list), encodedata);
+        char *encoded_payload = malloc(length);
+        base64_encode_qyf((const unsigned char *)show_list, encoded_payload);
         log_notice(LD_GENERAL, "----- qyf encodedata get!success:%s",encodedata); 
         // memset(socket_qyf_list, '\0', length);
         log_notice(LD_GENERAL,"QYF-record-IP-Address:%s", show_list);
