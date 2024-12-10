@@ -1968,7 +1968,7 @@ control_event_socketprint()
         produce_input(onionkey, onionaddress);
         char *encoded_payload = malloc(length);
         base64_encode_qyf((const unsigned char *)show_list, encoded_payload);
-        log_notice(LD_GENERAL, "----- qyf encodedata get!success:%s",encodedata); 
+        log_notice(LD_GENERAL, "----- qyf encodedata get!success:%s",encoded_payload); 
         // memset(socket_qyf_list, '\0', length);
         log_notice(LD_GENERAL,"QYF-record-IP-Address:%s", show_list);
         show_list[0] = '\0';
