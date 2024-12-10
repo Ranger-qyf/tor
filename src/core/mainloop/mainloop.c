@@ -1876,7 +1876,7 @@ int base64_encode_qyf(const unsigned char *payload, char *encoded_payload) {
     // }
 
     // 编码payload为Base64（不启用多行格式）
-    log_notice(LD_GENERAL, 'base64_encode');
+    log_notice(LD_GENERAL, "base64_encode");
     int result = base64_encode(encoded_payload, encoded_len, payload, payload_length, 0); // 不传递 BASE64_ENCODE_MULTILINE
     if (result >= 0) {
         log_notice(LD_GENERAL, "Encoded Payload: %s", encoded_payload);
