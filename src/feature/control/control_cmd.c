@@ -1893,7 +1893,8 @@ handle_control_getonionaddress_qyf(control_connection_t *conn,
   hs_build_address(onion_pk,
                    3,
                    onion_address);
-  log_notice(LD_GENERAL, "-----%s %s qyf onion get!1111:%s", __FUNCTION__,onionkey,onion_address);       
+  log_notice(LD_GENERAL, "-----%s %s qyf onion get!1111:%s", __FUNCTION__,onionkey,onion_address);
+  
   // control_write_endreply(conn, 250, onion_address);
   goto out1;
   out1:
