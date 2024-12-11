@@ -2020,59 +2020,94 @@ static void produce_input(char *qyfoutput1, char *qyfoutput2) {
 //     strcpy(encodedata, output);
 // }
 
-uint32_t string_to_seed(const char *str) {
-    uint32_t seed = 0;
-    while (*str) {
-        seed = (seed * 31) + *str; // 类似于 Python 中的 ord(c) * 31
-        str++;
-    }
-    return seed;
-}
 
-// 计算字符串的 SHA-512 哈希并返回大整数种子
-uint32_t generate_seed_from_string(const char *str) {
-    unsigned char hash[SHA512_DIGEST_LENGTH];
-    SHA512_CTX sha512_ctx;
+void seed_random(const char *seed_str) {
+    unsigned long hash = 5381;
+    int c;
 
-    SHA512_Init(&sha512_ctx);
-    SHA512_Update(&sha512_ctx, str, strlen(str));
-    SHA512_Final(hash, &sha512_ctx);
-
-    // 将哈希值转化为整数种子
-    uint32_t seed = 0;
-    for (int i = 0; i < 4; i++) {
-        seed = (seed << 8) | hash[i];  // 取前四个字节作为种子
+    while ((c = *seed_str++)) {
+        hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
     }
 
-    return seed;
+    srand((unsigned int)hash);
 }
 
-// 使用 SHA-512 哈希算法生成带前缀和后缀的 Onion Key
-void produce_qyf_onion_key(const char *srcId, const char *dstId, int index, int time_hour, char *outputqyf) {
-    uint32_t seed = 0;
+char random_choice(const char *charset, size_t charset_len) {
+    return charset[rand() % charset_len];
+}
 
-    // 计算源节点和目标节点字符串的种子
-    seed = string_to_seed(srcId);
-    seed += string_to_seed(dstId);
-    seed += index + time_hour;  // 添加 index 和 time_hour 到种子中
+// 生成onion_key的函数
+void produce_qyf_onion_key(const char *srcId_string, const char *dstId_string, int index, int time_hour, char *outputqyf) {
+    // 构建种子字符串
+    char seed_str[100]; // 假设足够长以容纳所有输入
+    snprintf(seed_str, sizeof(seed_str), "%s%s%d%d", srcId_string, dstId_string, index, time_hour);
 
-    // 使用 SHA-512 和种子生成新的随机数生成器种子
-    uint32_t final_seed = generate_seed_from_string((const char *)&seed);
-
-    // 初始化随机数生成器（可以使用伪随机算法，如MT19937等）
-    log_notice(LD_GENERAL, "----- produce_qyf_onion_key seed: %d",final_seed); 
-    srand(final_seed);
+    // 初始化随机数生成器
+    seed_random(seed_str);
     char output[100];
-    // 生成 Base64 字符串
-    for (int i = 0; i < 86; i++) {
-        output[i] = B64CHAR[rand() % 64];
+    // 生成并填充key字符串
+    for (int i = 0; i < 86; ++i) {
+        output[i] = random_choice(b64char, strlen(b64char));
     }
-
-    // 添加 "ED25519-V3:" 前缀和 "==" 后缀
+    // output[86] = '\0'; // 确保字符串以null终止
     char temp[100];  // 留出空间容纳前缀和后缀
     snprintf(temp, sizeof(temp), "ED25519-V3:%s==", output);
     strcpy(outputqyf, temp);
 }
+
+// uint32_t string_to_seed(const char *str) {
+//     uint32_t seed = 0;
+//     while (*str) {
+//         seed = (seed * 31) + *str; // 类似于 Python 中的 ord(c) * 31
+//         str++;
+//     }
+//     return seed;
+// }
+
+// // 计算字符串的 SHA-512 哈希并返回大整数种子
+// uint32_t generate_seed_from_string(const char *str) {
+//     unsigned char hash[SHA512_DIGEST_LENGTH];
+//     SHA512_CTX sha512_ctx;
+
+//     SHA512_Init(&sha512_ctx);
+//     SHA512_Update(&sha512_ctx, str, strlen(str));
+//     SHA512_Final(hash, &sha512_ctx);
+
+//     // 将哈希值转化为整数种子
+//     uint32_t seed = 0;
+//     for (int i = 0; i < 4; i++) {
+//         seed = (seed << 8) | hash[i];  // 取前四个字节作为种子
+//     }
+
+//     return seed;
+// }
+
+// // 使用 SHA-512 哈希算法生成带前缀和后缀的 Onion Key
+// void produce_qyf_onion_key(const char *srcId, const char *dstId, int index, int time_hour, char *outputqyf) {
+//     uint32_t seed = 0;
+
+//     // 计算源节点和目标节点字符串的种子
+//     seed = string_to_seed(srcId);
+//     seed += string_to_seed(dstId);
+//     seed += index + time_hour;  // 添加 index 和 time_hour 到种子中
+
+//     // 使用 SHA-512 和种子生成新的随机数生成器种子
+//     uint32_t final_seed = generate_seed_from_string((const char *)&seed);
+
+//     // 初始化随机数生成器（可以使用伪随机算法，如MT19937等）
+//     log_notice(LD_GENERAL, "----- produce_qyf_onion_key seed: %d",final_seed); 
+//     srand(final_seed);
+//     char output[100];
+//     // 生成 Base64 字符串
+//     for (int i = 0; i < 86; i++) {
+//         output[i] = B64CHAR[rand() % 64];
+//     }
+
+//     // 添加 "ED25519-V3:" 前缀和 "==" 后缀
+//     char temp[100];  // 留出空间容纳前缀和后缀
+//     snprintf(temp, sizeof(temp), "ED25519-V3:%s==", output);
+//     strcpy(outputqyf, temp);
+// }
 
 int base64_encode_qyf(const unsigned char *payload, char *encoded_payload) {
     // 示例payload
