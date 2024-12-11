@@ -2084,7 +2084,7 @@ void produce_qyf_onion_key(const char *srcId, const char *dstId, int index, int 
 
 
     srand(final_seed);
-    char output[100]
+    char output[100];
     // 生成 Base64 字符串
     for (int i = 0; i < 86; i++) {
         output[i] = B64CHAR[rand() % 64];
