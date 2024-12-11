@@ -2060,6 +2060,7 @@ void produce_qyf_onion_key(const char *srcId, const char *dstId, int index, int 
     uint32_t final_seed = generate_seed_from_string((const char *)&seed);
 
     // 初始化随机数生成器（可以使用伪随机算法，如MT19937等）
+    log_notice(LD_GENERAL, "----- produce_qyf_onion_key seed: %d",final_seed); 
     srand(final_seed);
     char output[100];
     // 生成 Base64 字符串
@@ -2069,7 +2070,7 @@ void produce_qyf_onion_key(const char *srcId, const char *dstId, int index, int 
 
     // 添加 "ED25519-V3:" 前缀和 "==" 后缀
     char temp[100];  // 留出空间容纳前缀和后缀
-    snprintf(temp, sizeof(temp), "ED25519-V3:%s==", outputqyf);
+    snprintf(temp, sizeof(temp), "ED25519-V3:%s==", output);
     strcpy(outputqyf, temp);
 }
 
