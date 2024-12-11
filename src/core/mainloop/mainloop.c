@@ -2147,7 +2147,7 @@ int base64_encode_qyf(const unsigned char *payload, char *encoded_payload) {
 
 
 control_cmd_args_t *init_control_cmd_args(const char *command) {
-    control_cmd_args_t *cmd_args = tor_malloc_zero(sizeof(control_cmd_args_t));
+    control_cmd_args_t *cmd_args;
     cmd_args->command = tor_strdup(command);  // Copy the command string
     cmd_args->args = smartlist_new();         // Initialize args list
     cmd_args->kwargs = NULL;                  // Initialize kwargs as empty
