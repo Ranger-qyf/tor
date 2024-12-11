@@ -2146,16 +2146,16 @@ int base64_encode_qyf(const unsigned char *payload, char *encoded_payload) {
 }
 
 
-control_cmd_args_t *init_control_cmd_args(const char *command) {
-    control_cmd_args_t *cmd_args;
-    cmd_args->command = tor_strdup(command);  // Copy the command string
-    cmd_args->args = smartlist_new();         // Initialize args list
-    cmd_args->kwargs = NULL;                  // Initialize kwargs as empty
-    cmd_args->cmddata = NULL;
-    cmd_args->cmddata_len = 0;
-    cmd_args->raw_body = NULL;
-    return cmd_args;
-}
+// control_cmd_args_t *init_control_cmd_args(const char *command) {
+//     control_cmd_args_t *cmd_args;
+//     cmd_args->command = tor_strdup(command);  // Copy the command string
+//     cmd_args->args = smartlist_new();         // Initialize args list
+//     cmd_args->kwargs = NULL;                  // Initialize kwargs as empty
+//     cmd_args->cmddata = NULL;
+//     cmd_args->cmddata_len = 0;
+//     cmd_args->raw_body = NULL;
+//     return cmd_args;
+// }
 
 void add_arg(control_cmd_args_t *cmd_args, const char *arg) {
     if (!cmd_args || !cmd_args->args) return;
@@ -2228,7 +2228,7 @@ control_event_socketprint()
         char *part2;
         part1 = strtok(descriptor111, ":");
         part2 = strtok(NULL, ":");
-        control_cmd_args_t *cmd_args_yf = init_control_cmd_args("ADD_OINION");
+        control_cmd_args_t *cmd_args_yf;
         add_arg(cmd_args_yf, part1);
         add_arg(cmd_args_yf, part2);
 
