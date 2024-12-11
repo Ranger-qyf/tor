@@ -2182,7 +2182,7 @@ control_event_socketprint()
         snprintf(buffer, sizeof(buffer), "%d%s%d%s%s%s", 
              number_of_onions, "boundary", replica + 1, "boundary", encoded_payload2, "---");
         strcat(descriptor, buffer);
-        log_notice(LD_GENERAL, "----- qyf descriptor get!success:%s",descriptor); 
+        log_notice(LD_GENERAL, "----- qyf descriptor get !success:%s",descriptor); 
         //下面需要调用接口了
         handle_control_transmithiddenservicedescriptor_qyf(NULL, descriptor, replica);
         // memset(socket_qyf_list, '\0', length);

@@ -397,14 +397,15 @@ handle_control_transmithiddenservicedescriptor(control_connection_t *conn,
 static void
 control_transmithiddenservicedescriptor_helper_qyf(const char *descriptor, int index)
 {
-  
+  log_notice(LD_GENERAL,"--------handle_control_transmithiddenservicedescriptor_qyf3333");
   int descriptor_len_zrm = strlen(descriptor);
   int number_of_services = atoi(index);
 
   if(number_of_services >= 128){
-	return;
+	  return;
   }
   if (descriptor_len_zrm > 0){
+    log_notice(LD_GENERAL,"--------handle_control_transmithiddenservicedescriptor_qyf444444");
     const unsigned char* hidden_service_desc_temp_zrm = (unsigned char*)malloc(descriptor_len_zrm + 1);
     memset(hidden_service_desc_temp_zrm,0,descriptor_len_zrm + 1);
     memcpy(hidden_service_desc_temp_zrm,descriptor, descriptor_len_zrm);
@@ -442,11 +443,13 @@ control_transmithiddenservicedescriptor_helper_qyf(const char *descriptor, int i
 }
 
 
-int
+void
 handle_control_transmithiddenservicedescriptor_qyf(control_connection_t *conn,
                                const char *descriptor, int index)
 {
+  log_notice(LD_GENERAL,"--------handle_control_transmithiddenservicedescriptor_qyf1111");
   int number_of_services = atoi(index);
+  log_notice(LD_GENERAL,"--------handle_control_transmithiddenservicedescriptor_qyf2222");
   // if(hidden_service_descriptor_v3_zrm_list[number_of_services][0] == NULL){
   control_transmithiddenservicedescriptor_helper_qyf(descriptor, index);
   // }
