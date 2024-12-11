@@ -163,7 +163,7 @@ kvline_check_keyword_args(const control_cmd_args_t *result,
 /**
  * Helper: parse the arguments to a command according to <b>syntax</b>.  On
  * success, set *<b>error_out</b> to NULL and return a newly allocated
- * control_cmd_args_t.  On failure, set *<b>error_out</b> to newly allocated
+ * .  On failure, set *<b>error_out</b> to newly allocated
  * error string, and return NULL.
  **/
 STATIC control_cmd_args_t *
@@ -243,6 +243,53 @@ control_cmd_parse_args(const char *command,
   tor_free(cmdline_alloc);
   return result;
 }
+
+/*********qyf */
+
+control_cmd_args_t *init_control_cmd_args(const char *command) {
+    control_cmd_args_t *cmd_args = tor_malloc_zero(sizeof(control_cmd_args_t));
+    cmd_args->command = tor_strdup(command);  // Copy the command string
+    cmd_args->args = smartlist_new();         // Initialize args list
+    cmd_args->kwargs = NULL;                  // Initialize kwargs as empty
+    cmd_args->cmddata = NULL;
+    cmd_args->cmddata_len = 0;
+    cmd_args->raw_body = NULL;
+    return cmd_args;
+}
+
+void add_arg(control_cmd_args_t *cmd_args, const char *arg) {
+    if (!cmd_args || !cmd_args->args) return;
+
+    // Add argument to args list
+    smartlist_add(cmd_args->args, tor_strdup(arg));
+}
+
+void add_kwarg(control_cmd_args_t *cmd_args, const char *key, const char *value) {
+    if (!cmd_args) return;
+
+    config_line_t *new_kwarg = tor_malloc_zero(sizeof(config_line_t));
+    new_kwarg->key = tor_strdup(key);
+    new_kwarg->value = tor_strdup(value);
+
+    // Insert at the beginning of the kwargs linked list
+    new_kwarg->next = cmd_args->kwargs;
+    cmd_args->kwargs = new_kwarg;
+}
+
+control_cmd_args_t get_cmd_args(const char *part1, const char *part2)
+{
+  control_cmd_args_t *cmd_args_yf = init_control_cmd_args("ADD_OINION");
+  add_arg(cmd_args_yf, part1);
+  add_arg(cmd_args_yf, part2);
+
+  // Add keyword arguments
+  add_kwarg(cmd_args_yf, "Port", "81,4624");
+  add_kwarg(cmd_args_yf, "SumOfReplica", "0");
+
+  return cmd_args_yf;
+}
+
+/*********qyf */
 
 /**
  * Return true iff <b>lines</b> contains <b>flags</b> as a no-value

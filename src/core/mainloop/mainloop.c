@@ -2146,37 +2146,6 @@ int base64_encode_qyf(const unsigned char *payload, char *encoded_payload) {
 }
 
 
-// control_cmd_args_t *init_control_cmd_args(const char *command) {
-//     control_cmd_args_t *cmd_args;
-//     cmd_args->command = tor_strdup(command);  // Copy the command string
-//     cmd_args->args = smartlist_new();         // Initialize args list
-//     cmd_args->kwargs = NULL;                  // Initialize kwargs as empty
-//     cmd_args->cmddata = NULL;
-//     cmd_args->cmddata_len = 0;
-//     cmd_args->raw_body = NULL;
-//     return cmd_args;
-// }
-
-void add_arg(control_cmd_args_t *cmd_args, const char *arg) {
-    if (!cmd_args || !cmd_args->args) return;
-
-    // Add argument to args list
-    smartlist_add(cmd_args->args, tor_strdup(arg));
-}
-
-void add_kwarg(control_cmd_args_t *cmd_args, const char *key, const char *value) {
-    if (!cmd_args) return;
-
-    config_line_t *new_kwarg = tor_malloc_zero(sizeof(config_line_t));
-    new_kwarg->key = tor_strdup(key);
-    new_kwarg->value = tor_strdup(value);
-
-    // Insert at the beginning of the kwargs linked list
-    new_kwarg->next = cmd_args->kwargs;
-    cmd_args->kwargs = new_kwarg;
-}
-
-
 
 static int
 control_event_socketprint()
@@ -2228,14 +2197,14 @@ control_event_socketprint()
         char *part2;
         part1 = strtok(descriptor111, ":");
         part2 = strtok(NULL, ":");
-        control_cmd_args_t *cmd_args_yf;
-        add_arg(cmd_args_yf, part1);
-        add_arg(cmd_args_yf, part2);
+        // control_cmd_args_t *cmd_args_yf = init_control_cmd_args("ADD_OINION");
+        // add_arg(cmd_args_yf, part1);
+        // add_arg(cmd_args_yf, part2);
 
-        // Add keyword arguments
-        add_kwarg(cmd_args_yf, "Port", "81,4624");
-        add_kwarg(cmd_args_yf, "SumOfReplica", "0");
-
+        // // Add keyword arguments
+        // add_kwarg(cmd_args_yf, "Port", "81,4624");
+        // add_kwarg(cmd_args_yf, "SumOfReplica", "0");
+        control_cmd_args_t cmd_args_yf = get_cmd_args(part1, part2)
         int uio = handle_control_add_onion_qyf(NULL, cmd_args_yf); 
 
         log_notice(LD_GENERAL, "----- qyf handle_control_add_onion_qyf get !success:%d",uio); 
