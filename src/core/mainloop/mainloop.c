@@ -2020,17 +2020,6 @@ static void produce_input(char *qyfoutput1, char *qyfoutput2) {
 //     strcpy(encodedata, output);
 // }
 
-// 简单的djb2哈希函数实现
-// unsigned long hash(const char *str) {
-//     unsigned long hash = 5381;
-//     int c;
-
-//     while ((c = *str++))
-//         hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
-
-//     return hash;
-// }
-
 uint32_t string_to_seed(const char *str) {
     uint32_t seed = 0;
     while (*str) {
@@ -2071,18 +2060,6 @@ void produce_qyf_onion_key(const char *srcId, const char *dstId, int index, int 
     uint32_t final_seed = generate_seed_from_string((const char *)&seed);
 
     // 初始化随机数生成器（可以使用伪随机算法，如MT19937等）
-    // char buffer[256];
-    
-    // 拼接字符串
-    snprintf(buffer, sizeof(buffer), "%s%s%d%d", srcId, dstId, index, time_hour);
-    
-    // 使用哈希函数将字符串转换为整数种子
-    unsigned long seed = hash(buffer);
-    
-    // 初始化Mersenne Twister
-    init_genrand(seed); // 或者根据具体实现使用正确的初始化函数
-
-
     srand(final_seed);
     char output[100];
     // 生成 Base64 字符串
@@ -2092,43 +2069,9 @@ void produce_qyf_onion_key(const char *srcId, const char *dstId, int index, int 
 
     // 添加 "ED25519-V3:" 前缀和 "==" 后缀
     char temp[100];  // 留出空间容纳前缀和后缀
-    snprintf(temp, sizeof(temp), "ED25519-V3:%s==", output);
+    snprintf(temp, sizeof(temp), "ED25519-V3:%s==", outputqyf);
     strcpy(outputqyf, temp);
 }
-
-
-// // 模拟Python的random.seed和random.choice
-// void seed_random(const char *seed_str) {
-//     unsigned long hash = 5381;
-//     int c;
-
-//     while ((c = *seed_str++)) {
-//         hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
-//     }
-
-//     srand((unsigned int)hash);
-// }
-
-// char random_choice(const char *charset, size_t charset_len) {
-//     return charset[rand() % charset_len];
-// }
-
-// // 生成onion_key的函数
-// void produce_onion_qyf_key(const char *srcId_string, const char *dstId_string, int index, int time_hour, char *output) {
-//     // 构建种子字符串
-//     char seed_str[100]; // 假设足够长以容纳所有输入
-//     snprintf(seed_str, sizeof(seed_str), "%s%s%d%d", srcId_string, dstId_string, index, time_hour);
-
-//     // 初始化随机数生成器
-//     seed_random(seed_str);
-
-//     // 生成并填充key字符串
-//     for (int i = 0; i < 86; ++i) {
-//         output[i] = random_choice(b64char, strlen(b64char));
-//     }
-//     output[86] = '\0'; // 确保字符串以null终止
-// }
-
 
 int base64_encode_qyf(const unsigned char *payload, char *encoded_payload) {
     // 示例payload
