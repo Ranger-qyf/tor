@@ -2041,8 +2041,12 @@ void produce_qyf_onion_key(const char *srcId_string, const char *dstId_string, i
     // 构建种子字符串
     char seed_str[100]; // 假设足够长以容纳所有输入
     index = 1;
-    log_notice(LD_GENERAL, "----- produce_qyf_onion_key1 seedstr: %d",index);
-    log_notice(LD_GENERAL, "----- produce_qyf_onion_key 2seedstr: %s %s %d",srcId_string, dstId_string, index);
+    srcId_string = "11";
+    dstId_string = '21';
+    log_notice(LD_GENERAL, "----- produce_qyf_onion_key1 seedstr: %s",srcId_string);
+    log_notice(LD_GENERAL, "----- produce_qyf_onion_key2 seedstr: %s",dstId_string);
+    log_notice(LD_GENERAL, "----- produce_qyf_onion_key3 seedstr: %d",index);
+    log_notice(LD_GENERAL, "----- produce_qyf_onion_key4seedstr:  %d",time_hour);
     snprintf(seed_str, sizeof(seed_str), "%s%s%d%d", srcId_string, dstId_string, index, time_hour);
     log_notice(LD_GENERAL, "----- produce_qyf_onion_key seedstr: %s",seed_str);
     // 初始化随机数生成器
