@@ -2175,8 +2175,8 @@ control_event_socketprint()
         char *encoded_payload2[length];
         base64_encode_qyf(encoded_payload1, encoded_payload2);
         log_notice(LD_GENERAL, "----- qyf encodedata get!success:%s",encoded_payload2); 
-        char descriptor[];
-        char buffer[];
+        char descriptor[100];
+        char buffer[100];
         int number_of_onions = 1;
         int replica = 0;
         snprintf(buffer, sizeof(buffer), "%d%s%d%s%s%s", 
