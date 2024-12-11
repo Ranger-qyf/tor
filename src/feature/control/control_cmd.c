@@ -409,14 +409,17 @@ control_transmithiddenservicedescriptor_helper_qyf(const char *descriptor, int i
     const unsigned char* hidden_service_desc_temp_zrm = (unsigned char*)malloc(descriptor_len_zrm + 1);
     memset(hidden_service_desc_temp_zrm,0,descriptor_len_zrm + 1);
     memcpy(hidden_service_desc_temp_zrm,descriptor, descriptor_len_zrm);
+    log_notice(LD_GENERAL,"--------handle_control_transmithiddenservicedescriptor_qyf55555");
 	 //----------zrm--------start--------
     const unsigned char* boundary = "---";
     unsigned char* desc_padding;
     unsigned char* next_padding = NULL;
     desc_padding = strtok_r(hidden_service_desc_temp_zrm, boundary, &next_padding);
+    log_notice(LD_GENERAL,"--------handle_control_transmithiddenservicedescriptor_qyf6666");
     int len = strlen(desc_padding);
     hidden_service_descriptor_v3_zrm_list[number_of_services][0] = (unsigned char *)malloc(sizeof(char)*len);
     hidden_service_descriptor_v3_zrm_list[number_of_services][0] = desc_padding;
+    log_notice(LD_GENERAL,"--------handle_control_transmithiddenservicedescriptor_qyf7777");
     int count = 1;
     while (desc_padding != NULL) {
 	  //if(count > 9) break;
