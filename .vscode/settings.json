@@ -40,6 +40,7 @@
         "socks_request_st.h": "c",
         "stdlib.h": "c",
         "control_auth.h": "c",
-        "control.h": "c"
+        "control.h": "c",
+        "random": "c"
     }
 }

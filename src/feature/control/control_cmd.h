@@ -122,4 +122,7 @@ smartlist_t * get_detached_onion_services(void);
 #define getonionaddress
 char handle_control_getonionaddress_qyf(control_connection_t *conn,
                          const char *onion_key, char *qyf_onion_address);
+
+int handle_control_transmithiddenservicedescriptor_qyf(control_connection_t *conn,
+                               const char *descriptor, int index);
 #endif

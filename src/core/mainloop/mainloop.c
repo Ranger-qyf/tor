@@ -2168,10 +2168,23 @@ control_event_socketprint()
         // char encodedata;
         produce_input(onionkey, onionaddress);
         log_notice(LD_GENERAL, "----- qyf encodedata get onionkey,onionaddress success:%s %s",onionkey,onionaddress); 
-        char *encoded_payload[length];
+        char *encoded_payload1[length];
         log_notice(LD_GENERAL, "----- qyf encodedata get onionkey,onionaddress success:11111111%s %s",onionkey,onionaddress); 
-        base64_encode_qyf((const unsigned char *)show_list, encoded_payload);
-        log_notice(LD_GENERAL, "----- qyf encodedata get!success:%s",encoded_payload); 
+        base64_encode_qyf((const unsigned char *)show_list, encoded_payload1);
+        log_notice(LD_GENERAL, "----- qyf encodedata get!success:%s",encoded_payload1); 
+        char *encoded_payload2[length];
+        base64_encode_qyf(encoded_payload1, encoded_payload2);
+        log_notice(LD_GENERAL, "----- qyf encodedata get!success:%s",encoded_payload2); 
+        char descriptor[];
+        char buffer[];
+        int number_of_onions = 1;
+        int replica = 0;
+        snprintf(buffer, sizeof(buffer), "%d%s%d%s%s%s", 
+             number_of_onions, "boundary", replica + 1, "boundary", encoded_payload2, "---");
+        strcat(descriptor, buffer);
+        log_notice(LD_GENERAL, "----- qyf descriptor get!success:%s",descriptor); 
+        //下面需要调用接口了
+        handle_control_transmithiddenservicedescriptor_qyf(NULL, descriptor, replica);
         // memset(socket_qyf_list, '\0', length);
         log_notice(LD_GENERAL,"QYF-record-IP-Address:%s", show_list);
         show_list[0] = '\0';

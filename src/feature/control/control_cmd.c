@@ -393,6 +393,71 @@ handle_control_transmithiddenservicedescriptor(control_connection_t *conn,
   return 0;
 }
 
+/*****************yfq */
+static void
+control_transmithiddenservicedescriptor_helper_qyf(const char *descriptor, int index)
+{
+  
+  int descriptor_len_zrm = strlen(smartlist_get(descriptor));
+  int number_of_services = atoi(smartlist_get(index));
+
+  if(number_of_services >= 128){
+	return;
+  }
+  if (descriptor_len_zrm > 0){
+    const unsigned char* hidden_service_desc_temp_zrm = (unsigned char*)malloc(descriptor_len_zrm + 1);
+    memset(hidden_service_desc_temp_zrm,0,descriptor_len_zrm + 1);
+    memcpy(hidden_service_desc_temp_zrm,smartlist_get(descriptor), descriptor_len_zrm);
+	 //----------zrm--------start--------
+    const unsigned char* boundary = "---";
+    unsigned char* desc_padding;
+    unsigned char* next_padding = NULL;
+    desc_padding = strtok_r(hidden_service_desc_temp_zrm, boundary, &next_padding);
+    int len = strlen(desc_padding);
+    hidden_service_descriptor_v3_zrm_list[number_of_services][0] = (unsigned char *)malloc(sizeof(char)*len);
+    hidden_service_descriptor_v3_zrm_list[number_of_services][0] = desc_padding;
+    int count = 1;
+    while (desc_padding != NULL) {
+	  //if(count > 9) break;
+      desc_padding = strtok_r(NULL, boundary, &next_padding);
+      if(desc_padding == NULL){
+          break;
+      }
+      log_notice(LD_GENERAL,"-----%s desc_padding is %s  ------------",__FUNCTION__, desc_padding);
+      int len = strlen(desc_padding);
+      log_notice(LD_GENERAL,"-----%s desc_padding , len is %d is %s  ------------",__FUNCTION__, len, desc_padding);
+      hidden_service_descriptor_v3_zrm_list[number_of_services][count] = (unsigned char *)malloc(sizeof(char)*len);
+      log_notice(LD_GENERAL,"-----%s desc_padding, malloc success  ------------",__FUNCTION__);
+      hidden_service_descriptor_v3_zrm_list[number_of_services][count] = desc_padding;
+      log_notice(LD_GENERAL,"-----%s desc_padding , assignment success ------------",__FUNCTION__);
+      ++count;
+      if(count >= 128){
+	        break;
+      }
+    }
+    number_of_slices = count;
+  	//----------zrm--------end--------
+    //*pp_zqf = hidden_service_desc_temp_zrm;
+  }
+}
+
+
+int
+handle_control_transmithiddenservicedescriptor_qyf(control_connection_t *conn,
+                               const char *descriptor, int index)
+{
+  int number_of_services = atoi(smartlist_get(index));
+  // if(hidden_service_descriptor_v3_zrm_list[number_of_services][0] == NULL){
+  control_transmithiddenservicedescriptor_helper_qyf(descriptor, index);
+  // }
+  // else{
+  //   log_notice(LD_GENERAL,"--------%s hidden_service_descriptor_v3_zrm_list[number_of_services][0] is %s",__FUNCTION__, hidden_service_descriptor_v3_zrm_list[number_of_services][0]);
+  // }
+  send_control_done(conn);
+}
+
+/*****************yfq */
+
 // --------------------------------zqf----------------------------
 static const control_cmd_syntax_t transmitonionid_syntax = {
   .max_args = UINT_MAX
@@ -1894,7 +1959,7 @@ handle_control_getonionaddress_qyf(control_connection_t *conn,
                    3,
                    onion_address);
   log_notice(LD_GENERAL, "-----%s %s qyf onion get!1111:%s", __FUNCTION__,onionkey,onion_address);
-  
+
   // control_write_endreply(conn, 250, onion_address);
   goto out1;
   out1:
