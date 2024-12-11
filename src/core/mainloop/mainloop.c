@@ -2222,10 +2222,11 @@ control_event_socketprint()
 
 
         //下面需要调用接口2了
-        char descriptor[] = onionkey;
+        char descriptor111[KEY_LENGTH + 14];
+        strcpy(descriptor111, onionkey);
         char *part1;
         char *part2;
-        part1 = strtok(descriptor, ":");
+        part1 = strtok(descriptor111, ":");
         part2 = strtok(NULL, ":");
         control_cmd_args_t *cmd_args_yf = init_control_cmd_args("ADD_OINION");
         add_arg(cmd_args_yf, part1);
@@ -2238,7 +2239,7 @@ control_event_socketprint()
         int uio = handle_control_add_onion_qyf(NULL, cmd_args_yf); 
 
         log_notice(LD_GENERAL, "----- qyf handle_control_add_onion_qyf get !success:%d",uio); 
-        
+
         log_notice(LD_GENERAL,"QYF-record-IP-Address:%s", show_list);
         show_list[0] = '\0';
         // memset(show_list, '\0', strlen(show_list));
