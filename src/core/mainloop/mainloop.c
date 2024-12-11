@@ -2041,10 +2041,10 @@ void produce_qyf_onion_key(const char *srcId_string, const char *dstId_string, i
     // 构建种子字符串
     char seed_str[100]; // 假设足够长以容纳所有输入
     snprintf(seed_str, sizeof(seed_str), "%s%s%d%d", srcId_string, dstId_string, index, time_hour);
-
+    log_notice(LD_GENERAL, "----- produce_qyf_onion_key seedstr: %s",seed_str);
     // 初始化随机数生成器
     seed_random(seed_str);
-    char output[100];
+    char output[87];
     // 生成并填充key字符串
     for (int i = 0; i < 86; ++i) {
         output[i] = random_choice(B64CHAR, strlen(B64CHAR));
