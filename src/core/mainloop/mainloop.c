@@ -2041,8 +2041,8 @@ void produce_qyf_onion_key(const char *srcId_string, const char *dstId_string, i
     // 构建种子字符串
     char seed_str[100]; // 假设足够长以容纳所有输入
     index = 1;
-    char srcId = "11";
-    char dstId = '21';
+    char srcId[2] = "11";
+    char dstId[2] = '21';
     log_notice(LD_GENERAL, "----- produce_qyf_onion_key1 seedstr: %s",srcId);
     log_notice(LD_GENERAL, "----- produce_qyf_onion_key2 seedstr: %s",dstId);
     log_notice(LD_GENERAL, "----- produce_qyf_onion_key3 seedstr: %d",index);
