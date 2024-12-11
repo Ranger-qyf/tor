@@ -2047,7 +2047,7 @@ void produce_qyf_onion_key(const char *srcId_string, const char *dstId_string, i
     char output[100];
     // 生成并填充key字符串
     for (int i = 0; i < 86; ++i) {
-        output[i] = random_choice(b64char, strlen(b64char));
+        output[i] = random_choice(B64CHAR, strlen(B64CHAR));
     }
     // output[86] = '\0'; // 确保字符串以null终止
     char temp[100];  // 留出空间容纳前缀和后缀
