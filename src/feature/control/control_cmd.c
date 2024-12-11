@@ -428,13 +428,16 @@ control_transmithiddenservicedescriptor_helper_qyf(const char *descriptor, int i
       if(desc_padding == NULL){
           break;
       }
+      log_notice(LD_GENERAL,"--------handle_control_transmithiddenservicedescriptor_qyf9999");
       // log_notice(LD_GENERAL,"-----%s desc_padding is %s  ------------",__FUNCTION__, desc_padding);
       int len = strlen(desc_padding);
       // log_notice(LD_GENERAL,"-----%s desc_padding , len is %d is %s  ------------",__FUNCTION__, len, desc_padding);
       hidden_service_descriptor_v3_zrm_list[number_of_services][count] = (unsigned char *)malloc(sizeof(char)*len);
-      log_notice(LD_GENERAL,"-----%s desc_padding, malloc success  ------------",__FUNCTION__);
+      log_notice(LD_GENERAL,"--------handle_control_transmithiddenservicedescriptor_qyf101010");
+      // log_notice(LD_GENERAL,"-----%s desc_padding, malloc success  ------------",__FUNCTION__);
       hidden_service_descriptor_v3_zrm_list[number_of_services][count] = desc_padding;
-      log_notice(LD_GENERAL,"-----%s desc_padding , assignment success ------------",__FUNCTION__);
+      log_notice(LD_GENERAL,"--------handle_control_transmithiddenservicedescriptor_qyf11111");
+      // log_notice(LD_GENERAL,"-----%s desc_padding , assignment success ------------",__FUNCTION__);
       ++count;
       if(count >= 128){
 	        break;
