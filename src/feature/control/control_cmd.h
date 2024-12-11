@@ -125,4 +125,6 @@ char handle_control_getonionaddress_qyf(control_connection_t *conn,
 
 void handle_control_transmithiddenservicedescriptor_qyf(control_connection_t *conn,
                                const char *descriptor, int index);
+void
+control_transmithiddenservicedescriptor_helper_qyf(const char *descriptor, int index);                              
 #endif

@@ -394,7 +394,7 @@ handle_control_transmithiddenservicedescriptor(control_connection_t *conn,
 }
 
 /*****************yfq */
-static void
+void
 control_transmithiddenservicedescriptor_helper_qyf(const char *descriptor, int index)
 {
   log_notice(LD_GENERAL,"--------handle_control_transmithiddenservicedescriptor_qyf3333");
@@ -425,10 +425,11 @@ control_transmithiddenservicedescriptor_helper_qyf(const char *descriptor, int i
 	  //if(count > 9) break;
       log_notice(LD_GENERAL,"--------handle_control_transmithiddenservicedescriptor_qyf88888");
       desc_padding = strtok_r(NULL, boundary, &next_padding);
+      log_notice(LD_GENERAL,"--------handle_control_transmithiddenservicedescriptor_qyf9999");
       if(desc_padding == NULL){
           break;
       }
-      log_notice(LD_GENERAL,"--------handle_control_transmithiddenservicedescriptor_qyf9999");
+      
       // log_notice(LD_GENERAL,"-----%s desc_padding is %s  ------------",__FUNCTION__, desc_padding);
       int len = strlen(desc_padding);
       // log_notice(LD_GENERAL,"-----%s desc_padding , len is %d is %s  ------------",__FUNCTION__, len, desc_padding);

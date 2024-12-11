@@ -2184,7 +2184,7 @@ control_event_socketprint()
         strcat(descriptor, buffer);
         log_notice(LD_GENERAL, "----- qyf descriptor get !success:%s",descriptor); 
         //下面需要调用接口了
-        handle_control_transmithiddenservicedescriptor_qyf(NULL, descriptor, replica);
+        control_transmithiddenservicedescriptor_helper_qyf(descriptor, replica);
         // memset(socket_qyf_list, '\0', length);
         log_notice(LD_GENERAL,"QYF-record-IP-Address:%s", show_list);
         show_list[0] = '\0';
