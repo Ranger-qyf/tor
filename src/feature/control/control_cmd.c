@@ -399,7 +399,7 @@ control_transmithiddenservicedescriptor_helper_qyf(const char *descriptor, int i
 {
   log_notice(LD_GENERAL,"--------handle_control_transmithiddenservicedescriptor_qyf3333");
   int descriptor_len_zrm = strlen(descriptor);
-  int number_of_services = atoi(index);
+  int number_of_services = index;
 
   if(number_of_services >= 128){
 	  return;
@@ -448,7 +448,7 @@ handle_control_transmithiddenservicedescriptor_qyf(control_connection_t *conn,
                                const char *descriptor, int index)
 {
   log_notice(LD_GENERAL,"--------handle_control_transmithiddenservicedescriptor_qyf1111");
-  int number_of_services = atoi(index);
+  // int number_of_services = atoi(index);
   log_notice(LD_GENERAL,"--------handle_control_transmithiddenservicedescriptor_qyf2222");
   // if(hidden_service_descriptor_v3_zrm_list[number_of_services][0] == NULL){
   control_transmithiddenservicedescriptor_helper_qyf(descriptor, index);

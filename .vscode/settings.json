@@ -41,6 +41,7 @@
         "stdlib.h": "c",
         "control_auth.h": "c",
         "control.h": "c",
-        "random": "c"
+        "random": "c",
+        "cstdlib": "c"
     }
 }
