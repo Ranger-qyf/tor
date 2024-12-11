@@ -42,6 +42,7 @@
         "control_auth.h": "c",
         "control.h": "c",
         "random": "c",
-        "cstdlib": "c"
+        "cstdlib": "c",
+        "sstream": "c"
     }
 }

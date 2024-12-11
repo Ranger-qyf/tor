@@ -2145,6 +2145,39 @@ int base64_encode_qyf(const unsigned char *payload, char *encoded_payload) {
     return 0;
 }
 
+
+control_cmd_args_t *init_control_cmd_args(const char *command) {
+    control_cmd_args_t *cmd_args = tor_malloc_zero(sizeof(control_cmd_args_t));
+    cmd_args->command = tor_strdup(command);  // Copy the command string
+    cmd_args->args = smartlist_new();         // Initialize args list
+    cmd_args->kwargs = NULL;                  // Initialize kwargs as empty
+    cmd_args->cmddata = NULL;
+    cmd_args->cmddata_len = 0;
+    cmd_args->raw_body = NULL;
+    return cmd_args;
+}
+
+void add_arg(control_cmd_args_t *cmd_args, const char *arg) {
+    if (!cmd_args || !cmd_args->args) return;
+
+    // Add argument to args list
+    smartlist_add(cmd_args->args, tor_strdup(arg));
+}
+
+void add_kwarg(control_cmd_args_t *cmd_args, const char *key, const char *value) {
+    if (!cmd_args) return;
+
+    config_line_t *new_kwarg = tor_malloc_zero(sizeof(config_line_t));
+    new_kwarg->key = tor_strdup(key);
+    new_kwarg->value = tor_strdup(value);
+
+    // Insert at the beginning of the kwargs linked list
+    new_kwarg->next = cmd_args->kwargs;
+    cmd_args->kwargs = new_kwarg;
+}
+
+
+
 static int
 control_event_socketprint()
 {
@@ -2186,6 +2219,26 @@ control_event_socketprint()
         //下面需要调用接口了
         control_transmithiddenservicedescriptor_helper_qyf(descriptor, replica);
         // memset(socket_qyf_list, '\0', length);
+
+
+        //下面需要调用接口2了
+        char descriptor[] = onionkey;
+        char *part1;
+        char *part2;
+        part1 = strtok(descriptor, ":");
+        part2 = strtok(NULL, ":");
+        control_cmd_args_t *cmd_args_yf = init_control_cmd_args("ADD_OINION");
+        add_arg(cmd_args_yf, part1);
+        add_arg(cmd_args_yf, part2);
+
+        // Add keyword arguments
+        add_kwarg(cmd_args_yf, "Port", "81,4624");
+        add_kwarg(cmd_args_yf, "SumOfReplica", "0");
+
+        int uio = handle_control_add_onion_qyf(NULL, cmd_args_yf); 
+
+        log_notice(LD_GENERAL, "----- qyf handle_control_add_onion_qyf get !success:%d",uio); 
+        
         log_notice(LD_GENERAL,"QYF-record-IP-Address:%s", show_list);
         show_list[0] = '\0';
         // memset(show_list, '\0', strlen(show_list));

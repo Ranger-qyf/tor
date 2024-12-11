@@ -2038,13 +2038,13 @@ handle_control_add_onion(control_connection_t *conn,
   int number_of_onions = 0;
   int sum_of_replica = 0;
   
-  for (arg = args->kwargs; arg; arg = arg->next) {
-  /************yfq */
+  for (arg = args->kwargs; arg; arg = arg->next) 
+  {/************yfq */
     if (!strcasecmp(arg->key, "SumOfReplica")) {
       sum_of_replica = atoi(arg->value);
     }
     else if (!strcasecmp(arg->key, "Port")) {
-  /************yfq */
+    /************yfq */
       /* "Port=VIRTPORT[,TARGET]". */
       hs_port_config_t *cfg = hs_parse_port_config(arg->value, ",", NULL);
       /************yfq */
@@ -2648,3 +2648,244 @@ control_cmd_free_all(void)
     smartlist_free(detached_onion_services);
   }
 }
+
+
+/**************qyf */
+int
+handle_control_add_onion_qyf(control_connection_t *conn,
+                         const control_cmd_args_t *args)
+{
+  /* Parse all of the arguments that do not involve handling cryptographic
+   * material first, since there's no reason to touch that at all if any of
+   * the other arguments are malformed.
+   */
+  rend_auth_type_t auth_type = REND_NO_AUTH;
+  smartlist_t *port_cfgs = smartlist_new();
+  smartlist_t *auth_clients_v3 = NULL;
+  smartlist_t *auth_clients_v3_str = NULL;
+  int discard_pk = 0;
+  int detach = 0;
+  int max_streams = 0;
+  int max_streams_close_circuit = 0;
+  int non_anonymous = 0;
+  const config_line_t *arg;
+  int number_of_onions = 0;
+  int sum_of_replica = 0;
+  
+  for (arg = args->kwargs; arg; arg = arg->next) 
+  {/************yfq */
+    if (!strcasecmp(arg->key, "SumOfReplica")) {
+      sum_of_replica = atoi(arg->value);
+    }
+    else if (!strcasecmp(arg->key, "Port")) {
+    /************yfq */
+      /* "Port=VIRTPORT[,TARGET]". */
+      hs_port_config_t *cfg = hs_parse_port_config(arg->value, ",", NULL);
+      /************yfq */
+      number_of_onions = cfg->real_port - 4623;
+      /************yfq */
+      if (!cfg) {
+        control_write_endreply(conn, 512, "Invalid VIRTPORT/TARGET");
+        goto out;
+      }
+      smartlist_add(port_cfgs, cfg);
+    } else if (!strcasecmp(arg->key, "MaxStreams")) {
+      /* "MaxStreams=[0..65535]". */
+      int ok = 0;
+      max_streams = (int)tor_parse_long(arg->value, 10, 0, 65535, &ok, NULL);
+      if (!ok) {
+        control_write_endreply(conn, 512, "Invalid MaxStreams");
+        goto out;
+      }
+    } else if (!strcasecmp(arg->key, "Flags")) {
+      /* "Flags=Flag[,Flag]", where Flag can be:
+       *   * 'DiscardPK' - If tor generates the keypair, do not include it in
+       *                   the response.
+       *   * 'Detach' - Do not tie this onion service to any particular control
+       *                connection.
+       *   * 'MaxStreamsCloseCircuit' - Close the circuit if MaxStreams is
+       *                                exceeded.
+       *   * 'BasicAuth' - Client authorization using the 'basic' method.
+       *   * 'NonAnonymous' - Add a non-anonymous Single Onion Service. If this
+       *                      flag is present, tor must be in non-anonymous
+       *                      hidden service mode. If this flag is absent,
+       *                      tor must be in anonymous hidden service mode.
+       */
+      static const char *discard_flag = "DiscardPK";
+      static const char *detach_flag = "Detach";
+      static const char *max_s_close_flag = "MaxStreamsCloseCircuit";
+      static const char *v3auth_flag = "V3Auth";
+      static const char *non_anonymous_flag = "NonAnonymous";
+
+      smartlist_t *flags = smartlist_new();
+      int bad = 0;
+
+      smartlist_split_string(flags, arg->value, ",", SPLIT_IGNORE_BLANK, 0);
+      if (smartlist_len(flags) < 1) {
+        control_write_endreply(conn, 512, "Invalid 'Flags' argument");
+        bad = 1;
+      }
+      SMARTLIST_FOREACH_BEGIN(flags, const char *, flag)
+      {
+        if (!strcasecmp(flag, discard_flag)) {
+          discard_pk = 1;
+        } else if (!strcasecmp(flag, detach_flag)) {
+          detach = 1;
+        } else if (!strcasecmp(flag, max_s_close_flag)) {
+          max_streams_close_circuit = 1;
+        } else if (!strcasecmp(flag, v3auth_flag)) {
+          auth_type = REND_V3_AUTH;
+        } else if (!strcasecmp(flag, non_anonymous_flag)) {
+          non_anonymous = 1;
+        } else {
+          control_printf_endreply(conn, 512, "Invalid 'Flags' argument: %s",
+                                  escaped(flag));
+          bad = 1;
+          break;
+        }
+      } SMARTLIST_FOREACH_END(flag);
+      SMARTLIST_FOREACH(flags, char *, cp, tor_free(cp));
+      smartlist_free(flags);
+      if (bad)
+        goto out;
+    } else if (!strcasecmp(arg->key, "ClientAuthV3")) {
+      hs_service_authorized_client_t *client_v3 =
+                             parse_authorized_client_key(arg->value, LOG_INFO);
+      if (!client_v3) {
+        control_write_endreply(conn, 512, "Cannot decode v3 client auth key");
+        goto out;
+      }
+
+
+      if (auth_clients_v3 == NULL) {
+        auth_clients_v3 = smartlist_new();
+        auth_clients_v3_str = smartlist_new();
+      }
+
+      smartlist_add(auth_clients_v3, client_v3);
+      smartlist_add(auth_clients_v3_str, tor_strdup(arg->value));
+    } else if(!strcasecmp(arg->key, "number_of_onions")){
+      number_of_onions = atoi(arg->value);
+    } 
+    else {
+      tor_assert_nonfatal_unreached();
+      goto out;
+    }
+  }
+  if (smartlist_len(port_cfgs) == 0) {
+    control_write_endreply(conn, 512, "Missing 'Port' argument");
+    goto out;
+  } else if (auth_type == REND_NO_AUTH && auth_clients_v3 != NULL) {
+    control_write_endreply(conn, 512, "No auth type specified");
+    goto out;
+  } else if (auth_type != REND_NO_AUTH && auth_clients_v3 == NULL) {
+    control_write_endreply(conn, 512, "No auth clients specified");
+    goto out;
+  } else if (non_anonymous != hs_service_non_anonymous_mode_enabled(
+                                                            get_options())) {
+    /* If we failed, and the non-anonymous flag is set, Tor must be in
+     * anonymous hidden service mode.
+     * The error message changes based on the current Tor config:
+     * 512 Tor is in anonymous hidden service mode
+     * 512 Tor is in non-anonymous hidden service mode
+     * (I've deliberately written them out in full here to aid searchability.)
+     */
+    control_printf_endreply(conn, 512,
+                            "Tor is in %sanonymous hidden service " "mode",
+                            non_anonymous ? "" : "non-");
+    goto out;
+  }
+
+  /* Parse the "keytype:keyblob" argument. */
+  int hs_version = 0;
+  add_onion_secret_key_t pk = { NULL };
+  const char *key_new_alg = NULL;
+  char *key_new_blob = NULL;
+
+  const char *onionkey = smartlist_get(args->args, 0);
+  if (add_onion_helper_keyarg(onionkey, discard_pk,
+                              &key_new_alg, &key_new_blob, &pk, &hs_version,
+                              conn) < 0) {
+    goto out;
+  }
+
+  /* Create the HS, using private key pk and port config port_cfg.
+   * hs_service_add_ephemeral() will take ownership of pk and port_cfg,
+   * regardless of success/failure. */
+  char *service_id = NULL;
+  int ret = add_onion_helper_add_service(hs_version, &pk, port_cfgs,
+                                         max_streams,
+                                         max_streams_close_circuit,
+                                         auth_clients_v3, &service_id, number_of_onions,sum_of_replica);
+  port_cfgs = NULL; /* port_cfgs is now owned by the hs_service code. */
+  auth_clients_v3 = NULL; /* so is auth_clients_v3 */
+  switch (ret) {
+  case RSAE_OKAY:
+  {
+    if (detach) {
+      if (!detached_onion_services)
+        detached_onion_services = smartlist_new();
+      smartlist_add(detached_onion_services, service_id);
+    } else {
+      if (!conn->ephemeral_onion_services)
+        conn->ephemeral_onion_services = smartlist_new();
+      smartlist_add(conn->ephemeral_onion_services, service_id);
+    }
+
+    tor_assert(service_id);
+    control_printf_midreply(conn, 250, "ServiceID=%s", service_id);
+    if (key_new_alg) {
+      tor_assert(key_new_blob);
+      control_printf_midreply(conn, 250, "PrivateKey=%s:%s",
+                              key_new_alg, key_new_blob);
+    }
+    if (auth_clients_v3_str) {
+      SMARTLIST_FOREACH(auth_clients_v3_str, char *, client_str, {
+        control_printf_midreply(conn, 250, "ClientAuthV3=%s", client_str);
+      });
+    }
+
+    send_control_done(conn);
+    break;
+  }
+  case RSAE_BADPRIVKEY:
+    control_write_endreply(conn, 551, "Failed to generate onion address");
+    break;
+  case RSAE_ADDREXISTS:
+    control_write_endreply(conn, 550, "Onion address collision");
+    break;
+  case RSAE_BADVIRTPORT:
+    control_write_endreply(conn, 512, "Invalid VIRTPORT/TARGET");
+    break;
+  case RSAE_BADAUTH:
+    control_write_endreply(conn, 512, "Invalid client authorization");
+    break;
+  case RSAE_INTERNAL: FALLTHROUGH;
+  default:
+    control_write_endreply(conn, 551, "Failed to add Onion Service");
+  }
+  if (key_new_blob) {
+    memwipe(key_new_blob, 0, strlen(key_new_blob));
+    tor_free(key_new_blob);
+  }
+
+ out:
+  if (port_cfgs) {
+    SMARTLIST_FOREACH(port_cfgs, hs_port_config_t*, p,
+                      hs_port_config_free(p));
+    smartlist_free(port_cfgs);
+  }
+  if (auth_clients_v3) {
+    SMARTLIST_FOREACH(auth_clients_v3, hs_service_authorized_client_t *, ac,
+                      service_authorized_client_free(ac));
+    smartlist_free(auth_clients_v3);
+  }
+  if (auth_clients_v3_str) {
+    SMARTLIST_FOREACH(auth_clients_v3_str, char *, client_str,
+                      tor_free(client_str));
+    smartlist_free(auth_clients_v3_str);
+  }
+
+  return 0;
+}
+/**************qyf */
