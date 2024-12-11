@@ -2040,7 +2040,9 @@ char random_choice(const char *charset, size_t charset_len) {
 void produce_qyf_onion_key(const char *srcId_string, const char *dstId_string, int index, int time_hour, char *outputqyf) {
     // 构建种子字符串
     char seed_str[100]; // 假设足够长以容纳所有输入
-    log_notice(LD_GENERAL, "----- produce_qyf_onion_key seedstr: %s %s %d %d",srcId_string, dstId_string, index, time_hour);
+    index = 1;
+    log_notice(LD_GENERAL, "----- produce_qyf_onion_key1 seedstr: %d",index);
+    log_notice(LD_GENERAL, "----- produce_qyf_onion_key 2seedstr: %s %s %d",srcId_string, dstId_string, index);
     snprintf(seed_str, sizeof(seed_str), "%s%s%d%d", srcId_string, dstId_string, index, time_hour);
     log_notice(LD_GENERAL, "----- produce_qyf_onion_key seedstr: %s",seed_str);
     // 初始化随机数生成器
