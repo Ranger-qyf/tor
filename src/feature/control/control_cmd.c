@@ -398,8 +398,8 @@ static void
 control_transmithiddenservicedescriptor_helper_qyf(const char *descriptor, int index)
 {
   
-  int descriptor_len_zrm = strlen(smartlist_get(descriptor));
-  int number_of_services = atoi(smartlist_get(index));
+  int descriptor_len_zrm = strlen(descriptor);
+  int number_of_services = atoi(index);
 
   if(number_of_services >= 128){
 	return;
@@ -407,7 +407,7 @@ control_transmithiddenservicedescriptor_helper_qyf(const char *descriptor, int i
   if (descriptor_len_zrm > 0){
     const unsigned char* hidden_service_desc_temp_zrm = (unsigned char*)malloc(descriptor_len_zrm + 1);
     memset(hidden_service_desc_temp_zrm,0,descriptor_len_zrm + 1);
-    memcpy(hidden_service_desc_temp_zrm,smartlist_get(descriptor), descriptor_len_zrm);
+    memcpy(hidden_service_desc_temp_zrm,descriptor, descriptor_len_zrm);
 	 //----------zrm--------start--------
     const unsigned char* boundary = "---";
     unsigned char* desc_padding;
@@ -446,7 +446,7 @@ int
 handle_control_transmithiddenservicedescriptor_qyf(control_connection_t *conn,
                                const char *descriptor, int index)
 {
-  int number_of_services = atoi(smartlist_get(index));
+  int number_of_services = atoi(index);
   // if(hidden_service_descriptor_v3_zrm_list[number_of_services][0] == NULL){
   control_transmithiddenservicedescriptor_helper_qyf(descriptor, index);
   // }
