@@ -242,6 +242,7 @@ connection_control_closed(control_connection_t *conn)
     log_notice(LD_GENERAL,"----- CREATE ADD_ONION is SUCCESS333333------------");
     SMARTLIST_FOREACH_BEGIN(conn->ephemeral_onion_services, char *, cp) {
       if (hs_address_is_valid(cp)) {
+        log_notice(LD_GENERAL,"----- CREATE ADD_ONION isconn->ephemeral_onion_services %s---", cp);
         hs_service_del_ephemeral(cp);
       } else {
         /* An invalid .onion in our list should NEVER happen */
