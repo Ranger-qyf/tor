@@ -2086,6 +2086,8 @@ handle_control_add_onion(control_connection_t *conn,
   int number_of_onions = 0;
   int sum_of_replica = 0;
   
+
+
   for (arg = args->kwargs; arg; arg = arg->next) 
   {/************yfq */
     if (!strcasecmp(arg->key, "SumOfReplica")) {
@@ -2699,6 +2701,42 @@ control_cmd_free_all(void)
 
 
 /**************qyf */
+void print_smartlist(const struct smartlist_t *sl) {
+    if (!sl) {
+        printf("Smartlist is NULL.\n");
+        return;
+    }
+
+    for (int i = 0; i < smartlist_len(sl); ++i) {
+        const char *item = smartlist_get(sl, i);
+        if (item) {
+            log_notice(LD_GENERAL,"----- smartlist is %s  ------------", item);
+            //printf("  Arg %d: %s\n", i + 1, item);
+        } else {
+            log_notice(LD_GENERAL,"----- smartlist is NULL  ------------");
+        }
+    }
+}
+
+// 打印 config_line_t 中的内容
+void print_config_lines(const control_cmd_args_t *args) {
+  const config_line_t *arg;
+    for (arg = args->kwargs; arg; arg = arg->next) 
+    {
+      log_notice(LD_GENERAL,"----- onfig_lines KEY is %s  VALUE is %s ------------", arg->key, arg->value);
+    }
+    // if (!cl) {
+    //     printf("Config lines are NULL.\n");
+    //     return;
+    // }
+
+    // for (const struct config_line_t *line = cl; line && line->key; ++line) {
+    //     printf("  Key: %s, Value: %s\n", line->key, line->value ? line->value : "(null)");
+    // }
+}
+
+
+
 int
 handle_control_add_onion_qyf(control_connection_t *conn,
                          const control_cmd_args_t *args)
@@ -2719,7 +2757,13 @@ handle_control_add_onion_qyf(control_connection_t *conn,
   const config_line_t *arg;
   int number_of_onions = 0;
   int sum_of_replica = 0;
-  
+
+  //printf("Positional Arguments:\n");
+  print_smartlist(args->args);
+
+  //printf("Keyword Arguments:\n");
+  print_config_lines(args);
+
   for (arg = args->kwargs; arg; arg = arg->next) 
   {/************yfq */
     if (!strcasecmp(arg->key, "SumOfReplica")) {
