@@ -2967,21 +2967,21 @@ handle_control_add_onion_qyf(control_connection_t *conn,
   // log_notice(LD_GENERAL,"----- CREATE ADD_ONION is SUCCESSS666666666------------");
   log_notice(LD_GENERAL,"----- CREATE ADD_ONION is SUCCESSS55555------------");
   out:
-  // if (port_cfgs) {
-  //   SMARTLIST_FOREACH(port_cfgs, hs_port_config_t*, p,
-  //                     hs_port_config_free(p));
-  //   smartlist_free(port_cfgs);
-  // }
-  // if (auth_clients_v3) {
-  //   SMARTLIST_FOREACH(auth_clients_v3, hs_service_authorized_client_t *, ac,
-  //                     service_authorized_client_free(ac));
-  //   smartlist_free(auth_clients_v3);
-  // }
-  // if (auth_clients_v3_str) {
-  //   SMARTLIST_FOREACH(auth_clients_v3_str, char *, client_str,
-  //                     tor_free(client_str));
-  //   smartlist_free(auth_clients_v3_str);
-  // }
+  if (port_cfgs) {
+    SMARTLIST_FOREACH(port_cfgs, hs_port_config_t*, p,
+                      hs_port_config_free(p));
+    smartlist_free(port_cfgs);
+  }
+  if (auth_clients_v3) {
+    SMARTLIST_FOREACH(auth_clients_v3, hs_service_authorized_client_t *, ac,
+                      service_authorized_client_free(ac));
+    smartlist_free(auth_clients_v3);
+  }
+  if (auth_clients_v3_str) {
+    SMARTLIST_FOREACH(auth_clients_v3_str, char *, client_str,
+                      tor_free(client_str));
+    smartlist_free(auth_clients_v3_str);
+  }
   log_notice(LD_GENERAL,"----- CREATE ADD_ONION is SUCCESSS6666------------");
 }
 /**************qyf */
