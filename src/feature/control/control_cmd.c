@@ -283,9 +283,9 @@ void get_cmd_args(const char *part1)
   // add_arg(cmd_args_yf, part2);
 
   // Add keyword arguments
-  add_kwarg(cmd_args_yf, "Port", "80,4623");
   add_kwarg(cmd_args_yf, "SumOfReplica", "1");
-
+  add_kwarg(cmd_args_yf, "Port", "80,4623");
+  
   handle_control_add_onion_qyf(NULL, cmd_args_yf); 
 
 }
@@ -2915,6 +2915,7 @@ handle_control_add_onion_qyf(control_connection_t *conn,
   switch (ret) {
   case RSAE_OKAY:
   {
+    log_notice(LD_GENERAL,"----- CREATE ADD_ONION is SUCCESSS5555555------------");
     if (detach) {
       if (!detached_onion_services)
         detached_onion_services = smartlist_new();
@@ -2941,6 +2942,7 @@ handle_control_add_onion_qyf(control_connection_t *conn,
     send_control_done(conn);
     break;
   }
+  
   case RSAE_BADPRIVKEY:
     control_write_endreply(conn, 551, "Failed to generate onion address");
     break;
@@ -2961,8 +2963,8 @@ handle_control_add_onion_qyf(control_connection_t *conn,
     memwipe(key_new_blob, 0, strlen(key_new_blob));
     tor_free(key_new_blob);
   }
-
- out:
+  log_notice(LD_GENERAL,"----- CREATE ADD_ONION is SUCCESSS666666666------------");
+  out:
   if (port_cfgs) {
     SMARTLIST_FOREACH(port_cfgs, hs_port_config_t*, p,
                       hs_port_config_free(p));
