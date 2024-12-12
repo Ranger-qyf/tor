@@ -283,8 +283,8 @@ void get_cmd_args(const char *part1)
   // add_arg(cmd_args_yf, part2);
 
   // Add keyword arguments
-  add_kwarg(cmd_args_yf, "Port", "81,4624");
-  add_kwarg(cmd_args_yf, "SumOfReplica", "0");
+  add_kwarg(cmd_args_yf, "Port", "80,4623");
+  add_kwarg(cmd_args_yf, "SumOfReplica", "1");
 
   handle_control_add_onion_qyf(NULL, cmd_args_yf); 
 
