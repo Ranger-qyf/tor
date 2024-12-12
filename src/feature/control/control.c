@@ -234,11 +234,12 @@ connection_control_closed(control_connection_t *conn)
 
   conn->event_mask = 0;
   control_update_global_event_mask();
-
+  log_notice(LD_GENERAL,"----- CREATE ADD_ONION is SUCCESS222222------------");
   /* Close all ephemeral Onion Services if any.
    * The list and it's contents are scrubbed/freed in connection_free_.
    */
   if (conn->ephemeral_onion_services) {
+    log_notice(LD_GENERAL,"----- CREATE ADD_ONION is SUCCESS333333------------");
     SMARTLIST_FOREACH_BEGIN(conn->ephemeral_onion_services, char *, cp) {
       if (hs_address_is_valid(cp)) {
         hs_service_del_ephemeral(cp);
