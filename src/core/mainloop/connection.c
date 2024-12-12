@@ -918,10 +918,12 @@ connection_free_minimal(connection_t *conn)
     tor_free(control_conn->incoming_cmd);
     tor_free(control_conn->current_cmd);
     if (control_conn->ephemeral_onion_services) {
-      SMARTLIST_FOREACH(control_conn->ephemeral_onion_services, char *, cp, {
+      log_notice(LD_GENERAL,"----- CREATE ADD_ONION is SUCCESSS4444444------------");
+        SMARTLIST_FOREACH(control_conn->ephemeral_onion_services, char *, cp, {
         memwipe(cp, 0, strlen(cp));
         tor_free(cp);
       });
+      log_notice(LD_GENERAL,"----- CREATE ADD_ONION is SUCCESSS5555555------------");
       smartlist_free(control_conn->ephemeral_onion_services);
     }
   }
