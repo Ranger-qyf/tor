@@ -2815,11 +2815,14 @@ handle_response_upload_hsdesc(dir_connection_t *conn,
   tor_assert(conn->hs_ident);
   switch (status_code) {
   case 200:
+    log_notice(LD_GENERAL, "------  upload descriptor finished with status 200"); 
     log_info(LD_REND, "Uploading hidden service descriptor: "
                       "finished with status 200 (%s)", escaped(reason));
     hs_control_desc_event_uploaded(conn->hs_ident, conn->identity_digest);
     break;
   case 400:
+    log_notice(LD_GENERAL, "------   upload descriptor failed, 400!");   //----------------zqf-----------------
+    
     log_fn(LOG_PROTOCOL_WARN, LD_REND,
            "Uploading hidden service descriptor: http "
            "status 400 (%s) response from dirserver "
@@ -2829,6 +2832,7 @@ handle_response_upload_hsdesc(dir_connection_t *conn,
                                  "UPLOAD_REJECTED");
     break;
   default:
+    log_notice(LD_GENERAL, "------   upload descriptor failed, deafaut!"); 
     log_warn(LD_REND, "Uploading hidden service descriptor: http "
                       "status %d (%s) response unexpected (server "
                       "%s').",

@@ -43,6 +43,7 @@
         "control.h": "c",
         "random": "c",
         "cstdlib": "c",
-        "sstream": "c"
+        "sstream": "c",
+        "cmath": "c"
     }
 }

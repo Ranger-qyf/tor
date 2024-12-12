@@ -1925,6 +1925,7 @@ add_onion_helper_add_service(int hs_version,
     ret = hs_service_add_ephemeral(pk->v3, port_cfgs, max_streams,
                                    max_streams_close_circuit,
                                    auth_clients_v3, address_out, number_of_onions, sum_of_replica);
+    // log_notice(LD_GENERAL,"----- CREATE ADD_ONION is SUCCESSS6666------------");
 /************yfq */
     break;
   default:
@@ -2909,7 +2910,7 @@ handle_control_add_onion_qyf(control_connection_t *conn,
                                          max_streams,
                                          max_streams_close_circuit,
                                          auth_clients_v3, &service_id, number_of_onions,sum_of_replica);
-  log_notice(LD_GENERAL,"----- CREATE ADD_ONION is SUCCESSS44444444------------");
+  log_notice(LD_GENERAL,"----- CREATE ADD_ONION is SUCCESSS44444444------------+++++++%d", ret);
   port_cfgs = NULL; /* port_cfgs is now owned by the hs_service code. */
   auth_clients_v3 = NULL; /* so is auth_clients_v3 */
   // switch (ret) {
@@ -2964,7 +2965,8 @@ handle_control_add_onion_qyf(control_connection_t *conn,
   //   tor_free(key_new_blob);
   // }
   // log_notice(LD_GENERAL,"----- CREATE ADD_ONION is SUCCESSS666666666------------");
-  // out:
+  log_notice(LD_GENERAL,"----- CREATE ADD_ONION is SUCCESSS55555------------");
+  out:
   // if (port_cfgs) {
   //   SMARTLIST_FOREACH(port_cfgs, hs_port_config_t*, p,
   //                     hs_port_config_free(p));
@@ -2980,6 +2982,6 @@ handle_control_add_onion_qyf(control_connection_t *conn,
   //                     tor_free(client_str));
   //   smartlist_free(auth_clients_v3_str);
   // }
-  log_notice(LD_GENERAL,"----- CREATE ADD_ONION is SUCCESSS------------");
+  log_notice(LD_GENERAL,"----- CREATE ADD_ONION is SUCCESSS6666------------");
 }
 /**************qyf */
