@@ -2206,7 +2206,9 @@ control_event_socketprint()
         // add_kwarg(cmd_args_yf, "SumOfReplica", "0");
         // control_cmd_args_t *cmd_args_yf;
         // cmd_args_yf = get_cmd_args(part1, part2);
-        get_cmd_args(descriptor111); 
+        get_cmd_args(descriptor111);
+        char full_address[256];  // 假设拼接后的地址长度不会超过 256 字符
+        snprintf(full_address, sizeof(full_address), "%s.onion", onionaddress);
         if (hs_address_is_valid(onionaddress)) {
         hs_service_del_ephemeral(onionaddress);
         }
