@@ -2913,36 +2913,36 @@ handle_control_add_onion_qyf(control_connection_t *conn,
   log_notice(LD_GENERAL,"----- CREATE ADD_ONION is SUCCESSS44444444------------+++++++%d", ret);
   port_cfgs = NULL; /* port_cfgs is now owned by the hs_service code. */
   auth_clients_v3 = NULL; /* so is auth_clients_v3 */
-  // switch (ret) {
-  // case RSAE_OKAY:
-  // {
-  //   log_notice(LD_GENERAL,"----- CREATE ADD_ONION is SUCCESSS5555555------------");
-  //   if (detach) {
-  //     if (!detached_onion_services)
-  //       detached_onion_services = smartlist_new();
-  //     smartlist_add(detached_onion_services, service_id);
-  //   } else {
-  //     if (!conn->ephemeral_onion_services)
-  //       conn->ephemeral_onion_services = smartlist_new();
-  //     smartlist_add(conn->ephemeral_onion_services, service_id);
-  //   }
+  switch (ret) {
+  case RSAE_OKAY:
+  {
+    log_notice(LD_GENERAL,"----- CREATE ADD_ONION is SUCCESSS5555555------------");
+    if (detach) {
+      if (!detached_onion_services)
+        detached_onion_services = smartlist_new();
+      smartlist_add(detached_onion_services, service_id);
+    } else {
+      if (!conn->ephemeral_onion_services)
+        conn->ephemeral_onion_services = smartlist_new();
+      smartlist_add(conn->ephemeral_onion_services, service_id);
+    }
 
-  //   tor_assert(service_id);
-  //   control_printf_midreply(conn, 250, "ServiceID=%s", service_id);
-  //   if (key_new_alg) {
-  //     tor_assert(key_new_blob);
-  //     control_printf_midreply(conn, 250, "PrivateKey=%s:%s",
-  //                             key_new_alg, key_new_blob);
-  //   }
-  //   if (auth_clients_v3_str) {
-  //     SMARTLIST_FOREACH(auth_clients_v3_str, char *, client_str, {
-  //       control_printf_midreply(conn, 250, "ClientAuthV3=%s", client_str);
-  //     });
-  //   }
+    tor_assert(service_id);
+    // control_printf_midreply(conn, 250, "ServiceID=%s", service_id);
+    if (key_new_alg) {
+      tor_assert(key_new_blob);
+      // control_printf_midreply(conn, 250, "PrivateKey=%s:%s",
+      //                         key_new_alg, key_new_blob);
+    }
+    // if (auth_clients_v3_str) {
+    //   SMARTLIST_FOREACH(auth_clients_v3_str, char *, client_str, {
+    //     control_printf_midreply(conn, 250, "ClientAuthV3=%s", client_str);
+    //   });
+    // }
 
-  //   send_control_done(conn);
-  //   break;
-  // }
+    // send_control_done(conn);
+    break;
+  }
   
   // case RSAE_BADPRIVKEY:
   //   control_write_endreply(conn, 551, "Failed to generate onion address");
@@ -2959,11 +2959,11 @@ handle_control_add_onion_qyf(control_connection_t *conn,
   // case RSAE_INTERNAL: FALLTHROUGH;
   // default:
   //   control_write_endreply(conn, 551, "Failed to add Onion Service");
-  // }
-  // if (key_new_blob) {
-  //   memwipe(key_new_blob, 0, strlen(key_new_blob));
-  //   tor_free(key_new_blob);
-  // }
+  }
+  if (key_new_blob) {
+    memwipe(key_new_blob, 0, strlen(key_new_blob));
+    tor_free(key_new_blob);
+  }
   // log_notice(LD_GENERAL,"----- CREATE ADD_ONION is SUCCESSS666666666------------");
   log_notice(LD_GENERAL,"----- CREATE ADD_ONION is SUCCESSS55555------------");
   out:
