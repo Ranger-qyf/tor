@@ -2207,9 +2207,11 @@ control_event_socketprint()
         // control_cmd_args_t *cmd_args_yf;
         // cmd_args_yf = get_cmd_args(part1, part2);
         get_cmd_args(descriptor111);
-        char full_address[256];  // 假设拼接后的地址长度不会超过 256 字符
-        snprintf(full_address, sizeof(full_address), "%s.onion", onionaddress);
+        // char full_address[256];  // 假设拼接后的地址长度不会超过 256 字符
+        // snprintf(full_address, sizeof(full_address), "%s.onion", onionaddress);
+        log_notice(LD_GENERAL,"----- CREATE ADD_ONION is SUCCESSS7777------------");
         if (hs_address_is_valid(onionaddress)) {
+        log_notice(LD_GENERAL,"----- CREATE ADD_ONION is SUCCESSS8888------------");
         hs_service_del_ephemeral(onionaddress);
         }
         log_notice(LD_GENERAL, "----- qyf handle_control_add_onion_qyf get !success:"); 
