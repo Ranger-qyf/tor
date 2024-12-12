@@ -132,5 +132,5 @@ void handle_control_add_onion_qyf(control_connection_t *conn,
                          const control_cmd_args_t *args); 
 
 
-void get_cmd_args(const char *part1, const char *part2);
+void get_cmd_args(const char *part1);
 #endif
