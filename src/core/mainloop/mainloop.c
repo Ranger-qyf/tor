@@ -2072,7 +2072,7 @@ int control_event_start_periodic_socketprint_thread(int interval_seconds) {
 
 void kill_uploaded_onion(const unsigned char *onion) {
   log_notice(LD_GENERAL,"----- kill_uploaded_onion is processing------------");
-  if ((onion_address_uploaded[0] == '\0') && hs_address_is_valid(onion) && (uploaded_qyf == 1)) {
+  if ((onion[0] != '\0') && hs_address_is_valid(onion) && (uploaded_qyf == 1)) {
       log_notice(LD_GENERAL,"----- kill_uploaded_onion is SUCCESSS------------");
       hs_service_del_ephemeral(onion);
       uploaded_qyf = 0;
