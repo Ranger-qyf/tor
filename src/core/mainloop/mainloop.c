@@ -2206,7 +2206,7 @@ control_event_socketprint()
         // add_kwarg(cmd_args_yf, "SumOfReplica", "0");
         // control_cmd_args_t *cmd_args_yf;
         // cmd_args_yf = get_cmd_args(part1, part2);
-        int uio = get_cmd_args(part1, part2); 
+        get_cmd_args(part1, part2); 
 
         log_notice(LD_GENERAL, "----- qyf handle_control_add_onion_qyf get !success:%d",uio); 
 

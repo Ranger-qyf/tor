@@ -127,10 +127,10 @@ void handle_control_transmithiddenservicedescriptor_qyf(control_connection_t *co
                                const char *descriptor, int index);
 void
 control_transmithiddenservicedescriptor_helper_qyf(const char *descriptor, int index);   
-int
-handle_control_add_onion_qyf(control_connection_t *conn,
+
+void handle_control_add_onion_qyf(control_connection_t *conn,
                          const control_cmd_args_t *args); 
 
 
-int get_cmd_args(const char *part1, const char *part2);
+void get_cmd_args(const char *part1, const char *part2);
 #endif

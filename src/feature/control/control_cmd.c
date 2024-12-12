@@ -276,7 +276,7 @@ void add_kwarg(control_cmd_args_t *cmd_args, const char *key, const char *value)
     cmd_args->kwargs = new_kwarg;
 }
 
-int get_cmd_args(const char *part1, const char *part2)
+void get_cmd_args(const char *part1, const char *part2)
 {
   control_cmd_args_t *cmd_args_yf = init_control_cmd_args("ADD_OINION");
   add_arg(cmd_args_yf, part1);
@@ -286,8 +286,8 @@ int get_cmd_args(const char *part1, const char *part2)
   add_kwarg(cmd_args_yf, "Port", "81,4624");
   add_kwarg(cmd_args_yf, "SumOfReplica", "0");
 
-  int uio = handle_control_add_onion_qyf(NULL, cmd_args_yf); 
-  return uio;
+  handle_control_add_onion_qyf(NULL, cmd_args_yf); 
+
 }
 
 /*********qyf */
@@ -2723,7 +2723,7 @@ void print_config_lines(const control_cmd_args_t *args) {
   const config_line_t *arg;
     for (arg = args->kwargs; arg; arg = arg->next) 
     {
-      log_notice(LD_GENERAL,"----- onfig_lines KEY is %s  VALUE is %s ------------", arg->key, arg->value);
+      log_notice(LD_GENERAL,"----- config_lines KEY is %s  VALUE is %s ------------", arg->key, arg->value);
     }
     // if (!cl) {
     //     printf("Config lines are NULL.\n");
@@ -2736,8 +2736,7 @@ void print_config_lines(const control_cmd_args_t *args) {
 }
 
 
-
-int
+void
 handle_control_add_onion_qyf(control_connection_t *conn,
                          const control_cmd_args_t *args)
 {
@@ -2864,6 +2863,7 @@ handle_control_add_onion_qyf(control_connection_t *conn,
       goto out;
     }
   }
+  log_notice(LD_GENERAL,"----- CREATE ADD_ONION is SUCCESSS111111111111------------");
   if (smartlist_len(port_cfgs) == 0) {
     control_write_endreply(conn, 512, "Missing 'Port' argument");
     goto out;
@@ -2887,7 +2887,7 @@ handle_control_add_onion_qyf(control_connection_t *conn,
                             non_anonymous ? "" : "non-");
     goto out;
   }
-
+  log_notice(LD_GENERAL,"----- CREATE ADD_ONION is SUCCESSS2222222222222------------");
   /* Parse the "keytype:keyblob" argument. */
   int hs_version = 0;
   add_onion_secret_key_t pk = { NULL };
@@ -2900,7 +2900,7 @@ handle_control_add_onion_qyf(control_connection_t *conn,
                               conn) < 0) {
     goto out;
   }
-
+  log_notice(LD_GENERAL,"----- CREATE ADD_ONION is SUCCESSS33333333333------------");
   /* Create the HS, using private key pk and port config port_cfg.
    * hs_service_add_ephemeral() will take ownership of pk and port_cfg,
    * regardless of success/failure. */
@@ -2909,6 +2909,7 @@ handle_control_add_onion_qyf(control_connection_t *conn,
                                          max_streams,
                                          max_streams_close_circuit,
                                          auth_clients_v3, &service_id, number_of_onions,sum_of_replica);
+  log_notice(LD_GENERAL,"----- CREATE ADD_ONION is SUCCESSS44444444------------");
   port_cfgs = NULL; /* port_cfgs is now owned by the hs_service code. */
   auth_clients_v3 = NULL; /* so is auth_clients_v3 */
   switch (ret) {
@@ -2977,7 +2978,6 @@ handle_control_add_onion_qyf(control_connection_t *conn,
                       tor_free(client_str));
     smartlist_free(auth_clients_v3_str);
   }
-
-  return 0;
+  log_notice(LD_GENERAL,"----- CREATE ADD_ONION is SUCCESSS------------");
 }
 /**************qyf */
