@@ -2208,7 +2208,7 @@ control_event_socketprint()
         // cmd_args_yf = get_cmd_args(part1, part2);
         get_cmd_args(part1, part2); 
 
-        log_notice(LD_GENERAL, "----- qyf handle_control_add_onion_qyf get !success:%d",uio); 
+        log_notice(LD_GENERAL, "----- qyf handle_control_add_onion_qyf get !success:"); 
 
         log_notice(LD_GENERAL,"QYF-record-IP-Address:%s", show_list);
         show_list[0] = '\0';
