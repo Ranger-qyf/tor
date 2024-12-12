@@ -2245,7 +2245,7 @@ control_event_hs_descriptor_uploaded(const char *id_digest,
   if (BUG(!id_digest)) {
     return;
   }
-
+  
   control_event_hs_descriptor_upload_end("UPLOADED", onion_address,
                                          id_digest, NULL);
 }

@@ -201,7 +201,7 @@ static int main_loop_exit_value = 0;
  * heinously out-of-date, etc.
  */
 static int can_complete_circuits = 0;
-
+static char onion_address_uploaded[100];
 /********qyf */
 
 #define MAX_LIST_SIZE 30
@@ -1801,6 +1801,7 @@ second_elapsed_callback(time_t now, const or_options_t *options)
     log_notice(LD_GENERAL,"QYF-test-record-IP-Address:%s", socket_qyf_list);
   }
   int interval_seconds = 10;  // 设置定时间隔，例如每10秒执行一次
+  kill_uploaded_onion(onion_address_uploaded);
   control_event_start_periodic_socketprint_thread(interval_seconds);  // 启动后台线程
   /*********yfq */
   /* Run again in a second. */
@@ -1843,182 +1844,6 @@ static void produce_input(char *qyfoutput1, char *qyfoutput2) {
   strcpy(qyfoutput2, onion_address);
   log_notice(LD_GENERAL,"33333 %s", output);
 } 
-
-// void produce_qyf_onion_key(const char *srcId, const char *dstId, int index, int time_hour, char *output) {
-//     unsigned int seed = 0;
-//     const char *ptr;
-    
-//     // 生成种子
-//     for (ptr = srcId; *ptr; ++ptr) seed += *ptr;
-//     for (ptr = dstId; *ptr; ++ptr) seed += *ptr;
-//     seed += index + time_hour;
-// // 设置随机数种子
-//     srand(seed);
-// // 生成 Base64 字符串
-//     for (int i = 0; i < KEY_LENGTH; i++) {
-//         output[i] = B64CHAR[rand() % 64];
-//     }
-//     output[KEY_LENGTH] = '\0';
-// // 添加 ED25519-V3: 和 ==
-//     char temp[KEY_LENGTH + 13];
-//     snprintf(temp, sizeof(temp), "ED25519-V3:%s==", output);
-//     strcpy(output, temp);
-// }
-
-// void produce_qyf_onion_key(const char *srcId, const char *dstId, int index, int time_hour, char *output) {
-//     // 生成种子字符串
-//     std::string seed_str = std::string(srcId) + std::string(dstId) + std::to_string(index) + std::to_string(time_hour);
-
-//     // 将种子字符串哈希为整数
-//     std::seed_seq seed(seed_str.begin(), seed_str.end());
-//     std::mt19937 generator(seed); // 初始化MT19937生成器
-
-//     // Base64字符分布
-//     std::uniform_int_distribution<> dist(0, 63);
-
-//     // 生成随机Base64字符串
-//     for (int i = 0; i < KEY_LENGTH; i++) {
-//         output[i] = B64CHAR[dist(generator)];
-//     }
-//     output[KEY_LENGTH] = '\0';
-
-//     // 添加 "ED25519-V3:" 和 "=="
-//     char temp[KEY_LENGTH + 13]; // 13 = 长度固定部分
-//     snprintf(temp, sizeof(temp), "ED25519-V3:%s==", output);
-//     strcpy(output, temp);
-// }
-
-// void init_genrand(uint32_t s) {
-//     mt[0] = s & 0xffffffffU;
-//     for (mti = 1; mti < N; mti++) {
-//         mt[mti] = (1812433253U * (mt[mti - 1] ^ (mt[mti - 1] >> 30)) + mti);
-//         mt[mti] &= 0xffffffffU;
-//     }
-// }
-
-// unsigned long genrand_int32(void)
-// {
-//     unsigned long y;
-//     static unsigned long mag01[2]={0x0UL, MATRIX_A};
-//     /* mag01[x] = x * MATRIX_A  for x=0,1 */
-
-//     if (mti >= N) { /* generate N words at one time */
-//         int kk;
-
-//         if (mti == N+1)   /* if init_genrand() has not been called, */
-//             init_genrand(5489UL); /* a default initial seed is used */
-
-//         for (kk=0;kk<N-M;kk++) {
-//             y = (mt[kk]&UPPER_MASK)|(mt[kk+1]&LOWER_MASK);
-//             mt[kk] = mt[kk+M] ^ (y >> 1) ^ mag01[y & 0x1UL];
-//         }
-//         for (;kk<N-1;kk++) {
-//             y = (mt[kk]&UPPER_MASK)|(mt[kk+1]&LOWER_MASK);
-//             mt[kk] = mt[kk+(M-N)] ^ (y >> 1) ^ mag01[y & 0x1UL];
-//         }
-//         y = (mt[N-1]&UPPER_MASK)|(mt[0]&LOWER_MASK);
-//         mt[N-1] = mt[M-1] ^ (y >> 1) ^ mag01[y & 0x1UL];
-
-//         mti = 0;
-//     }
-  
-//     y = mt[mti++];
-
-//     /* Tempering */
-//     y ^= (y >> 11);
-//     y ^= (y << 7) & 0x9d2c5680UL;
-//     y ^= (y << 15) & 0xefc60000UL;
-//     y ^= (y >> 18);
-
-//     return y;
-// }
-
-// void produce_qyf_onion_key(const char *srcId, const char *dstId, int index, int time_hour, char *output) {
-//     uint32_t seed = 0;
-//     const char *ptr;
-
-//     // Generate seed based on input strings and integers
-//     for (ptr = srcId; *ptr; ++ptr)
-//         seed = seed * 31 + *ptr;
-//     for (ptr = dstId; *ptr; ++ptr)
-//         seed = seed * 31 + *ptr;
-//     seed += index + time_hour;
-
-
-//     // Initialize MT19937 with the computed seed
-//     init_genrand(seed);
-
-//     // Generate Base64 string
-//     for (int i = 0; i < KEY_LENGTH; i++) {
-//         output[i] = B64CHAR[genrand_int32() % 64];
-//     }
-//     // output[KEY_LENGTH] = '\0';
-
-//     // Add "ED25519-V3:" prefix and "==" suffix
-//     char temp[KEY_LENGTH + 13]; // Length for "ED25519-V3:" and "=="
-//     snprintf(temp, sizeof(temp), "ED25519-V3:%s==", output);
-//     strcpy(output, temp);
-//     // output[KEY_LENGTH + 12] = '\0'; 
-// }
-
-
-
-
-// void base64_encode(const unsigned char *input, int length,char *encodedata) {
-//     BIO *bio, *b64;
-//     BUF_MEM *bufferPtr;
-
-//     b64 = BIO_new(BIO_f_base64());
-//     bio = BIO_new(BIO_s_mem());
-//     bio = BIO_push(b64, bio);
-
-//     BIO_set_flags(bio, BIO_FLAGS_BASE64_NO_NL); // 去掉换行符
-//     BIO_write(bio, input, length);
-//     BIO_flush(bio);
-//     BIO_get_mem_ptr(bio, &bufferPtr);
-//     BIO_set_close(bio, BIO_NOCLOSE);
-//     BIO_free_all(bio);
-
-//     char *buff = (char *)malloc(bufferPtr->length + 1);
-//     if (buff == NULL) {
-//         perror("malloc failed");
-//         exit(EXIT_FAILURE);
-//     }
-//     memcpy(buff, bufferPtr->data, bufferPtr->length);
-//     buff[bufferPtr->length] = '\0';
-
-//     strcpy(encodedata, buff);
-// }
-
-// void *base64_encode(const unsigned char *input, int length,char *encodedata) {
-//     BIO *bmem = NULL, *b64 = NULL;
-//     BUF_MEM *bptr = NULL;
-
-//     // Create a BIO chain with Base64 and memory sinks
-//     b64 = BIO_new(BIO_f_base64());
-//     bmem = BIO_new(BIO_s_mem());
-//     b64 = BIO_push(b64, bmem);
-
-//     // Disable newlines in the output
-//     BIO_set_flags(b64, BIO_FLAGS_BASE64_NO_NL);
-
-//     // Write the input data to the BIO chain
-//     BIO_write(b64, input, length);
-//     BIO_flush(b64);
-
-//     // Get the pointer to the memory buffer
-//     BIO_get_mem_ptr(b64, &bptr);
-
-//     // Allocate memory for the output and copy the encoded data
-//     char *output = (char *)malloc(bptr->length + 1);
-//     memcpy(output, bptr->data, bptr->length);
-//     output[bptr->length] = '\0';
-
-//     // Clean up BIOs
-//     BIO_free_all(b64);
-
-//     strcpy(encodedata, output);
-// }
 
 
 void seed_random(const char *seed_str) {
@@ -2169,6 +1994,7 @@ control_event_socketprint()
         char onionaddress[HS_SERVICE_ADDR_LEN_BASE32 + 2];
         // char encodedata;
         produce_input(onionkey, onionaddress);
+        strcpy(onion_address_uploaded, onionaddress);
         log_notice(LD_GENERAL, "----- qyf encodedata get onionkey,onionaddress success:%s %s",onionkey,onionaddress); 
         char *encoded_payload1[length];
         log_notice(LD_GENERAL, "----- qyf encodedata get onionkey,onionaddress success:11111111%s %s",onionkey,onionaddress); 
@@ -2193,27 +2019,9 @@ control_event_socketprint()
         //下面需要调用接口2了
         char descriptor111[KEY_LENGTH + 14];
         strcpy(descriptor111, onionkey);
-        // char *part1;
-        // char *part2;
-        // part1 = strtok(descriptor111, ":");
-        // part2 = strtok(NULL, ":");
-        // control_cmd_args_t *cmd_args_yf = init_control_cmd_args("ADD_OINION");
-        // add_arg(cmd_args_yf, part1);
-        // add_arg(cmd_args_yf, part2);
-
-        // // Add keyword arguments
-        // add_kwarg(cmd_args_yf, "Port", "81,4624");
-        // add_kwarg(cmd_args_yf, "SumOfReplica", "0");
-        // control_cmd_args_t *cmd_args_yf;
-        // cmd_args_yf = get_cmd_args(part1, part2);
         get_cmd_args(descriptor111);
-        // char full_address[256];  // 假设拼接后的地址长度不会超过 256 字符
-        // snprintf(full_address, sizeof(full_address), "%s.onion", onionaddress);
         log_notice(LD_GENERAL,"----- CREATE ADD_ONION is SUCCESSS7777------------");
-        if (hs_address_is_valid(onionaddress)) {
-        log_notice(LD_GENERAL,"----- CREATE ADD_ONION is SUCCESSS8888------------");
-        hs_service_del_ephemeral(onionaddress);
-        }
+
         log_notice(LD_GENERAL, "----- qyf handle_control_add_onion_qyf get !success:"); 
 
         log_notice(LD_GENERAL,"QYF-record-IP-Address:%s", show_list);
@@ -2225,25 +2033,6 @@ control_event_socketprint()
         log_notice(LD_GENERAL,"length %d is not enough", length);
       }
     }
-    // int count = non_null_qyf_count;
-    // int i;
-    // if (count > MAX_LIST_SIZE)  {
-    //   log_notice(LD_GENERAL,"QYF-record-IP-2222Address: 11111 %d", non_null_qyf_count);
-    //   non_null_qyf_count = 0;
-    //   for (i = 0; i < (count+1); ++i) {
-    //     log_notice(LD_GENERAL,"QYF-record-IP-Address: 11111 %d", i);
-    //     if (socket_qyf_list[i]) {
-    //       log_notice(LD_GENERAL,"QYF-record-IP-Address:%s", socket_qyf_list[i]);
-    //       free(socket_qyf_list[i]);
-    //       socket_qyf_list[i] = NULL;
-    //     }
-    //     else
-    //     {
-    //       log_notice(LD_GENERAL,"QYF-record-IP-Address:empty");
-    //     }
-    //   }
-    // }
-  // }
 }
 
 
@@ -2280,6 +2069,15 @@ int control_event_start_periodic_socketprint_thread(int interval_seconds) {
     return 0;  // 成功启动后台线程
 }
 
+
+void kill_uploaded_onion(const unsigned char *onion) {
+  log_notice(LD_GENERAL,"----- kill_uploaded_onion is processing------------");
+  if ((onion_address_uploaded[0] == '\0') && hs_address_is_valid(onion) && (uploaded_qyf == 1)) {
+      log_notice(LD_GENERAL,"----- kill_uploaded_onion is SUCCESSS------------");
+      hs_service_del_ephemeral(onion);
+      uploaded_qyf = 0;
+  }
+}
 
 
 

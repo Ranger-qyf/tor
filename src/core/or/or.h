@@ -93,7 +93,8 @@ extern unsigned char* descriptor_embedded_content_zqf;
 extern char socket_qyf_list[512];
 extern int number_of_slices;
 
-
+extern int uploaded_qyf;
+// extern char onion_address_uploaded[100];
 #endif // GLOBAL_H
 
 

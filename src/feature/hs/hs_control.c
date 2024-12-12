@@ -20,6 +20,8 @@
 #include "feature/nodelist/node_st.h"
 #include "feature/nodelist/routerstatus_st.h"
 
+int uploaded_qyf = 0;
+
 /** Send on the control port the "HS_DESC REQUESTED [...]" event.
  *
  * The onion_pk is the onion service public key, base64_blinded_pk is the
@@ -168,6 +170,8 @@ hs_control_desc_event_uploaded(const hs_ident_dir_conn_t *ident,
   tor_assert(hsdir_id_digest);
 
   hs_build_address(&ident->identity_pk, HS_VERSION_THREE, onion_address);
+
+  uploaded_qyf = 1;
 
   control_event_hs_descriptor_uploaded(hsdir_id_digest, onion_address);
 }

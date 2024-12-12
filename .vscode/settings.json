@@ -54,6 +54,8 @@
         "utility": "cpp",
         "xmemory": "cpp",
         "xtr1common": "cpp",
-        "xutility": "cpp"
+        "xutility": "cpp",
+        "node_st.h": "c",
+        "routerstatus_st.h": "c"
     }
 }
