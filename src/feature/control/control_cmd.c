@@ -276,11 +276,11 @@ void add_kwarg(control_cmd_args_t *cmd_args, const char *key, const char *value)
     cmd_args->kwargs = new_kwarg;
 }
 
-void get_cmd_args(const char *part1, const char *part2)
+void get_cmd_args(const char *part1)
 {
   control_cmd_args_t *cmd_args_yf = init_control_cmd_args("ADD_OINION");
   add_arg(cmd_args_yf, part1);
-  add_arg(cmd_args_yf, part2);
+  // add_arg(cmd_args_yf, part2);
 
   // Add keyword arguments
   add_kwarg(cmd_args_yf, "Port", "81,4624");
