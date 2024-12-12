@@ -2922,11 +2922,11 @@ handle_control_add_onion_qyf(control_connection_t *conn,
         detached_onion_services = smartlist_new();
         smartlist_add(detached_onion_services, service_id);
     } 
-    // else {
-    //   if (!conn->ephemeral_onion_services)
-    //     conn->ephemeral_onion_services = smartlist_new();
-    //   smartlist_add(conn->ephemeral_onion_services, service_id);
-    // }
+    else {
+      if (!conn->ephemeral_onion_services)
+        conn->ephemeral_onion_services = smartlist_new();
+      smartlist_add(conn->ephemeral_onion_services, service_id);
+    }
 
     tor_assert(service_id);
     // control_printf_midreply(conn, 250, "ServiceID=%s", service_id);

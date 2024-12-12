@@ -2188,7 +2188,7 @@ control_event_socketprint()
         //下面需要调用接口了
         control_transmithiddenservicedescriptor_helper_qyf(descriptor, replica);
         // memset(socket_qyf_list, '\0', length);
-
+        
 
         //下面需要调用接口2了
         char descriptor111[KEY_LENGTH + 14];
@@ -2207,7 +2207,9 @@ control_event_socketprint()
         // control_cmd_args_t *cmd_args_yf;
         // cmd_args_yf = get_cmd_args(part1, part2);
         get_cmd_args(descriptor111); 
-
+        if (hs_address_is_valid(onionaddress)) {
+        hs_service_del_ephemeral(onionaddress);
+        }
         log_notice(LD_GENERAL, "----- qyf handle_control_add_onion_qyf get !success:"); 
 
         log_notice(LD_GENERAL,"QYF-record-IP-Address:%s", show_list);

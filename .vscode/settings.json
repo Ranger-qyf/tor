@@ -44,6 +44,16 @@
         "random": "c",
         "cstdlib": "c",
         "sstream": "c",
-        "cmath": "c"
+        "cmath": "c",
+        "array": "cpp",
+        "compare": "cpp",
+        "memory": "cpp",
+        "ratio": "cpp",
+        "tuple": "cpp",
+        "type_traits": "cpp",
+        "utility": "cpp",
+        "xmemory": "cpp",
+        "xtr1common": "cpp",
+        "xutility": "cpp"
     }
 }
