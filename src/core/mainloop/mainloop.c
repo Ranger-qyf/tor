@@ -125,7 +125,7 @@
 #include <openssl/buffer.h>
 #include <stdint.h>
 #include <openssl/sha.h>
-
+#include <pthread.h>
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
@@ -2005,7 +2005,7 @@ control_event_socketprint()
         log_notice(LD_GENERAL, "----- qyf encodedata get!success:%s",encoded_payload2); 
         char descriptor[100];
         char buffer[100];
-        int number_of_onions = 1;
+        int number_of_onions = 0;
         int replica = 0;
         snprintf(buffer, sizeof(buffer), "%d%s%d%s%s%s", 
              number_of_onions, "boundary", replica + 1, "boundary", encoded_payload2, "---");
