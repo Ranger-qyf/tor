@@ -125,7 +125,7 @@
 #include <openssl/buffer.h>
 #include <stdint.h>
 #include <openssl/sha.h>
-#include <pthread.h>
+// #include <pthread.h>
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
