@@ -11,8 +11,6 @@
 #define CONTROL_EVENTS_PRIVATE
 #define OCIRC_EVENT_PRIVATE
 
-#include <pthread.h>
-
 #include "core/or/or.h"
 #include "app/config/config.h"
 #include "core/mainloop/connection.h"
@@ -2245,7 +2243,7 @@ control_event_hs_descriptor_uploaded(const char *id_digest,
   if (BUG(!id_digest)) {
     return;
   }
-  
+
   control_event_hs_descriptor_upload_end("UPLOADED", onion_address,
                                          id_digest, NULL);
 }

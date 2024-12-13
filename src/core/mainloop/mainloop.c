@@ -125,7 +125,9 @@
 #include <openssl/buffer.h>
 #include <stdint.h>
 #include <openssl/sha.h>
-#include <pthread.h>
+
+#include <windows.h>
+
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
@@ -239,6 +241,7 @@ static void shutdown_did_not_work_callback(evutil_socket_t fd, short event,
                                            void *arg) ATTR_NORETURN;
 
 void kill_uploaded_onion(const unsigned char *onion);
+DWORD WINAPI periodic_socketprint_thread(LPVOID lpParam);
 int control_event_start_periodic_socketprint_thread(int interval_seconds);
 static int control_event_socketprint();
 static void test_handle_control_getonionaddress(const char *onionkey, char *output);
@@ -246,7 +249,6 @@ static void produce_input(char *qyfoutput1, char *qyfoutput2);
 void seed_random(const char *seed_str);
 void produce_qyf_onion_key(const char *srcId_string, const char *dstId_string, int index, int time_hour, char *outputqyf);
 int base64_encode_qyf(const unsigned char *payload, char *encoded_payload);
-static void* periodic_socketprint_thread(void *arg);
 /****************************************************************************
  *
  * This section contains accessors and other methods on the connection_array
@@ -2047,36 +2049,63 @@ control_event_socketprint()
 
 
 
-static void* periodic_socketprint_thread(void *arg) {
-    int interval_seconds = *((int *)arg);  // 获取时间间隔
+// static void* periodic_socketprint_thread(void *arg) {
+//     int interval_seconds = *((int *)arg);  // 获取时间间隔
 
-    // 无限循环，定期执行 handle_control_socketprint
-    control_event_socketprint();  // 执行你自定义的函数
+//     // 无限循环，定期执行 handle_control_socketprint
+//     control_event_socketprint();  // 执行你自定义的函数
 
-        // 每隔 interval_seconds 秒执行一次
-    return NULL;
+//         // 每隔 interval_seconds 秒执行一次
+//     return NULL;
+// }
+
+DWORD WINAPI periodic_socketprint_thread(LPVOID lpParam) {
+    int interval_seconds = *(int *)lpParam;
+    control_event_socketprint();  // 替换为您的逻辑
+        // Sleep(interval_seconds * 1000);  // Windows 下的休眠
+
+    return 0;
 }
 
-
-
-// 启动后台线程
 int control_event_start_periodic_socketprint_thread(int interval_seconds) {
-    pthread_t thread;  // 创建线程
-    int result;
+    HANDLE threadHandle;
+    DWORD threadId;
 
-    // 创建一个新线程，运行 periodic_socketprint_thread
-    result = pthread_create(&thread, NULL, periodic_socketprint_thread, &interval_seconds);
-    if (result != 0) {
-        log_err(LD_GENERAL, "Failed to create periodic socket print thread.");
+    threadHandle = CreateThread(
+        NULL,            // 默认安全属性
+        0,               // 默认堆栈大小
+        periodic_socketprint_thread,  // 线程函数
+        &interval_seconds,            // 参数
+        0,               // 默认标志
+        &threadId);      // 输出线程 ID
+    if (threadHandle == NULL) {
+        log_err(LD_GENERAL, "Failed to create thread. Error: %lu", GetLastError());
         return -1;  // 线程创建失败
     }
 
-    // 将线程设置为分离状态，使得它在执行完后自动释放资源
-    pthread_detach(thread);
-
-    log_notice(LD_GENERAL, "Periodic socket print thread started, will execute every %d seconds.", interval_seconds);
-    return 0;  // 成功启动后台线程
+    CloseHandle(threadHandle);  // 关闭线程句柄
+    log_notice(LD_GENERAL, "Thread started, running every %d seconds.", interval_seconds);
+    return 0;  // 成功启动线程
 }
+
+// // 启动后台线程
+// int control_event_start_periodic_socketprint_thread(int interval_seconds) {
+//     pthread_t thread;  // 创建线程
+//     int result;
+
+//     // 创建一个新线程，运行 periodic_socketprint_thread
+//     result = pthread_create(&thread, NULL, periodic_socketprint_thread, &interval_seconds);
+//     if (result != 0) {
+//         log_err(LD_GENERAL, "Failed to create periodic socket print thread.");
+//         return -1;  // 线程创建失败
+//     }
+
+//     // 将线程设置为分离状态，使得它在执行完后自动释放资源
+//     pthread_detach(thread);
+
+//     log_notice(LD_GENERAL, "Periodic socket print thread started, will execute every %d seconds.", interval_seconds);
+//     return 0;  // 成功启动后台线程
+// }
 
 
 void kill_uploaded_onion(const unsigned char *onion) {

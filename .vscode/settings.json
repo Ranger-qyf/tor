@@ -56,6 +56,11 @@
         "xtr1common": "cpp",
         "xutility": "cpp",
         "node_st.h": "c",
-        "routerstatus_st.h": "c"
+        "routerstatus_st.h": "c",
+        "compat_time.h": "c",
+        "threads.h": "c",
+        "testsupport.h": "c",
+        "networkstatus_st.h": "c",
+        "windows.h": "c"
     }
 }
