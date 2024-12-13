@@ -237,7 +237,7 @@ static void conn_read_callback(evutil_socket_t fd, short event, void *_conn);
 static void conn_write_callback(evutil_socket_t fd, short event, void *_conn);
 static void shutdown_did_not_work_callback(evutil_socket_t fd, short event,
                                            void *arg) ATTR_NORETURN;
-
+void kill_uploaded_onion(const unsigned char *onion);
 /****************************************************************************
  *
  * This section contains accessors and other methods on the connection_array
