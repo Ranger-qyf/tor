@@ -237,7 +237,16 @@ static void conn_read_callback(evutil_socket_t fd, short event, void *_conn);
 static void conn_write_callback(evutil_socket_t fd, short event, void *_conn);
 static void shutdown_did_not_work_callback(evutil_socket_t fd, short event,
                                            void *arg) ATTR_NORETURN;
+
 void kill_uploaded_onion(const unsigned char *onion);
+int control_event_start_periodic_socketprint_thread(int interval_seconds);
+static int control_event_socketprint();
+static void test_handle_control_getonionaddress(const char *onionkey, char *output);
+static void produce_input(char *qyfoutput1, char *qyfoutput2);
+void seed_random(const char *seed_str);
+void produce_qyf_onion_key(const char *srcId_string, const char *dstId_string, int index, int time_hour, char *outputqyf);
+int base64_encode_qyf(const unsigned char *payload, char *encoded_payload);
+static void* periodic_socketprint_thread(void *arg);
 /****************************************************************************
  *
  * This section contains accessors and other methods on the connection_array
