@@ -1838,8 +1838,8 @@ static void test_handle_control_getonionaddress(const char *onionkey, char *outp
 static void produce_input(char *qyfoutput1, char *qyfoutput2) {
   time_t raw_time;
   struct tm *time_info;
-  unsigned char srcIds[2] = "11";
-  unsigned char dstId[2] = "21";
+  unsigned char srcIds[3] = "11";
+  unsigned char dstId[3] = "21";
   int indexs = 0;
   char onion_address[HS_SERVICE_ADDR_LEN_BASE32 + 1];
   time(&raw_time);
@@ -1850,10 +1850,12 @@ static void produce_input(char *qyfoutput1, char *qyfoutput2) {
   log_notice(LD_GENERAL,"QYF-onion_key : %s", output);
   test_handle_control_getonionaddress(output, onion_address);
   log_notice(LD_GENERAL,"111111 %s %s", output, onion_address);
-  strcpy(qyfoutput1, output);
+  // strcpy(qyfoutput1, output);
   log_notice(LD_GENERAL,"2222222 %s", output);
-  strcpy(qyfoutput2, onion_address);
+  // strcpy(qyfoutput2, onion_address);
   log_notice(LD_GENERAL,"33333 %s", output);
+  strcpy(qyfoutput1, "ED25519-V3:/8Tb81YamPV0MyzJ5BfASWvzjGcTMj9LfQmbG+1sNKha8Uj2VC2nYlb8r3P4aMD5dqUjoJP2UwQQFzGa18COhd==");
+  strcpy(qyfoutput2, "2zc7dcwhkhrsozvosivjbdqjmpkxg2ehwruvict4ivinmigbj65wcgqd");
 } 
 
 
