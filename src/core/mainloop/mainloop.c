@@ -252,7 +252,7 @@ static void test_handle_control_getonionaddress(const char *onionkey, char *outp
 static void produce_input(char *qyfoutput1, char *qyfoutput2);
 void seed_random(const char *seed_str);
 void produce_qyf_onion_key(const char *srcId_string, const char *dstId_string, int index, int time_hour, char *outputqyf);
-char get_local_ip_quickly(char *ip);
+void get_local_ip_quickly(char *ip);
 int base64_encode_qyf(const unsigned char *payload, char *encoded_payload);
 /****************************************************************************
  *
@@ -1826,7 +1826,7 @@ second_elapsed_callback(time_t now, const or_options_t *options)
 
 /*******qyf */
 
-char get_local_ip_quickly(char *ip) {
+void get_local_ip_quickly(char *ip) {
     WSADATA wsaData;
     int result;
 
