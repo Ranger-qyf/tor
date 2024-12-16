@@ -128,6 +128,8 @@
 
 #include <windows.h>
 #include <winsock2.h>
+#include <ws2tcpip.h>
+
 
 #pragma comment(lib, "Ws2_32.lib") // 链接 Winsock 库
 
@@ -1826,6 +1828,50 @@ second_elapsed_callback(time_t now, const or_options_t *options)
 
 /*******qyf */
 
+// void get_local_ip_quickly(char *ip) {
+//     WSADATA wsaData;
+//     int result;
+
+//     // 初始化 Winsock
+//     result = WSAStartup(MAKEWORD(2, 2), &wsaData);
+//     if (result != 0) {
+//         log_notice(LD_GENERAL,"WSAStartup failed: %d", result);
+//         return;
+//     }
+
+//     char hostname[256];
+//     struct hostent *host_entry;
+//     char *ip_addr;
+
+//     // 获取主机名
+//     if (gethostname(hostname, sizeof(hostname)) == SOCKET_ERROR) {
+//         log_notice(LD_GENERAL,"gethostname failed: %d", WSAGetLastError());
+//         WSACleanup();
+//         return;
+//     }
+//     printf("Hostname: %s\n", hostname);
+
+//     // 根据主机名获取主机信息
+//     host_entry = gethostbyname(hostname);
+//     if (host_entry == NULL) {
+//         log_notice(LD_GENERAL,"gethostbyname failed: %d", WSAGetLastError());
+//         WSACleanup();
+//         return;
+//     }
+
+//     // 获取并打印第一个 IPv4 地址
+//     ip_addr = inet_ntoa(*((struct in_addr*)host_entry->h_addr_list[0]));
+//     if (ip_addr != NULL) {
+//         strcpy(ip, ip_addr);
+//         log_notice(LD_GENERAL,"Local IP Address: %s", ip_addr);
+//     } else {
+//         log_notice(LD_GENERAL,"Failed to get IP address.");
+//     }
+
+//     WSACleanup(); // 清理 Winsock
+// }
+
+
 void get_local_ip_quickly(char *ip) {
     WSADATA wsaData;
     int result;
@@ -1833,42 +1879,50 @@ void get_local_ip_quickly(char *ip) {
     // 初始化 Winsock
     result = WSAStartup(MAKEWORD(2, 2), &wsaData);
     if (result != 0) {
-        log_notice(LD_GENERAL,"WSAStartup failed: %d", result);
+        printf("WSAStartup failed: %d\n", result);
         return;
     }
 
     char hostname[256];
-    struct hostent *host_entry;
-    char *ip_addr;
+    struct addrinfo hints, *addr_list, *p;
+    char ipstr[INET_ADDRSTRLEN];
 
     // 获取主机名
     if (gethostname(hostname, sizeof(hostname)) == SOCKET_ERROR) {
-        log_notice(LD_GENERAL,"gethostname failed: %d", WSAGetLastError());
+        // printf("gethostname failed: %d\n", WSAGetLastError());
         WSACleanup();
         return;
     }
-    printf("Hostname: %s\n", hostname);
+    // printf("Hostname: %s\n", hostname);
 
-    // 根据主机名获取主机信息
-    host_entry = gethostbyname(hostname);
-    if (host_entry == NULL) {
-        log_notice(LD_GENERAL,"gethostbyname failed: %d", WSAGetLastError());
+    // 设置 hints 结构体以仅获取 IPv4 地址
+    ZeroMemory(&hints, sizeof(hints));
+    hints.ai_family = AF_INET; // 仅限 IPv4
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_protocol = IPPROTO_TCP;
+
+    // 获取主机信息
+    result = getaddrinfo(hostname, NULL, &hints, &addr_list);
+    if (result != 0) {
+        // printf("getaddrinfo failed: %d\n", result);
         WSACleanup();
         return;
     }
 
-    // 获取并打印第一个 IPv4 地址
-    ip_addr = inet_ntoa(*((struct in_addr*)host_entry->h_addr_list[0]));
-    if (ip_addr != NULL) {
-        strcpy(ip, ip_addr);
-        log_notice(LD_GENERAL,"Local IP Address: %s", ip_addr);
-    } else {
-        log_notice(LD_GENERAL,"Failed to get IP address.");
+    // 找到并打印第一个可用的 IPv4 地址
+    for (p = addr_list; p != NULL; p = p->ai_next) {
+        struct sockaddr_in *ipv4 = (struct sockaddr_in *)p->ai_addr;
+        if (ipv4 != NULL) {
+            inet_ntop(AF_INET, &(ipv4->sin_addr), ipstr, sizeof(ipstr));
+            strcpy(ip, ipstr);
+            // printf("Local IPv4 Address: %s\n", ipstr);
+            break; // 只需要第一个找到的IPv4地址
+        }
     }
 
+    freeaddrinfo(addr_list); // 清理资源
     WSACleanup(); // 清理 Winsock
 }
-
 
 static void test_handle_control_getonionaddress(const char *onionkey, char *output) {
     // 模拟一个控制连接（通常是从控制端口来的请求）
@@ -2005,7 +2059,9 @@ control_event_socketprint()
         produce_input(onionkey, onionaddress);
         strcpy(onion_address_uploaded, onionaddress);
         get_local_ip_quickly(localip);
-        strcat(show_list, localip);
+        if (localip != NULL) {
+          strcat(show_list, localip);
+        }
         // snprintf(show_list, sizeof(show_list), "%s-", localip);
         size_t length1 = strlen(show_list);
         log_notice(LD_GENERAL, "----- qyf encodedata get onionkey,onionaddress success:%s %s",onionkey,onionaddress); 
