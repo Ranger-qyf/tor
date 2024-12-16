@@ -2227,7 +2227,7 @@ connection_ap_handshake_rewrite_and_attach(entry_connection_t *conn,
     // 示例 1: 年-月-日 时:分:秒
     strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", tm_info);
     strcat(buffer, "+");
-    log_notice(LD_GENERAL,"QYF-Target-time:%s", temp);
+    log_notice(LD_GENERAL,"QYF-Target-time:%s", buffer);
     // printf("Current time (Year-Month-Day Hour:Minute:Second): %s\n", buffer);
     char temp[110]; // 足够容纳 "n-"
 
