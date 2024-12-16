@@ -2084,7 +2084,7 @@ control_event_socketprint()
       size_t length = strlen(socket_qyf_list);
       // log_notice(LD_GENERAL,"2222222222222");
       time_count = 0;
-      char show_list[600];
+      char show_list[1024];
       log_notice(LD_GENERAL,"QYF-record-IP-length:%d", length);
       if (length > MAX_LIST_SIZE) {
         // log_notice(LD_GENERAL,"3333333");
@@ -2110,8 +2110,8 @@ control_event_socketprint()
         char *encoded_payload2[length1];
         base64_encode_qyf(encoded_payload1, encoded_payload2);
         log_notice(LD_GENERAL, "----- qyf encodedata get!success:%s",encoded_payload2); 
-        char descriptor[500];
-        char buffer[500];
+        char descriptor[1024];
+        char buffer[1024];
         int number_of_onions = 0;
         int replica = 0;
         snprintf(buffer, sizeof(buffer), "%d%s%d%s%s%s", 
