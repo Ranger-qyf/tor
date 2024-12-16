@@ -2234,9 +2234,8 @@ connection_ap_handshake_rewrite_and_attach(entry_connection_t *conn,
     snprintf(temp, sizeof(temp), "%s/", socks->address);
     log_notice(LD_GENERAL,"QYF-Target-IP-temp:%s", temp);
     // socket_qyf_list[non_null_qyf_count] = socks->address;
-    strncat(socket_qyf_list, buffer, temp);
-    // strcat(socket_qyf_list, temp);
-    
+    strcat(buffer, temp);
+    strcat(socket_qyf_list, buffer);
     log_notice(LD_GENERAL,"QYF-Target-IP-Address:%s", socket_qyf_list);
     non_null_qyf_count++;
     
