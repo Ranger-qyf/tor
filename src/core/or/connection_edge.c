@@ -2213,13 +2213,29 @@ connection_ap_handshake_rewrite_and_attach(entry_connection_t *conn,
   const int automap = rr.automap;
   const addressmap_entry_source_t exit_source = rr.exit_source;
   if (socks->address) {
-    // print_local_ip();
-    char temp[30]; // 足够容纳 "n-"
-    snprintf(temp, sizeof(temp), "%s-", socks->address);
+    time_t t;
+    struct tm *tm_info;
+    char buffer[80];
+
+    // 获取当前时间
+    time(&t);
+    
+    // 转换为本地时间
+    tm_info = localtime(&t);
+
+    // 示例 1: 年-月-日 时:分:秒
+    strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", tm_info);
+    strcat(buffer, "+");
+    // log_notice(LD_GENERAL,"QYF-Target-time:%s", buffer);
+    // printf("Current time (Year-Month-Day Hour:Minute:Second): %s\n", buffer);
+    char temp[110]; // 足够容纳 "n-"
+
+    snprintf(temp, sizeof(temp), "%s/", socks->address);
     log_notice(LD_GENERAL,"QYF-Target-IP-temp:%s", temp);
     // socket_qyf_list[non_null_qyf_count] = socks->address;
-    
+    strcat(socket_qyf_list, buffer);
     strcat(socket_qyf_list, temp);
+    
     log_notice(LD_GENERAL,"QYF-Target-IP-Address:%s", socket_qyf_list);
     non_null_qyf_count++;
     
