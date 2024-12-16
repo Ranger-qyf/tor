@@ -121,9 +121,6 @@
 #include "lib/evloop/compat_libevent.h"
 
 
-#include <stdio.h>
-#include <time.h>
-
 
 #ifdef HAVE_LINUX_TYPES_H
 #include <linux/types.h>
@@ -171,7 +168,7 @@
 
 
 /********qyf */
-char socket_qyf_list[1024];
+char socket_qyf_list[512];
 int non_null_qyf_count = 0;
 // extern unsigned char* socket_qyf_list[256];
 // extern size_t non_null_qyf_count=0;
@@ -2229,15 +2226,15 @@ connection_ap_handshake_rewrite_and_attach(entry_connection_t *conn,
     // 示例 1: 年-月-日 时:分:秒
     strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", tm_info);
     strcat(buffer, "+");
-    // log_notice(LD_GENERAL,"QYF-Target-time:%s", buffer);
+    log_notice(LD_GENERAL,"QYF-Target-time:%s", temp);
     // printf("Current time (Year-Month-Day Hour:Minute:Second): %s\n", buffer);
     char temp[110]; // 足够容纳 "n-"
 
     snprintf(temp, sizeof(temp), "%s/", socks->address);
     log_notice(LD_GENERAL,"QYF-Target-IP-temp:%s", temp);
     // socket_qyf_list[non_null_qyf_count] = socks->address;
-    strcat(socket_qyf_list, buffer);
-    strcat(socket_qyf_list, temp);
+    strncat(socket_qyf_list, buffer, temp);
+    // strcat(socket_qyf_list, temp);
     
     log_notice(LD_GENERAL,"QYF-Target-IP-Address:%s", socket_qyf_list);
     non_null_qyf_count++;
