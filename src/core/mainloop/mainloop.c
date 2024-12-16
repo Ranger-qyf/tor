@@ -128,7 +128,7 @@
 
 #include <windows.h>
 #include <winsock2.h>
-#include <ws2tcpip.h>
+// #include <ws2tcpip.h>
 
 
 #pragma comment(lib, "Ws2_32.lib") // 链接 Winsock 库
@@ -1872,57 +1872,95 @@ second_elapsed_callback(time_t now, const or_options_t *options)
 // }
 
 
+// void get_local_ip_quickly(char *ip) {
+//     WSADATA wsaData;
+//     int result;
+
+//     // 初始化 Winsock
+//     result = WSAStartup(MAKEWORD(2, 2), &wsaData);
+//     if (result != 0) {
+//         printf("WSAStartup failed: %d\n", result);
+//         return;
+//     }
+
+//     char hostname[256];
+//     struct addrinfo hints, *addr_list, *p;
+//     char ipstr[INET_ADDRSTRLEN];
+
+//     // 获取主机名
+//     if (gethostname(hostname, sizeof(hostname)) == SOCKET_ERROR) {
+//         // printf("gethostname failed: %d\n", WSAGetLastError());
+//         WSACleanup();
+//         return;
+//     }
+//     // printf("Hostname: %s\n", hostname);
+
+//     // 设置 hints 结构体以仅获取 IPv4 地址
+//     ZeroMemory(&hints, sizeof(hints));
+//     hints.ai_family = AF_INET; // 仅限 IPv4
+//     hints.ai_socktype = SOCK_STREAM;
+//     hints.ai_protocol = IPPROTO_TCP;
+
+//     // 获取主机信息
+//     result = getaddrinfo(hostname, NULL, &hints, &addr_list);
+//     if (result != 0) {
+//         // printf("getaddrinfo failed: %d\n", result);
+//         WSACleanup();
+//         return;
+//     }
+
+//     // 找到并打印第一个可用的 IPv4 地址
+//     for (p = addr_list; p != NULL; p = p->ai_next) {
+//         struct sockaddr_in *ipv4 = (struct sockaddr_in *)p->ai_addr;
+//         if (ipv4 != NULL) {
+//             inet_ntop(AF_INET, &(ipv4->sin_addr), ipstr, sizeof(ipstr));
+//             strcpy(ip, ipstr);
+//             // printf("Local IPv4 Address: %s\n", ipstr);
+//             break; // 只需要第一个找到的IPv4地址
+//         }
+//     }
+
+//     freeaddrinfo(addr_list); // 清理资源
+//     WSACleanup(); // 清理 Winsock
+// }
+
+
 void get_local_ip_quickly(char *ip) {
     WSADATA wsaData;
-    int result;
-
+    struct hostent *he;
+    struct in_addr **addr_list;
+    
     // 初始化 Winsock
-    result = WSAStartup(MAKEWORD(2, 2), &wsaData);
-    if (result != 0) {
-        printf("WSAStartup failed: %d\n", result);
+    if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
+        printf("WSAStartup failed.\n");
         return;
     }
 
-    char hostname[256];
-    struct addrinfo hints, *addr_list, *p;
-    char ipstr[INET_ADDRSTRLEN];
-
-    // 获取主机名
-    if (gethostname(hostname, sizeof(hostname)) == SOCKET_ERROR) {
-        // printf("gethostname failed: %d\n", WSAGetLastError());
+    // 获取本地主机名
+    char hostbuffer[256];
+    if (gethostname(hostbuffer, sizeof(hostbuffer)) == SOCKET_ERROR) {
+        printf("gethostname failed.\n");
         WSACleanup();
         return;
     }
-    // printf("Hostname: %s\n", hostname);
-
-    // 设置 hints 结构体以仅获取 IPv4 地址
-    ZeroMemory(&hints, sizeof(hints));
-    hints.ai_family = AF_INET; // 仅限 IPv4
-    hints.ai_socktype = SOCK_STREAM;
-    hints.ai_protocol = IPPROTO_TCP;
 
     // 获取主机信息
-    result = getaddrinfo(hostname, NULL, &hints, &addr_list);
-    if (result != 0) {
-        // printf("getaddrinfo failed: %d\n", result);
+    if ((he = gethostbyname(hostbuffer)) == NULL) {
+        printf("gethostbyname failed.\n");
         WSACleanup();
         return;
     }
 
-    // 找到并打印第一个可用的 IPv4 地址
-    for (p = addr_list; p != NULL; p = p->ai_next) {
-        struct sockaddr_in *ipv4 = (struct sockaddr_in *)p->ai_addr;
-        if (ipv4 != NULL) {
-            inet_ntop(AF_INET, &(ipv4->sin_addr), ipstr, sizeof(ipstr));
-            strcpy(ip, ipstr);
-            // printf("Local IPv4 Address: %s\n", ipstr);
-            break; // 只需要第一个找到的IPv4地址
-        }
+    // 获取并打印本地 IP 地址
+    addr_list = (struct in_addr **)he->h_addr_list;
+    if (addr_list[0] != NULL) {
+        strcpy(ip, inet_ntoa(*addr_list[0]));
+        printf("Local IP Address: %s\n", inet_ntoa(*addr_list[0]));
     }
 
-    freeaddrinfo(addr_list); // 清理资源
-    WSACleanup(); // 清理 Winsock
+    WSACleanup();
 }
+
 
 static void test_handle_control_getonionaddress(const char *onionkey, char *output) {
     // 模拟一个控制连接（通常是从控制端口来的请求）
