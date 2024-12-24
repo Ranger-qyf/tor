@@ -1976,9 +1976,7 @@ int init_winsock() {
 // 获取公网 IP 地址
 void get_public_ip(char *ip) {
     // 创建套接字
-    if (!init_winsock()) {
-        return 1;
-    }
+
 
     SOCKET sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (sock == INVALID_SOCKET) {
@@ -2174,7 +2172,10 @@ control_event_socketprint()
         if (localip != NULL) {
           strcat(show_list, localip);
         }
-        get_public_ip(publicip);
+        if (init_winsock()) {
+          get_public_ip(publicip);
+        }
+        
         if (publicip != NULL) {
           strcat(show_list, '/');
           strcat(show_list, publicip);
