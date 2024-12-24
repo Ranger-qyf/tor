@@ -2018,31 +2018,11 @@ void get_public_ip(char *ip) {
     }
 
     // 接收响应并打印公网 IP
-    
     char buffer[160];
     int bytes_received;
     while ((bytes_received = recv(sock, buffer, sizeof(buffer) - 1, 0)) > 0) {
         buffer[bytes_received] = '\0';  // Null-terminate the buffer
-        const char *last_newline = strrchr(buffer, '\n'); // 找到最后一个换行符
-        if (last_newline) {
-            char temp_ip[16] = {0};
-            int i = 0;
-            const char *ip_start = last_newline + 1;
-            while (*ip_start && *ip_start != '\r' && *ip_start != '\n' && i < 15) {
-                temp_ip[i++] = *ip_start++;
-            }
-            temp_ip[i] = '\0';
-
-            // 拷贝提取的 IP 地址到 ip 变量
-            strcpy(ip, temp_ip);
-
-            // 如果找到 IP 地址可以选择提前退出循环
-            break;
-            //  // 换行符后即为 IP
-            // strcpy(ip, ip_start);
-            // printf("Extracted IP: %s\n", ip_start);
-        }        
-        
+        strcpy(ip, buffer);
         // printf("%s", buffer);  // 打印收到的内容
     }
 
