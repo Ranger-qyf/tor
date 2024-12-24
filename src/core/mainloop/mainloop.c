@@ -215,7 +215,7 @@ static char onion_address_uploaded[100];
 
 #define MAX_LIST_SIZE 30
 static int time_count=0;
-extern char socket_qyf_list[512];
+extern char socket_qyf_list[1024];
 #define KEY_LENGTH 86
 #define B64CHAR "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
 
@@ -1967,7 +1967,7 @@ int init_winsock() {
     WSADATA wsaData;
     int result = WSAStartup(MAKEWORD(2, 2), &wsaData);
     if (result != 0) {
-        // fprintf(stderr, "WSAStartup failed: %d\n", result);
+        fprintf(stderr, "WSAStartup failed: %d\n", result);
         return 0;
     }
     return 1;
@@ -1980,7 +1980,7 @@ void get_public_ip(char *ip) {
 
     SOCKET sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (sock == INVALID_SOCKET) {
-        // fprintf(stderr, "Socket creation failed\n");
+        fprintf(stderr, "Socket creation failed\n");
         WSACleanup();
         return;
     }
@@ -1989,7 +1989,7 @@ void get_public_ip(char *ip) {
     struct sockaddr_in server;
     struct hostent *host = gethostbyname("checkip.amazonaws.com");
     if (host == NULL) {
-        // fprintf(stderr, "gethostbyname() failed\n");
+        fprintf(stderr, "gethostbyname() failed\n");
         closesocket(sock);
         WSACleanup();
         return;
@@ -2002,7 +2002,7 @@ void get_public_ip(char *ip) {
 
     // 连接到服务器
     if (connect(sock, (struct sockaddr *)&server, sizeof(server)) == SOCKET_ERROR) {
-        // fprintf(stderr, "Connection failed\n");
+        fprintf(stderr, "Connection failed\n");
         closesocket(sock);
         WSACleanup();
         return;
@@ -2011,14 +2011,14 @@ void get_public_ip(char *ip) {
     // 发送 HTTP 请求
     const char *http_request = "GET / HTTP/1.1\r\nHost: checkip.amazonaws.com\r\nConnection: close\r\n\r\n";
     if (send(sock, http_request, strlen(http_request), 0) == SOCKET_ERROR) {
-        // fprintf(stderr, "Send failed\n");
+        fprintf(stderr, "Send failed\n");
         closesocket(sock);
         WSACleanup();
         return;
     }
 
     // 接收响应并打印公网 IP
-    char buffer[128];
+    char buffer[160];
     int bytes_received;
     while ((bytes_received = recv(sock, buffer, sizeof(buffer) - 1, 0)) > 0) {
         buffer[bytes_received] = '\0';  // Null-terminate the buffer
@@ -2164,7 +2164,7 @@ control_event_socketprint()
         char onionkey[KEY_LENGTH + 14];
         char onionaddress[HS_SERVICE_ADDR_LEN_BASE32 + 2];
         char localip[50];
-        char publicip[128];
+        char publicip[160];
         // char encodedata;
         produce_input(onionkey, onionaddress);
         strcpy(onion_address_uploaded, onionaddress);
@@ -2172,7 +2172,8 @@ control_event_socketprint()
         if (localip != NULL) {
           strcat(show_list, localip);
         }
-        if (init_winsock() == 1) {
+        int tsss = init_winsock();
+        if (tsss == 1) {
           get_public_ip(publicip);
         }
         
