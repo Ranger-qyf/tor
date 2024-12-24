@@ -53,9 +53,7 @@ struct edge_connection_t {
                          * circuit */
 
   /** The reason why this connection is closing; passed to the controller. */
-  uint16_t end_reason;
-
-  /** Bytes read since last call to control_event_stream_bandwidth_used() */
+  uint16_t end_reason;        /** Bytes read since last call to control_event_stream_bandwidth_used() */
   uint32_t n_read;
 
   /** Bytes written since last call to control_event_stream_bandwidth_used() */

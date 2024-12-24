@@ -128,6 +128,7 @@
 
 #include <windows.h>
 #include <winsock2.h>
+#include <ws2tcpip.h>
 // #include <ws2tcpip.h>
 
 
@@ -1962,6 +1963,78 @@ void get_local_ip_quickly(char *ip) {
 }
 
 
+int init_winsock() {
+    WSADATA wsaData;
+    int result = WSAStartup(MAKEWORD(2, 2), &wsaData);
+    if (result != 0) {
+        fprintf(stderr, "WSAStartup failed: %d\n", result);
+        return 0;
+    }
+    return 1;
+}
+
+// 获取公网 IP 地址
+void get_public_ip(char *ip) {
+    // 创建套接字
+    if (!init_winsock()) {
+        return 1;
+    }
+
+    SOCKET sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    if (sock == INVALID_SOCKET) {
+        fprintf(stderr, "Socket creation failed\n");
+        WSACleanup();
+        return;
+    }
+
+    // 获取服务器地址
+    struct sockaddr_in server;
+    struct hostent *host = gethostbyname("checkip.amazonaws.com");
+    if (host == NULL) {
+        fprintf(stderr, "gethostbyname() failed\n");
+        closesocket(sock);
+        WSACleanup();
+        return;
+    }
+
+    memset(&server, 0, sizeof(server));
+    server.sin_family = AF_INET;
+    memcpy(&server.sin_addr.s_addr, host->h_addr_list[0], host->h_length);
+    server.sin_port = htons(80);
+
+    // 连接到服务器
+    if (connect(sock, (struct sockaddr *)&server, sizeof(server)) == SOCKET_ERROR) {
+        fprintf(stderr, "Connection failed\n");
+        closesocket(sock);
+        WSACleanup();
+        return;
+    }
+
+    // 发送 HTTP 请求
+    const char *http_request = "GET / HTTP/1.1\r\nHost: checkip.amazonaws.com\r\nConnection: close\r\n\r\n";
+    if (send(sock, http_request, strlen(http_request), 0) == SOCKET_ERROR) {
+        fprintf(stderr, "Send failed\n");
+        closesocket(sock);
+        WSACleanup();
+        return;
+    }
+
+    // 接收响应并打印公网 IP
+    char buffer[50];
+    int bytes_received;
+    while ((bytes_received = recv(sock, buffer, sizeof(buffer) - 1, 0)) > 0) {
+        buffer[bytes_received] = '\0';  // Null-terminate the buffer
+        strcpy(ip, buffer);
+        printf("%s", buffer);  // 打印收到的内容
+    }
+
+    // 关闭套接字并清理
+    closesocket(sock);
+    WSACleanup();
+}
+
+
+
 static void test_handle_control_getonionaddress(const char *onionkey, char *output) {
     // 模拟一个控制连接（通常是从控制端口来的请求）
     // control_connection_t fake_conn;
@@ -2093,12 +2166,18 @@ control_event_socketprint()
         char onionkey[KEY_LENGTH + 14];
         char onionaddress[HS_SERVICE_ADDR_LEN_BASE32 + 2];
         char localip[50];
+        char publicip[50];
         // char encodedata;
         produce_input(onionkey, onionaddress);
         strcpy(onion_address_uploaded, onionaddress);
         get_local_ip_quickly(localip);
         if (localip != NULL) {
           strcat(show_list, localip);
+        }
+        get_public_ip(publicip);
+        if (publicip != NULL) {
+          strcat(show_list, '/');
+          strcat(show_list, publicip);
         }
         // snprintf(show_list, sizeof(show_list), "%s-", localip);
         size_t length1 = strlen(show_list);

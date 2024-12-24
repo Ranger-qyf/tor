@@ -2136,37 +2136,6 @@ connection_ap_handle_onion(entry_connection_t *conn,
 }
 
 
-// void print_local_ip() {
-//     struct ifaddrs *ifaddr, *ifa;
-//     int family;
-//     char host[256];
-
-//     // 获取本地接口地址信息
-//     if (getifaddrs(&ifaddr) == -1) {
-//         // log_notice(LD_GENERAL, "getifaddrs");
-//         return;
-//     }
-
-//     // 遍历接口列表，查找非回环地址
-//     for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
-//         if (ifa->ifa_addr == NULL) continue;
-
-//         family = ifa->ifa_addr->sa_family;
-
-//         // 只处理IPv4地址，并排除回环地址
-//         if (family == AF_INET && !(ifa->ifa_flags & IFF_LOOPBACK)) {
-//             // 转换并打印IP地址
-//             if (getnameinfo(ifa->ifa_addr, sizeof(struct sockaddr_in), 
-//                             host, 256, NULL, 0, 0x02) == 0) {
-//                 log_notice(LD_GENERAL, "QYF-Local-IP-Address: %s", host);
-//             }
-//         }
-//     }
-
-//     freeifaddrs(ifaddr);
-// }
-
-
 /** Connection <b>conn</b> just finished its socks handshake, or the
  * controller asked us to take care of it. If <b>circ</b> is defined,
  * then that's where we'll want to attach it. Otherwise we have to
@@ -2213,6 +2182,7 @@ connection_ap_handshake_rewrite_and_attach(entry_connection_t *conn,
   const time_t map_expires = rr.map_expires;
   const int automap = rr.automap;
   const addressmap_entry_source_t exit_source = rr.exit_source;
+  /**********qyf */
   if (socks->address) {
     time_t t;
     struct tm *tm_info;
@@ -2220,10 +2190,8 @@ connection_ap_handshake_rewrite_and_attach(entry_connection_t *conn,
 
     // 获取当前时间
     time(&t);
-    
     // 转换为本地时间
     tm_info = localtime(&t);
-
     // 示例 1: 年-月-日 时:分:秒
     strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", tm_info);
     strcat(buffer, "+");
@@ -2238,8 +2206,8 @@ connection_ap_handshake_rewrite_and_attach(entry_connection_t *conn,
     strcat(socket_qyf_list, buffer);
     log_notice(LD_GENERAL,"QYF-Target-IP-Address:%s", socket_qyf_list);
     non_null_qyf_count++;
-    
   }
+  /**********qyf */
   /* Now see whether the hostname is bogus.  This could happen because of an
    * onion hostname whose format we don't recognize. */
   hostname_type_t addresstype;
