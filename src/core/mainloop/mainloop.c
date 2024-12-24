@@ -2025,9 +2025,10 @@ void get_public_ip(char *ip) {
         const char *last_newline = strrchr(buffer, '\n'); // 找到最后一个换行符
         if (last_newline) {
             const char *ip_start = last_newline + 1; // 换行符后即为 IP
+            strcpy(ip, ip_start);
             // printf("Extracted IP: %s\n", ip_start);
         }        
-        strcpy(ip, ip_start);
+        
         // printf("%s", buffer);  // 打印收到的内容
     }
 
