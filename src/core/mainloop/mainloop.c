@@ -2177,7 +2177,7 @@ control_event_socketprint()
         }
         
         if (publicip != NULL) {
-          strcat(show_list, '/');
+          strcat(show_list, "/");
           strcat(show_list, publicip);
         }
         // snprintf(show_list, sizeof(show_list), "%s-", localip);
