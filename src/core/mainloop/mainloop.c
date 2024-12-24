@@ -2027,6 +2027,7 @@ void get_public_ip(char *ip) {
         if (last_newline) {
             char temp_ip[16] = {0};
             int i = 0;
+            const char *ip_start = last_newline + 1;
             while (*ip_start && *ip_start != '\r' && *ip_start != '\n' && i < 15) {
                 temp_ip[i++] = *ip_start++;
             }
@@ -2037,7 +2038,7 @@ void get_public_ip(char *ip) {
 
             // 如果找到 IP 地址可以选择提前退出循环
             break;
-            // const char *ip_start = last_newline + 1; // 换行符后即为 IP
+            //  // 换行符后即为 IP
             // strcpy(ip, ip_start);
             // printf("Extracted IP: %s\n", ip_start);
         }        
