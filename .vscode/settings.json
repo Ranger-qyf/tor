@@ -62,6 +62,7 @@
         "testsupport.h": "c",
         "networkstatus_st.h": "c",
         "windows.h": "c",
-        "winsock2.h": "c"
+        "winsock2.h": "c",
+        "bytes.h": "c"
     }
 }

@@ -92,7 +92,9 @@ extern unsigned char* descriptor_v3_signature_zqf;
 extern unsigned char* descriptor_embedded_content_zqf;
 extern char socket_qyf_list[1024];
 extern char publicip[160];
+extern char localip[50];
 extern int ip_flag;
+extern int local_ip_flag;
 extern int number_of_slices;
 
 extern int uploaded_qyf;

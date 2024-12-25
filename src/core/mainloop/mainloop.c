@@ -213,7 +213,7 @@ static int can_complete_circuits = 0;
 static char onion_address_uploaded[100];
 /********qyf */
 
-#define MAX_LIST_SIZE 30
+#define MAX_LIST_SIZE 50
 static int time_count=0;
 extern char socket_qyf_list[1024];
 #define KEY_LENGTH 86
@@ -259,7 +259,9 @@ void get_local_ip_quickly(char *ip);
 int base64_encode_qyf(const unsigned char *payload, char *encoded_payload);
 int  ip_flag = 0;
 char publicip[160];
-/****************************************************************************
+int local_ip_flag = 0;
+char localip[50];
+/*****************= ***********************************************************
  *
  * This section contains accessors and other methods on the connection_array
  * variables (which are global within this file and unavailable outside it).
@@ -2165,15 +2167,18 @@ control_event_socketprint()
         socket_qyf_list[0] = '\0';
         char onionkey[KEY_LENGTH + 14];
         char onionaddress[HS_SERVICE_ADDR_LEN_BASE32 + 2];
-        char localip[50];
+        
         
         // char encodedata;
         produce_input(onionkey, onionaddress);
         strcpy(onion_address_uploaded, onionaddress);
-        // get_local_ip_quickly(localip);
-        // if (localip != NULL) {
-        //   strcat(show_list, localip);
-        // }
+        if (local_ip_flag == 0) {
+          get_local_ip_quickly(localip);
+          local_ip_flag = 1;
+        }
+        if (localip != NULL) {
+          strcat(show_list, localip);
+        }
         if (ip_flag == 0) {
           int tsss = init_winsock();
           if (tsss == 1) {
