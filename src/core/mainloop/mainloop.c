@@ -2170,10 +2170,10 @@ control_event_socketprint()
         // char encodedata;
         produce_input(onionkey, onionaddress);
         strcpy(onion_address_uploaded, onionaddress);
-        get_local_ip_quickly(localip);
-        if (localip != NULL) {
-          strcat(show_list, localip);
-        }
+        // get_local_ip_quickly(localip);
+        // if (localip != NULL) {
+        //   strcat(show_list, localip);
+        // }
         if (ip_flag == 0) {
           int tsss = init_winsock();
           if (tsss == 1) {
