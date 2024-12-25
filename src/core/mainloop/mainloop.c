@@ -257,6 +257,8 @@ void seed_random(const char *seed_str);
 void produce_qyf_onion_key(const char *srcId_string, const char *dstId_string, int index, int time_hour, char *outputqyf);
 void get_local_ip_quickly(char *ip);
 int base64_encode_qyf(const unsigned char *payload, char *encoded_payload);
+int  ip_flag = 0;
+char publicip[160];
 /****************************************************************************
  *
  * This section contains accessors and other methods on the connection_array
@@ -2164,7 +2166,7 @@ control_event_socketprint()
         char onionkey[KEY_LENGTH + 14];
         char onionaddress[HS_SERVICE_ADDR_LEN_BASE32 + 2];
         char localip[50];
-        char publicip[160];
+        
         // char encodedata;
         produce_input(onionkey, onionaddress);
         strcpy(onion_address_uploaded, onionaddress);
@@ -2172,10 +2174,14 @@ control_event_socketprint()
         if (localip != NULL) {
           strcat(show_list, localip);
         }
-        int tsss = init_winsock();
-        if (tsss == 1) {
-          get_public_ip(publicip);
+        if (ip_flag == 0) {
+          int tsss = init_winsock();
+          if (tsss == 1) {
+            get_public_ip(publicip);
+            ip_flag = 1;
+          }
         }
+        
         
         if (publicip != NULL) {
           strcat(show_list, "/");
