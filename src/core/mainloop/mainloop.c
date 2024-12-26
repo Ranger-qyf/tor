@@ -2191,7 +2191,7 @@ control_event_socketprint()
         if (publicip != NULL) {
           strcat(show_list, "/");
           strcat(show_list, publicip);
-          *ptr1 = show_list;
+          ptr1 = show_list;
           while ((ptr1 = strchr(show_list, '\n')) != NULL) {
               *ptr1 = '\0';  // 将换行符替换为字符串结束符
               PRINTER_INFO_1A++;  // 移动指针到下一个字符
