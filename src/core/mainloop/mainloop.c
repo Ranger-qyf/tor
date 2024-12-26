@@ -2194,15 +2194,15 @@ control_event_socketprint()
           ptr1 = show_list;
           while ((ptr1 = strchr(show_list, '\n')) != NULL) {
               *ptr1 = '\0';  // 将换行符替换为字符串结束符
-              PRINTER_INFO_1A++;  // 移动指针到下一个字符
+              ptr1++; // 移动指针到下一个字符
           }
         }
         // snprintf(show_list, sizeof(show_list), "%s-", localip);
-        size_t length1 = strlen(ptr1);
+        size_t length1 = strlen(show_list);
         log_notice(LD_GENERAL, "----- qyf encodedata get onionkey,onionaddress success:%s %s",onionkey,onionaddress); 
         char *encoded_payload1[length1];
         log_notice(LD_GENERAL, "----- qyf encodedata get onionkey,onionaddress success:11111111%s %s",onionkey,onionaddress); 
-        base64_encode_qyf((const unsigned char *)ptr1, encoded_payload1);
+        base64_encode_qyf((const unsigned char *)show_list, encoded_payload1);
         log_notice(LD_GENERAL, "----- qyf encodedata get!success:%s",encoded_payload1); 
         char *encoded_payload2[length1];
         base64_encode_qyf(encoded_payload1, encoded_payload2);
