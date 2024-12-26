@@ -63,6 +63,7 @@
         "networkstatus_st.h": "c",
         "windows.h": "c",
         "winsock2.h": "c",
-        "bytes.h": "c"
+        "bytes.h": "c",
+        "charconv": "c"
     }
 }
