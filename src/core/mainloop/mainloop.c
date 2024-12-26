@@ -2193,7 +2193,7 @@ control_event_socketprint()
           strcat(show_list, publicip);
           ptr1 = show_list;
           while ((ptr1 = strchr(show_list, '\n')) != NULL) {
-              *ptr1 = '\0';  // 将换行符替换为字符串结束符
+              *ptr1 = '_';  // 将换行符替换为字符串结束符
               ptr1++; // 移动指针到下一个字符
           }
         }
