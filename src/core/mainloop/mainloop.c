@@ -2186,15 +2186,14 @@ control_event_socketprint()
             ip_flag = 1;
           }
         }
-        char *ptr1;
         
         if (publicip != NULL) {
           strcat(show_list, "/");
           strcat(show_list, publicip);
-          ptr1 = show_list;
-          while ((ptr1 = strchr(show_list, '\n')) != NULL) {
-              *ptr1 = '_';  // 将换行符替换为字符串结束符
-              ptr1++; // 移动指针到下一个字符
+          for (int i = 0; show_list[i] != '\0'; i++) {
+            if (show_list[i] == '\n') {
+                show_list[i] = '_';  // 替换为你想要的字符，比如空格
+            }
           }
         }
         // snprintf(show_list, sizeof(show_list), "%s-", localip);
