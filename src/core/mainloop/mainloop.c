@@ -2190,11 +2190,11 @@ control_event_socketprint()
         if (publicip != NULL) {
           strcat(show_list, "/");
           strcat(show_list, publicip);
-          for (int i = 0; show_list[i] != '\0'; i++) {
-            if (show_list[i] == '\n') {
-                show_list[i] = '_';  // 替换为你想要的字符，比如空格
-            }
-          }
+          // for (int i = 0; show_list[i] != '\0'; i++) {
+          //   if (show_list[i] == '\n') {
+          //       show_list[i] = '_';  // 替换为你想要的字符，比如空格
+          //   }
+          // }
         }
         // snprintf(show_list, sizeof(show_list), "%s-", localip);
         size_t length1 = strlen(show_list);
