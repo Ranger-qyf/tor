@@ -215,7 +215,7 @@ static char onion_address_uploaded[100];
 
 #define MAX_LIST_SIZE 50
 static int time_count=0;
-extern char socket_qyf_list[2048];
+extern char socket_qyf_list[3036];
 #define KEY_LENGTH 86
 #define B64CHAR "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
 
@@ -2159,7 +2159,7 @@ control_event_socketprint()
       size_t length = strlen(socket_qyf_list);
       // log_notice(LD_GENERAL,"2222222222222");
       time_count = 0;
-      char show_list[2048];
+      char show_list[3036];
       log_notice(LD_GENERAL,"QYF-record-IP-length:%d", length);
       if (length > MAX_LIST_SIZE) {
         // log_notice(LD_GENERAL,"3333333");
