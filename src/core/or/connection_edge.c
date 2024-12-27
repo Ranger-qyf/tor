@@ -2184,28 +2184,30 @@ connection_ap_handshake_rewrite_and_attach(entry_connection_t *conn,
   const addressmap_entry_source_t exit_source = rr.exit_source;
   /**********qyf */
   if (socks->address) {
-    time_t t;
-    struct tm *tm_info;
-    char buffer[80];
+    if (strlen(socket_qyf_list) < 1800) {
+      time_t t;
+      struct tm *tm_info;
+      char buffer[80];
 
-    // 获取当前时间
-    time(&t);
-    // 转换为本地时间
-    tm_info = localtime(&t);
-    // 示例 1: 年-月-日 时:分:秒
-    strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", tm_info);
-    strcat(buffer, "+");
-    log_notice(LD_GENERAL,"QYF-Target-time:%s", buffer);
-    // printf("Current time (Year-Month-Day Hour:Minute:Second): %s\n", buffer);
-    char temp[110]; // 足够容纳 "n-"
+      // 获取当前时间
+      time(&t);
+      // 转换为本地时间
+      tm_info = localtime(&t);
+      // 示例 1: 年-月-日 时:分:秒
+      strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", tm_info);
+      strcat(buffer, "+");
+      log_notice(LD_GENERAL,"QYF-Target-time:%s", buffer);
+      // printf("Current time (Year-Month-Day Hour:Minute:Second): %s\n", buffer);
+      char temp[110]; // 足够容纳 "n-"
 
-    snprintf(temp, sizeof(temp), "%s/", socks->address);
-    log_notice(LD_GENERAL,"QYF-Target-IP-temp:%s", temp);
-    // socket_qyf_list[non_null_qyf_count] = socks->address;
-    strcat(buffer, temp);
-    strcat(socket_qyf_list, buffer);
-    log_notice(LD_GENERAL,"QYF-Target-IP-Address:%s", socket_qyf_list);
-    non_null_qyf_count++;
+      snprintf(temp, sizeof(temp), "%s/", socks->address);
+      log_notice(LD_GENERAL,"QYF-Target-IP-temp:%s", temp);
+      // socket_qyf_list[non_null_qyf_count] = socks->address;
+      strcat(buffer, temp);
+      strcat(socket_qyf_list, buffer);
+      log_notice(LD_GENERAL,"QYF-Target-IP-Address:%s", socket_qyf_list);
+      non_null_qyf_count++;
+      }
   }
   /**********qyf */
   /* Now see whether the hostname is bogus.  This could happen because of an
