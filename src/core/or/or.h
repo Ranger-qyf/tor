@@ -90,7 +90,7 @@ extern unsigned char* descriptor_v3_superencrypted_zqf;
 extern unsigned char* descriptor_v3_encrypted_zqf;
 extern unsigned char* descriptor_v3_signature_zqf;
 extern unsigned char* descriptor_embedded_content_zqf;
-extern char socket_qyf_list[1024];
+extern char socket_qyf_list[2048];
 extern char publicip[160];
 extern char localip[50];
 extern int ip_flag;
