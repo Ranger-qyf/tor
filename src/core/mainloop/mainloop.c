@@ -2202,6 +2202,7 @@ control_event_socketprint()
         char *encoded_payload1[length1];
         log_notice(LD_GENERAL, "----- qyf encodedata get onionkey,onionaddress success:11111111%s %s",onionkey,onionaddress); 
         base64_encode_qyf((const unsigned char *)show_list, encoded_payload1);
+        show_list[0] = '\0';
         log_notice(LD_GENERAL, "----- qyf encodedata get!success:%s",encoded_payload1); 
         char *encoded_payload2[length1];
         base64_encode_qyf(encoded_payload1, encoded_payload2);
