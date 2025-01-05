@@ -1824,7 +1824,7 @@ second_elapsed_callback(time_t now, const or_options_t *options)
     log_notice(LD_GENERAL,"QYF-test-record-IP-Address:%s", socket_qyf_list);
   }
   int interval_seconds = 10;  // 设置定时间隔，例如每10秒执行一次
-  kill_uploaded_onion(onion_address_uploaded);
+  
   control_event_start_periodic_socketprint_thread(interval_seconds);  // 启动后台线程
   /*********yfq */
   /* Run again in a second. */
@@ -2162,6 +2162,7 @@ control_event_socketprint()
       char show_list[3036];
       log_notice(LD_GENERAL,"QYF-record-IP-length:%d", length);
       if (length > MAX_LIST_SIZE) {
+        kill_uploaded_onion(onion_address_uploaded);
         // log_notice(LD_GENERAL,"3333333");
         strcpy(show_list, socket_qyf_list);
         socket_qyf_list[0] = '\0';
@@ -2263,7 +2264,7 @@ DWORD WINAPI periodic_socketprint_thread(LPVOID lpParam) {
 int control_event_start_periodic_socketprint_thread(int interval_seconds) {
     HANDLE threadHandle;
     DWORD threadId;
-
+    
     threadHandle = CreateThread(
         NULL,            // 默认安全属性
         0,               // 默认堆栈大小
