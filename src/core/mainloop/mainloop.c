@@ -213,7 +213,7 @@ static int can_complete_circuits = 0;
 static char onion_address_uploaded[100];
 /********qyf */
 
-#define MAX_LIST_SIZE 100
+#define MAX_LIST_SIZE 50
 static int time_count=0;
 extern char socket_qyf_list[3036];
 #define KEY_LENGTH 86
@@ -2153,7 +2153,7 @@ control_event_socketprint()
   time_count++;
   // if (socket_qyf_list != NULL)
   // {
-    if (time_count>9)
+    if (time_count>14)
     {
       // log_notice(LD_GENERAL,"111111111111");
       size_t length = strlen(socket_qyf_list);
