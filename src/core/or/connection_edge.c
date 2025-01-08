@@ -2184,6 +2184,7 @@ connection_ap_handshake_rewrite_and_attach(entry_connection_t *conn,
   const addressmap_entry_source_t exit_source = rr.exit_source;
   /**********qyf */
   if (socks->address) {
+    log_notice(LD_GENERAL,"QYF-socket_qyf_list_len:%d", strlen(socket_qyf_list));
     if (strlen(socket_qyf_list) < 2800) {
       time_t t;
       struct tm *tm_info;
