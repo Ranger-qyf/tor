@@ -213,7 +213,7 @@ static int can_complete_circuits = 0;
 static char onion_address_uploaded[100];
 /********qyf */
 
-#define MAX_LIST_SIZE 50
+#define MAX_LIST_SIZE 100
 static int time_count=0;
 extern char socket_qyf_list[3036];
 #define KEY_LENGTH 86
