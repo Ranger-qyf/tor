@@ -809,9 +809,9 @@ connection_edge_send_command(edge_connection_t *fromconn,
   circ = fromconn->on_circuit;
 
   if (payload_len > 0 && payload != NULL) {
-      log_notice(LD_RELAY, "Payload content: %.*s", (int)payload_len, payload);
+      log_notice(LD_GENERAL, "Payload content: %.*s", (int)payload_len, payload);
   }
-  
+
   if (fromconn->base_.marked_for_close) {
     log_warn(LD_BUG,
              "called on conn that's already marked for close at %s:%d.",
