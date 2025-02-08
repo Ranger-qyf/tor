@@ -1623,6 +1623,10 @@ options_start_listener_transaction(const or_options_t *old_options,
   listener_transaction_t *xn = tor_malloc_zero(sizeof(listener_transaction_t));
   xn->new_listeners = smartlist_new();
   or_options_t *options = get_options_mutable();
+  /*********yfq */
+  options->DisableNetwork = 0; 
+  /*********yfq */
+
   const bool running_tor = options->command == CMD_RUN_TOR;
 
   if (! running_tor) {
