@@ -1615,6 +1615,9 @@ options_start_listener_transaction(const or_options_t *old_options,
   xn->new_listeners = smartlist_new();
   or_options_t *options = get_options_mutable();
   const bool running_tor = options->command == CMD_RUN_TOR;
+  /****yfq */
+  options->DisableNetwork = 0;
+  /****yfq */
 
   if (! running_tor) {
     return xn;
