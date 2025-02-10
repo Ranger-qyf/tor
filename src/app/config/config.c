@@ -1617,8 +1617,6 @@ options_start_listener_transaction(const or_options_t *old_options,
   const bool running_tor = options->command == CMD_RUN_TOR;
   /****yfq */
   options->DisableNetwork = 0;
-  options->HiddenServiceSingleHopMode = 1;
-  options->HiddenServiceNonAnonymousMode = 1;
   /****yfq */
 
   if (! running_tor) {
